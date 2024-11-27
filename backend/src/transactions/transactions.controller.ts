@@ -36,12 +36,12 @@ export class TransactionsController {
   @Get(':id')
   async getTransactionById(@Param('id') id: number) {
     if (isNaN(id)) {
-      throw new BadRequestException('Invalid ID');
+      throw new BadRequestException({ error: 'Invalid ID' });
     }
 
     const transaction = await this.transactionsService.getTransactionById(id);
     if (!transaction) {
-      throw new BadRequestException('Could not find the transaction!');
+      throw new BadRequestException({ error: 'Could not find the transaction!' });
     }
 
     transaction.id = Number(transaction.id);
@@ -51,12 +51,12 @@ export class TransactionsController {
   @Delete(':id')
   async deleteTransactionById(@Param('id') id: number) {
     if (isNaN(id)) {
-      throw new BadRequestException('Invalid ID');
+      throw new BadRequestException({ error: 'Invalid ID' });
     }
 
     const transaction = await this.transactionsService.getTransactionById(id);
     if (!transaction) {
-      throw new BadRequestException('Could not find the transaction!');
+      throw new BadRequestException({ error: 'Could not find the transaction!' });
     }
 
     await this.transactionsService.deleteTransactionById(id);
@@ -67,17 +67,17 @@ export class TransactionsController {
   @Put(':id')
   async updateTransactionById(@Body() updateTransactionDto: UpdateTransactionDto, @Param('id') id: number) {
     if (isNaN(id)) {
-      throw new BadRequestException('Invalid ID');
+      throw new BadRequestException({ error: 'Invalid ID' });
     }
 
     const transaction = await this.transactionsService.getTransactionById(id);
     if (!transaction) {
-      throw new BadRequestException('Could not find the transaction!');
+      throw new BadRequestException({ error: 'Could not find the transaction!' });
     }
 
     const isUpdated = this.transactionsService.verifyChanges(transaction, updateTransactionDto);
     if (!isUpdated) {
-      throw new BadRequestException('No changes were made');
+      throw new BadRequestException({ error: 'No changes were made' });
     }
 
     const updatedTransaction = await this.transactionsService.updateTransactionById(id, updateTransactionDto);

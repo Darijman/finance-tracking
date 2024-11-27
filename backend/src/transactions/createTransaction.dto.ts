@@ -1,8 +1,8 @@
-import { IsEnum, IsNumber, IsString, IsOptional, IsDate } from 'class-validator';
+import { IsEnum, IsNumber, IsString, IsOptional, IsDate, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 import { Categories, TransactionType } from './transaction.entity';
 
 export class CreateTransactionDto {
-  @IsDate()
+  @IsDate({ message: 'TransactionDate must be a valid Date!' })
   transactionDate: Date;
 
   @IsNumber()
@@ -16,5 +16,8 @@ export class CreateTransactionDto {
 
   @IsString()
   @IsOptional()
+  @IsNotEmpty()
+  @MaxLength(255, { message: 'Comment must contain no more than 255 letters!' })
+  @MinLength(1, { message: 'Comment must contain at least 1 letter!' })
   comment?: string;
 }

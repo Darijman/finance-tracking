@@ -31,31 +31,22 @@ export class TransactionsService {
     return transaction;
   }
 
-  async updateTransactionById(id: number, updateTransactionDto: CreateTransactionDto): Promise<Transaction> {
+  async updateTransactionById(id: number, updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
     const transaction = await this.transactionsRepository.findOneBy({ id });
     Object.assign(transaction, updateTransactionDto);
     return await this.transactionsRepository.save(transaction);
   }
 
   verifyChanges(transaction: Transaction, newTransaction: UpdateTransactionDto): boolean {
-    let isUpdated = false;
+    let isUpdated: boolean = false;
 
-    if (newTransaction.transactionDate !== transaction.transactionDate) {
+    if (newTransaction.amount && newTransaction.amount !== Number(transaction.amount)) isUpdated = true;
+    if (newTransaction.category && newTransaction.category !== transaction.category) isUpdated = true;
+    if (newTransaction.comment && newTransaction.comment !== transaction.comment) isUpdated = true;
+    if (newTransaction.type && newTransaction.type !== transaction.type) isUpdated = true;
+    if (newTransaction.transactionDate && newTransaction.transactionDate.getTime() !== transaction.transactionDate.getTime()) {
       isUpdated = true;
     }
-    if (newTransaction.amount !== transaction.amount) {
-      isUpdated = true;
-    }
-    if (newTransaction.type !== transaction.type) {
-      isUpdated = true;
-    }
-    if (newTransaction.category !== transaction.category) {
-      isUpdated = true;
-    }
-    if (newTransaction.comment !== transaction.comment) {
-      isUpdated = true;
-    }
-
     return isUpdated;
   }
 }
