@@ -17,6 +17,10 @@ export class UpdateTransactionDto {
   type?: TransactionType;
 
   @IsOptional()
+  @IsNumber()
+  userId?: number;
+
+  @IsOptional()
   @IsEnum(Categories)
   category?: Categories;
 

@@ -2,10 +2,14 @@ import { Controller, Get, Post, Delete, Put, Body, BadRequestException, Param } 
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './createTransaction.dto';
 import { UpdateTransactionDto } from './updateTransaction.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('transactions')
 export class TransactionsController {
-  constructor(private readonly transactionsService: TransactionsService) {}
+  constructor(
+    private readonly transactionsService: TransactionsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Get()
   async getAllTransactions() {
@@ -18,13 +22,14 @@ export class TransactionsController {
 
   @Post()
   async createNewTransaction(@Body() createTransactionDto: CreateTransactionDto) {
-    const { transactionDate, amount, type, category, comment } = createTransactionDto;
+    const { transactionDate, amount, type, category, userId, comment } = createTransactionDto;
 
     const newTransaction = {
       transactionDate,
       amount,
       type,
       category,
+      userId,
       comment,
     };
 
@@ -46,6 +51,20 @@ export class TransactionsController {
 
     transaction.id = Number(transaction.id);
     return transaction;
+  }
+
+  @Get('user/:userId')
+  async getTransactionsByUserId(@Param('userId') userId: number) {
+    if (isNaN(userId)) {
+      throw new BadRequestException({ error: 'Invalid user ID' });
+    }
+
+    const user = await this.usersService.getUserById(userId);
+    if (!user) {
+      throw new BadRequestException({ error: 'Could not find the user!' });
+    }
+
+    return await this.transactionsService.getTransactionsByUserId(userId);
   }
 
   @Delete(':id')

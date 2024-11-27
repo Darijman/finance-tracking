@@ -1,8 +1,10 @@
 import { IsEnum, IsNumber, IsString, IsOptional, IsDate, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 import { Categories, TransactionType } from './transaction.entity';
+import { Transform } from 'class-transformer';
 
 export class CreateTransactionDto {
   @IsDate({ message: 'TransactionDate must be a valid Date!' })
+  @Transform(({ value }) => (typeof value === 'string' ? new Date(value) : value))
   transactionDate: Date;
 
   @IsNumber()
@@ -13,6 +15,9 @@ export class CreateTransactionDto {
 
   @IsEnum(Categories)
   category: Categories;
+
+  @IsNumber()
+  userId: number;
 
   @IsString()
   @IsOptional()

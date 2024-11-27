@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { Transaction } from 'src/transactions/transaction.entity';
 import * as bcrypt from 'bcrypt';
 
 @Entity('users')
@@ -20,6 +21,9 @@ export class User {
   @Column()
   @Exclude()
   password: string;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.user)
+  transactions: Transaction[];
 
   @CreateDateColumn()
   createdAt: Date;

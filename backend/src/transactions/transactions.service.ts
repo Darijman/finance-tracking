@@ -20,6 +20,12 @@ export class TransactionsService {
     return await this.transactionsRepository.findOneBy({ id });
   }
 
+  async getTransactionsByUserId(userId: number): Promise<Transaction[]> {
+    return this.transactionsRepository.find({
+      where: { user: { id: userId } },
+    });
+  }
+
   async createNewTransaction(transaction: CreateTransactionDto): Promise<Transaction> {
     const newTransaction = this.transactionsRepository.create(transaction);
     return await this.transactionsRepository.save(newTransaction);

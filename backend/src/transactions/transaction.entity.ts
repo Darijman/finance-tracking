@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from 'src/users/user.entity';
 
 export enum Categories {
   'Food' = 'Food',
@@ -33,6 +34,13 @@ export class Transaction {
 
   @Column({ nullable: true, default: null, length: 255 })
   comment?: string;
+
+  @ManyToOne(() => User, (user) => user.transactions)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column()
+  userId: number;
 
   @CreateDateColumn()
   createdAt: Date;
