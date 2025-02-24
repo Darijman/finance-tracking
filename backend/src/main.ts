@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import * as cors from 'cors';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +20,9 @@ async function bootstrap() {
       },
     }),
   );
+  app.use(express.static('public'));
+  app.use(express.json());
+  app.use(cors());
   await app.listen(9000);
 }
 bootstrap();

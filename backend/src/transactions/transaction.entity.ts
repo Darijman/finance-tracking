@@ -23,7 +23,7 @@ export class Transaction {
   @Column({ type: 'datetime' })
   transactionDate: Date;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', {precision: 10, scale: 2 })
   amount: number;
 
   @Column({ type: 'enum', enum: TransactionType })

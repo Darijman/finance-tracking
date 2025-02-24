@@ -1,23 +1,27 @@
-import { Controller, Get, Post, Delete, Put, Body, BadRequestException, Param } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, BadRequestException, Param, Inject, UseInterceptors } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './createTransaction.dto';
 import { UpdateTransactionDto } from './updateTransaction.dto';
 import { UsersService } from 'src/users/users.service';
+import { Cache } from 'cache-manager';
+import { ParseInterceptor } from './parseInterceptor';
+
+const getUserTransactionsCacheKey = (userId: number) => `userTransactions_${userId}`;
 
 @Controller('transactions')
+@UseInterceptors(ParseInterceptor)
 export class TransactionsController {
   constructor(
     private readonly transactionsService: TransactionsService,
     private readonly usersService: UsersService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   @Get()
   async getAllTransactions() {
     const allTransactions = await this.transactionsService.getAllTransactions();
-    const parsedIds = allTransactions.map((transaction) => {
-      return { ...transaction, id: Number(transaction.id) };
-    });
-    return parsedIds;
+    return allTransactions;
   }
 
   @Post()
@@ -34,7 +38,8 @@ export class TransactionsController {
     };
 
     const createdTransaction = await this.transactionsService.createNewTransaction(newTransaction);
-    createdTransaction.id = Number(createdTransaction.id);
+    const userCacheKey = getUserTransactionsCacheKey(userId);
+    await this.cacheManager.del(userCacheKey);
     return createdTransaction;
   }
 
@@ -49,7 +54,6 @@ export class TransactionsController {
       throw new BadRequestException({ error: 'Could not find the transaction!' });
     }
 
-    transaction.id = Number(transaction.id);
     return transaction;
   }
 
@@ -64,7 +68,24 @@ export class TransactionsController {
       throw new BadRequestException({ error: 'Could not find the user!' });
     }
 
-    return await this.transactionsService.getTransactionsByUserId(userId);
+    const userCacheKey = getUserTransactionsCacheKey(userId);
+    const cachedUserTransactions: any[] = await this.cacheManager.get(userCacheKey);
+    if (cachedUserTransactions) {
+      return cachedUserTransactions;
+    }
+
+    const userTransactions = await this.transactionsService.getTransactionsByUserId(userId);
+    const parsedUserTransactions = userTransactions.map((transaction) => ({
+      ...transaction,
+      id: Number(transaction.id),
+      amount: Number(transaction.amount),
+    }));
+
+    if (userTransactions.length) {
+      await this.cacheManager.set(userCacheKey, parsedUserTransactions, 300000);
+    }
+
+    return parsedUserTransactions;
   }
 
   @Delete(':id')
@@ -78,8 +99,9 @@ export class TransactionsController {
       throw new BadRequestException({ error: 'Could not find the transaction!' });
     }
 
+    const userCacheKey = getUserTransactionsCacheKey(transaction.userId);
     await this.transactionsService.deleteTransactionById(id);
-    transaction.id = Number(transaction.id);
+    await this.cacheManager.del(userCacheKey);
     return transaction;
   }
 
@@ -100,7 +122,8 @@ export class TransactionsController {
     }
 
     const updatedTransaction = await this.transactionsService.updateTransactionById(id, updateTransactionDto);
-    updatedTransaction.id = Number(updatedTransaction.id);
+    const userCacheKey = getUserTransactionsCacheKey(transaction.userId);
+    await this.cacheManager.del(userCacheKey);
     return updatedTransaction;
   }
 }
