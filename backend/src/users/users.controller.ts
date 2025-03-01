@@ -1,6 +1,5 @@
-import { Controller, Get, Post, Delete, Body, BadRequestException, Param, UseInterceptors, Put } from '@nestjs/common';
+import { Controller, Get, Delete, Body, BadRequestException, Param, UseInterceptors, Put } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './createUser.dto';
 import { UpdateUserDto } from './updateUser.dto';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 
@@ -13,26 +12,6 @@ export class UsersController {
   async getAllUsers() {
     const allUsers = await this.usersService.getAllUsers();
     return allUsers;
-  }
-
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Post()
-  async createNewUser(@Body() createUserDto: CreateUserDto) {
-    const { name, email, password } = createUserDto;
-
-    const nameExists = await this.usersService.findUserByName(name);
-    if (nameExists) {
-      throw new BadRequestException({ error: 'This name is taken!' });
-    }
-
-    const newUser = {
-      name,
-      email,
-      password,
-    };
-
-    const createdUser = await this.usersService.createNewUser(newUser);
-    return createdUser;
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

@@ -6,6 +6,7 @@ import { Transaction } from './transactions/transaction.entity';
 import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 import * as redisStore from 'cache-manager-redis-store';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import * as redisStore from 'cache-manager-redis-store';
     }),
     TransactionsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

@@ -1,16 +1,11 @@
-import { IsString, IsEmail, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
 
-export class RegisterUserDto {
+export class LogInUserDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(2, { message: 'Name must contain at least 2 letters!' })
   @MaxLength(40, { message: 'Name must contain no more than 40 letters!' })
   name: string;
-
-  @IsString()
-  @IsEmail({}, { message: 'Invalid email format' })
-  @IsNotEmpty()
-  email: string;
 
   @IsString()
   @IsNotEmpty()
