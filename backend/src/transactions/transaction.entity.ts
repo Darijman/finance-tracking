@@ -2,17 +2,17 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { User } from 'src/users/user.entity';
 
 export enum Categories {
-  'Food' = 'Food',
-  'Transport' = 'Transport',
-  'Entertainment' = 'Entertainment',
-  'Clothes' = 'Clothes',
-  'Health' = 'Health',
-  'Different' = 'Different',
+  'FOOD' = 'FOOD',
+  'TRANSPORT' = 'TRANSPORT',
+  'ENTERTAINMENT' = 'ENTERTAINMENT',
+  'CLOTHES' = 'CLOTHES',
+  'HEALTH' = 'HEALTH',
+  'DIFFERENT' = 'DIFFERENT',
 }
 
 export enum TransactionType {
-  'Income' = 'Income',
-  'Expense' = 'Expense',
+  'INCOME' = 'INCOME',
+  'EXPENSE' = 'EXPENSE',
 }
 
 @Entity('transactions')
@@ -23,7 +23,7 @@ export class Transaction {
   @Column({ type: 'datetime' })
   transactionDate: Date;
 
-  @Column('decimal', {precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
   @Column({ type: 'enum', enum: TransactionType })
@@ -39,7 +39,7 @@ export class Transaction {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column()
+  @Column({ type: 'int' })
   userId: number;
 
   @CreateDateColumn()

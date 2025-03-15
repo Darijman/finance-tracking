@@ -1,67 +1,43 @@
-import { Controller, Get, Delete, Body, BadRequestException, Param, UseInterceptors, Put } from '@nestjs/common';
+import { Controller, Get, Delete, Body, Param, UseInterceptors, Put, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './updateUser.dto';
 import { ClassSerializerInterceptor } from '@nestjs/common';
+import { Admin } from 'src/auth/auth.decorators';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { User } from './user.entity';
 
 @Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Admin()
   @Get()
-  async getAllUsers() {
-    const allUsers = await this.usersService.getAllUsers();
-    return allUsers;
+  async getAllUsers(): Promise<User[]> {
+    return await this.usersService.getAllUsers();
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(AuthGuard)
   @Get(':id')
-  async getUserById(@Param('id') id: number) {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID' });
-    }
-
-    const user = await this.usersService.getUserById(id);
-    if (!user) {
-      throw new BadRequestException({ error: 'Could not find the user!' });
-    }
-    return user;
+  async getUserById(@Param('id') id: number): Promise<User> {
+    return await this.usersService.getUserById(id);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(AuthGuard)
+  @Get(':id/details')
+  async getUserByIdWithRole(@Param('id') id: number): Promise<User> {
+    return await this.usersService.getUserByIdWithRole(id);
+  }
+
+  @UseGuards(AuthGuard)
   @Delete(':id')
-  async deleteUserById(@Param('id') id: number) {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID' });
-    }
-
-    const user = await this.usersService.getUserById(id);
-    if (!user) {
-      throw new BadRequestException({ error: 'Could not find the user!' });
-    }
-
-    await this.usersService.deleteUserById(id);
-    return user;
+  async deleteUserById(@Param('id') id: number): Promise<User> {
+    return await this.usersService.deleteUserById(id);
   }
 
+  @UseGuards(AuthGuard)
   @Put(':id')
-  @UseInterceptors(ClassSerializerInterceptor)
-  async updateUserById(@Body() updateUserDto: UpdateUserDto, @Param('id') id: number) {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID' });
-    }
-
-    const user = await this.usersService.getUserById(id);
-    if (!user) {
-      throw new BadRequestException({ error: 'Could not find the user!' });
-    }
-
-    const isUpdated = await this.usersService.verifyChanges(user, updateUserDto);
-    if (!isUpdated) {
-      throw new BadRequestException({ error: 'No changes were made' });
-    }
-
-    const updatedUser = await this.usersService.updateUserById(id, updateUserDto);
-    return updatedUser;
+  async updateUserById(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+    return await this.usersService.updateUserById(id, updateUserDto);
   }
 }

@@ -1,8 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './registerUser.dto';
-import { Public } from './auth.constants';
+import { Public } from './auth.decorators';
 import { LogInUserDto } from './logInUser.dto';
 
 @Controller('auth')
@@ -17,7 +17,7 @@ export class AuthController {
   }
 
   @Public()
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(200)
   @Post('login')
   logInUser(@Body() logInUserDto: LogInUserDto) {
     return this.authService.logIn(logInUserDto);

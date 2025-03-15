@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, MinLength, MaxLength, IsNumber, IsOptional } from 'class-validator';
 
 export class RegisterUserDto {
   @IsString()
@@ -11,6 +11,10 @@ export class RegisterUserDto {
   @IsEmail({}, { message: 'Invalid email format' })
   @IsNotEmpty()
   email: string;
+
+  @IsNumber()
+  @IsOptional()
+  roleId: number;
 
   @IsString()
   @IsNotEmpty()

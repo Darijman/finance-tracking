@@ -1,12 +1,31 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
+  OneToMany,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Transaction } from 'src/transactions/transaction.entity';
+import { Role } from 'src/roles/role.entity';
 import * as bcrypt from 'bcrypt';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
+
+  @Column({ type: 'int', default: 1 })
+  roleId: number;
+
+  @ManyToOne(() => Role, (role) => role.users)
+  @JoinColumn({ name: 'roleId' })
+  role: Role;
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);
@@ -22,7 +41,7 @@ export class User {
   @Exclude()
   password: string;
 
-  @OneToMany(() => Transaction, (transaction) => transaction.user)
+  @OneToMany(() => Transaction, (transaction) => transaction.userId)
   transactions: Transaction[];
 
   @CreateDateColumn()

@@ -24,8 +24,8 @@ export class UpdateTransactionDto {
   @IsEnum(Categories)
   category?: Categories;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   @IsNotEmpty()
   @MaxLength(255, { message: 'Comment must contain no more than 255 letters!' })
   @MinLength(1, { message: 'Comment must contain at least 1 letter!' })

@@ -16,7 +16,9 @@ export class CreateTransactionDto {
   @IsEnum(Categories)
   category: Categories;
 
-  @IsNumber()
+  @IsNotEmpty({ message: 'UserId is required!' })
+  @IsNumber({}, { message: 'UserId must be a number!' })
+  @Transform(({ value }) => parseInt(value, 10))
   userId: number;
 
   @IsOptional()

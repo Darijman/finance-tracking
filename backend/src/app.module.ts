@@ -5,8 +5,10 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { Transaction } from './transactions/transaction.entity';
 import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
-import * as redisStore from 'cache-manager-redis-store';
 import { AuthModule } from './auth/auth.module';
+import { RolesModule } from './roles/roles.module';
+import { Role } from './roles/role.entity';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
       username: 'root',
       password: '123456789',
       database: 'finance-tracking',
-      entities: [Transaction, User],
+      entities: [Transaction, User, Role],
       synchronize: true,
       timezone: 'Z',
     }),
@@ -25,12 +27,13 @@ import { AuthModule } from './auth/auth.module';
       store: redisStore,
       host: 'localhost',
       port: 6379,
-      ttl: 300, // 5 минут (в секундах)
-      isGlobal: true, // ✅ Делаем доступным во всех модулях
+      ttl: 300,
+      isGlobal: true,
     }),
     TransactionsModule,
     UsersModule,
     AuthModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [],

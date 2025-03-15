@@ -14,18 +14,18 @@ export class AuthService {
   async registerNewUser(@Body() registerUserDto: RegisterUserDto): Promise<{ access_token: string }> {
     const { name, email } = registerUserDto;
 
-    const nameExists = await this.usersService.findUserByName(name);
+    const nameExists = await this.usersService.getUserByName(name);
     if (nameExists) {
       throw new BadRequestException({ error: 'This name is taken!' });
     }
 
-    const emailExists = await this.usersService.findUserByEmail(email);
+    const emailExists = await this.usersService.getUserByEmail(email);
     if (emailExists) {
       throw new BadRequestException({ error: 'This email is already in use!' });
     }
 
     const createdUser = await this.usersService.registerNewUser(registerUserDto);
-    const payload = { sub: createdUser.id, username: createdUser.name };
+    const payload = { id: createdUser.id, name: createdUser.name };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
@@ -33,14 +33,14 @@ export class AuthService {
 
   async logIn(@Body() logInUserDto: LogInUserDto): Promise<{ access_token: string }> {
     const { name, password } = logInUserDto;
-    const user = await this.usersService.findUserByName(name);
+    const user = await this.usersService.getUserByName(name);
 
-    const isPasswordCorrect = user.validatePassword(password);
+    const isPasswordCorrect = await user.validatePassword(password);
     if (!isPasswordCorrect) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({ error: 'Incorrect password!' });
     }
 
-    const payload = { sub: user.id, name: user.name };
+    const payload = { id: user.id, name: user.name };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

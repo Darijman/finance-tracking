@@ -1,17 +1,21 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { IS_PUBLIC_KEY, jwtConstants } from './auth.constants';
+import { jwtConstants } from './auth.constants';
+import { IS_PUBLIC_KEY, IS_ADMIN_KEY } from './auth.decorators';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
+    private usersService: UsersService,
     private reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isAdminRequired = this.reflector.getAllAndOverride<boolean>(IS_ADMIN_KEY, [context.getHandler(), context.getClass()]);
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()]);
     if (isPublic) {
       return true;
@@ -20,15 +24,23 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({ error: 'Session expired. Please log in again.' });
     }
-    try {
-      const payload = await this.jwtService.verifyAsync(token, { secret: jwtConstants.secret });
 
-      request['user'] = payload;
+    let payload = null;
+    try {
+      payload = await this.jwtService.verifyAsync(token, { secret: jwtConstants.secret });
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({ error: 'Session expired. Please log in again.' });
     }
+
+    const user = await this.usersService.getUserByIdWithRole(payload?.id);
+
+    if (isAdminRequired && user.role.name !== 'ADMIN') {
+      throw new ForbiddenException({ error: 'You do not have permission to access this resource!' });
+    }
+
+    request['user'] = payload;
     return true;
   }
 

@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Delete, Put, Body, BadRequestException, Param, Inject, UseInterceptors } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Controller, Get, Post, Delete, Put, Body, Param, UseInterceptors, UseGuards, Request, ForbiddenException } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './createTransaction.dto';
 import { UpdateTransactionDto } from './updateTransaction.dto';
-import { UsersService } from 'src/users/users.service';
-import { Cache } from 'cache-manager';
 import { ParseInterceptor } from './parseInterceptor';
-
-const getUserTransactionsCacheKey = (userId: number) => `userTransactions_${userId}`;
+import { Admin } from 'src/auth/auth.decorators';
+import { Transaction } from './transaction.entity';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { UsersService } from 'src/users/users.service';
+import { RolesService } from 'src/roles/roles.service';
 
 @Controller('transactions')
 @UseInterceptors(ParseInterceptor)
@@ -15,115 +15,61 @@ export class TransactionsController {
   constructor(
     private readonly transactionsService: TransactionsService,
     private readonly usersService: UsersService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly rolesService: RolesService,
   ) {}
 
+  @Admin()
   @Get()
-  async getAllTransactions() {
-    const allTransactions = await this.transactionsService.getAllTransactions();
-    return allTransactions;
+  async getAllTransactions(): Promise<Transaction[]> {
+    return await this.transactionsService.getAllTransactions();
   }
 
+  @UseGuards(AuthGuard)
   @Post()
-  async createNewTransaction(@Body() createTransactionDto: CreateTransactionDto) {
-    const { transactionDate, amount, type, category, userId, comment } = createTransactionDto;
-
-    const newTransaction = {
-      transactionDate,
-      amount,
-      type,
-      category,
-      userId,
-      comment,
-    };
-
-    const createdTransaction = await this.transactionsService.createNewTransaction(newTransaction);
-    const userCacheKey = getUserTransactionsCacheKey(userId);
-    await this.cacheManager.del(userCacheKey);
-    return createdTransaction;
+  async createNewTransaction(@Body() createTransactionDto: CreateTransactionDto): Promise<Transaction> {
+    return await this.transactionsService.createNewTransaction(createTransactionDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
-  async getTransactionById(@Param('id') id: number) {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID' });
+  async getTransactionById(@Param('id') id: number, @Request() req: any): Promise<Transaction> {
+    const currentUser = await this.usersService.getUserByIdWithRole(req.user.id);
+    const transaction = await this.transactionsService.getTransactionById(id);
+    if (currentUser.role.name === 'ADMIN') {
+      return transaction;
     }
 
-    const transaction = await this.transactionsService.getTransactionById(id);
-    if (!transaction) {
-      throw new BadRequestException({ error: 'Could not find the transaction!' });
+    if (currentUser.id !== transaction.userId) {
+      throw new ForbiddenException({ error: 'You do not have permission to access this resource!' });
     }
 
     return transaction;
   }
 
+  @UseGuards(AuthGuard)
   @Get('user/:userId')
-  async getTransactionsByUserId(@Param('userId') userId: number) {
-    if (isNaN(userId)) {
-      throw new BadRequestException({ error: 'Invalid user ID' });
+  async getTransactionsByUserId(@Param('userId') userId: number, @Request() req: any): Promise<Transaction[]> {
+    const currentUser = await this.usersService.getUserByIdWithRole(req.user.id);
+    if (currentUser.role.name === 'ADMIN') {
+      return await this.transactionsService.getTransactionsByUserId(userId);
     }
 
-    const user = await this.usersService.getUserById(userId);
-    if (!user) {
-      throw new BadRequestException({ error: 'Could not find the user!' });
+    if (currentUser.id !== userId) {
+      throw new ForbiddenException({ error: 'You do not have permission to access this resource!' });
     }
 
-    const userCacheKey = getUserTransactionsCacheKey(userId);
-    const cachedUserTransactions: any[] = await this.cacheManager.get(userCacheKey);
-    if (cachedUserTransactions) {
-      return cachedUserTransactions;
-    }
-
-    const userTransactions = await this.transactionsService.getTransactionsByUserId(userId);
-    const parsedUserTransactions = userTransactions.map((transaction) => ({
-      ...transaction,
-      id: Number(transaction.id),
-      amount: Number(transaction.amount),
-    }));
-
-    if (userTransactions.length) {
-      await this.cacheManager.set(userCacheKey, parsedUserTransactions, 300000);
-    }
-
-    return parsedUserTransactions;
+    return await this.transactionsService.getTransactionsByUserId(userId);
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
-  async deleteTransactionById(@Param('id') id: number) {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID' });
-    }
-
-    const transaction = await this.transactionsService.getTransactionById(id);
-    if (!transaction) {
-      throw new BadRequestException({ error: 'Could not find the transaction!' });
-    }
-
-    const userCacheKey = getUserTransactionsCacheKey(transaction.userId);
-    await this.transactionsService.deleteTransactionById(id);
-    await this.cacheManager.del(userCacheKey);
-    return transaction;
+  async deleteTransactionById(@Param('id') id: number): Promise<Transaction> {
+    return await this.transactionsService.deleteTransactionById(id);
   }
 
+  @UseGuards(AuthGuard)
   @Put(':id')
-  async updateTransactionById(@Body() updateTransactionDto: UpdateTransactionDto, @Param('id') id: number) {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID' });
-    }
-
-    const transaction = await this.transactionsService.getTransactionById(id);
-    if (!transaction) {
-      throw new BadRequestException({ error: 'Could not find the transaction!' });
-    }
-
-    const isUpdated = this.transactionsService.verifyChanges(transaction, updateTransactionDto);
-    if (!isUpdated) {
-      throw new BadRequestException({ error: 'No changes were made' });
-    }
-
-    const updatedTransaction = await this.transactionsService.updateTransactionById(id, updateTransactionDto);
-    const userCacheKey = getUserTransactionsCacheKey(transaction.userId);
-    await this.cacheManager.del(userCacheKey);
-    return updatedTransaction;
+  async updateTransactionById(@Param('id') id: number, @Body() updateTransactionDto: UpdateTransactionDto): Promise<Transaction> {
+    return await this.transactionsService.updateTransactionById(id, updateTransactionDto);
   }
 }
