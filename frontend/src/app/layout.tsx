@@ -1,22 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import { Signika_Negative } from 'next/font/google';
-import "./globals.css";
+import { ThemeProvider } from '@/contexts/themeContext/ThemeContext';
+import './globals.css';
 
 const signika_negative = Signika_Negative({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Finance-Tracking",
+  title: 'Finance-Tracking',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang='en'>
       <body className={signika_negative.className}>
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
