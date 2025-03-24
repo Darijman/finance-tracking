@@ -33,7 +33,6 @@
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  color: var(--primary-text-color);
   border-radius: 10px;
   padding: 0px 10px;
   height: 46px;
@@ -71,6 +70,11 @@
   bottom: 3px;
   transition: 0.4s;
   border-radius: 50%;
+}
+
+.theme_image {
+  width: 30px;
+  height: 30px;
 }
 
 [data-theme='light'] .slider {

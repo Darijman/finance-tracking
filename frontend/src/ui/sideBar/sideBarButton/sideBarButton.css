@@ -4,7 +4,6 @@
   cursor: pointer;
   border: none;
   background-color: transparent;
-  color: var(--primary-text-color);
   border-radius: 10px;
   padding: 8px 10px;
   max-width: 100%;
@@ -28,6 +27,12 @@
   font-size: 15px;
 }
 
-[data-theme='dark'] .sidebar_button_image {
+[data-theme='dark'] .icon {
   filter: invert(1);
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
 }

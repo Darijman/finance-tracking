@@ -1,30 +1,38 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import './sideBarButton.css';
 
 interface Props {
-  iconSrc: string;
+  iconSrc: React.FC<React.SVGProps<SVGSVGElement>>;
   label: string;
   href?: string;
   onClick?: React.MouseEventHandler;
   navigation?: boolean;
 }
 
-export const SideBarButton = ({ iconSrc, label, href, navigation, onClick }: Props) => {
+export const SideBarButton = ({ iconSrc: Icon, label, href, navigation, onClick }: Props) => {
   const router = useRouter();
+  const pathName = usePathname();
+
+  const isActive = pathName === href;
 
   return (
     <>
       {navigation && href ? (
         <button className='sidebar_button' onClick={() => router.push(href)}>
-          <Image className='sidebar_button_image' src={iconSrc} alt={label} width={30} height={30} />
-          <span className='sidebar_button_text'>{label}</span>
+          <Icon
+            className='icon'
+            style={{ stroke: isActive ? 'black' : 'white', strokeWidth: isActive ? 1 : 0, fill: isActive ? 'black' : 'white' }}
+          />
+          <span className='sidebar_button_text' style={{ fontWeight: isActive ? 'bold' : 'normal', fontSize: isActive ? '16px' : '15px' }}>
+            {label}
+          </span>
         </button>
       ) : (
         <button className='sidebar_button' onClick={onClick}>
-          <Image className='sidebar_button_image' src={iconSrc} alt={label} width={30} height={30} />
+          <Icon className='icon' />
           <span className='sidebar_button_text'>{label}</span>
         </button>
       )}

@@ -1,9 +1,22 @@
 body {
   font-family: 'Josefin Sans', sans-serif;
-  margin: 0px;
+  margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background-color: var(--background-color)
+  background-color: var(--background-color);
+  color: var(--primary-text-color);
+  display: flex;
+}
+
+main {
+  display: flex;
+  flex-grow: 1;
+  padding: 20px 50px 50px 50px;
+}
+
+main > * {
+  flex-grow: 1;
+  width: 100%;
 }
 
 :root {
@@ -25,8 +38,6 @@ body {
   --secondary-text-color: #A8A8A8;
   --border-color: #262626;
   --toggle-dark-bg: #FFFFFF;
-  --toggle-dark-slider: #000000
+  --toggle-dark-slider: #000000;
 }
-
-
 

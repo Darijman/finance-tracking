@@ -28,7 +28,6 @@
   cursor: pointer;
   border: none;
   background-color: transparent;
-  color: var(--primary-text-color);
   border-radius: 10px;
   padding: 8px 15px;
   max-width: 100%;

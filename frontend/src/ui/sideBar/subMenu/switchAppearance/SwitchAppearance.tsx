@@ -1,7 +1,9 @@
 'use client';
 
-import { useTheme } from '@/contexts/themeContext/ThemeContext';
-import Image from 'next/image';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
+import SunIcon from '@/assets/svg/sun-icon.svg';
+import MoonIcon from '@/assets/svg/moon-icon.svg';
 import './switchAppearance.css';
 
 interface Props {
@@ -9,7 +11,16 @@ interface Props {
 }
 
 export const SwitchAppearance = ({ closeSwitchApperance }: Props) => {
-  const { theme, toggleTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const isDarkMode = resolvedTheme === 'dark';
 
   return (
     <div className='appearance_container'>
@@ -20,26 +31,20 @@ export const SwitchAppearance = ({ closeSwitchApperance }: Props) => {
           </button>
           <span className='appearance_container_title'>Switch appearance</span>
         </div>
-        <Image
-          className='theme_image'
-          src={theme === 'dark' ? '/svg/moon-icon.svg' : '/svg/sun-icon.svg'}
-          width={30}
-          height={30}
-          alt='theme-icon'
-        />
+        {isDarkMode ? <MoonIcon className='theme_image' /> : <SunIcon className='theme_image' />}
       </div>
       <hr />
       <div
         className='toggle_container'
         onClick={(e) => {
           if (!(e.target as HTMLElement).closest('label')) {
-            toggleTheme();
+            setTheme(isDarkMode ? 'light' : 'dark');
           }
         }}
       >
         <span>Dark mode</span>
         <label className='switch_label'>
-          <input type='checkbox' onChange={toggleTheme} checked={theme === 'dark'} />
+          <input type='checkbox' onChange={() => setTheme(isDarkMode ? 'light' : 'dark')} checked={isDarkMode} />
           <span className='slider'></span>
         </label>
       </div>
