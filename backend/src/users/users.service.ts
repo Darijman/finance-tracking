@@ -56,6 +56,14 @@ export class UsersService {
     return user;
   }
 
+  async isUserNameTaken(name: string): Promise<boolean> {
+    return !!(await this.usersRepository.findOneBy({ name }));
+  }
+
+  async isUserEmailTaken(email: string): Promise<boolean> {
+    return !!(await this.usersRepository.findOneBy({ email }));
+  }
+
   async registerNewUser(user: RegisterUserDto): Promise<User> {
     const newUser = this.usersRepository.create(user);
     return await this.usersRepository.save(newUser);

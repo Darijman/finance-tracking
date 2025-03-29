@@ -5,10 +5,13 @@ import { useRef, useState } from 'react';
 import { SwitchAppearance } from './switchAppearance/SwitchAppearance';
 import { useTheme } from 'next-themes';
 import { useClickOutside } from '@/hooks/useClickOutside/UseClickOutside';
+import api from '../../../../axiosInstance';
 import SettingsIcon from '@/assets/svg/settings-icon.svg';
 import SunIcon from '@/assets/svg/sun-icon.svg';
 import MoonIcon from '@/assets/svg/moon-icon.svg';
 import './subMenu.css';
+import { useAuth } from '@/contexts/authContext/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   closeSubMenu: () => void;
@@ -17,10 +20,18 @@ interface Props {
 
 export const SubMenu = ({ closeSubMenu, buttonRef }: Props) => {
   const { theme } = useTheme();
+  const { setUser } = useAuth();
+  const router = useRouter();
   const [showSwitchAppearance, setShowSwitchAppearance] = useState<boolean>(false);
   const subMenuRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(subMenuRef, closeSubMenu, buttonRef);
+
+  const logOutUser = async () => {
+    await api.post(`/auth/logOut`);
+    setUser(null);
+    router.push(`/auth/login`);
+  };
 
   return (
     <div ref={subMenuRef}>
@@ -42,7 +53,9 @@ export const SubMenu = ({ closeSubMenu, buttonRef }: Props) => {
             </li>
             <hr />
             <li className='submenu_item'>
-              <button className='submenu_button'>Log out</button>
+              <button className='submenu_button' onClick={logOutUser}>
+                Log out
+              </button>
             </li>
           </ul>
         </div>

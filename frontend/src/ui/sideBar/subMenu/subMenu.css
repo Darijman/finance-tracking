@@ -23,6 +23,7 @@
 }
 
 .submenu_button {
+  color: var(--primary-text-color);
   display: flex;
   align-items: center;
   cursor: pointer;

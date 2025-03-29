@@ -15,7 +15,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <NextThemesProvider attribute='data-theme' enableSystem>
+    <NextThemesProvider attribute='data-theme' enableSystem defaultTheme='system'>
       {children}
     </NextThemesProvider>
   );

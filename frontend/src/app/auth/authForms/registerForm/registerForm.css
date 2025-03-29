@@ -1,0 +1,115 @@
+.register_container {
+  background-color: #E5E5E5;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 0 5px #262626
+}
+
+.app_title {
+  margin: 0px 0px 20px 0px;
+}
+
+.register_title {
+  text-align: center;
+  margin: 0px;
+}
+
+.register_item {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  max-width: 350px;
+  width: 100%; 
+  margin-bottom: 20px;
+}
+
+.register_title_divider {
+  background-color: #262626;
+  height: 1px;
+  margin: 20px;
+}
+
+.register_main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.register_submit_button {
+  width: 250px;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #262626;
+  color: #FFFFFF;
+  text-transform: capitalize;
+  font-weight: bold;
+  margin-bottom: 20px;
+  &:hover {
+    opacity: 0.9;
+  }
+  &:disabled {
+    background-color: #d9d9d9;
+    color: #a0a0a0;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.has_account {
+  text-align: right;
+}
+
+.password_input_container {
+  position: relative;
+  max-width: 350px;
+  width: 100%;
+}
+
+.register_input_password {
+  padding-right: 50px;
+}
+
+.toggle_password_button {
+  position: absolute;
+  right: 10px;
+  transform: translateY(10%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 5px;
+}
+
+.password_input_container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.register_error {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+  margin: 5px 0px 0px 0px; 
+}
+
+.register_server_error {
+  color: red;
+  font-size: 17px;
+  text-align: center;
+  margin: 5px 0px 0px 0px; 
+}
+
+
+@media screen and (max-width: 800px) {
+  .app_title {
+    text-align: center;
+  }
+}

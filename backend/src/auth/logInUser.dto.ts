@@ -1,11 +1,11 @@
-import { IsString, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, MaxLength, IsEmail } from 'class-validator';
 
 export class LogInUserDto {
   @IsString()
+  @IsEmail({}, { message: 'Invalid email format' })
+  @MaxLength(254, { message: 'Email must contain no more than 254 characters!' })
   @IsNotEmpty()
-  @MinLength(2, { message: 'Name must contain at least 2 letters!' })
-  @MaxLength(40, { message: 'Name must contain no more than 40 letters!' })
-  name: string;
+  email: string;
 
   @IsString()
   @IsNotEmpty()

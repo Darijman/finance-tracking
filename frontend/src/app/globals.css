@@ -1,8 +1,13 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Josefin Sans', sans-serif;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
   background-color: var(--background-color);
   color: var(--primary-text-color);
   display: flex;
@@ -21,7 +26,7 @@ main > * {
 
 :root {
   --background-color: #FFFFFF;
-  --foreground-color: #FAFAFA;
+  --foreground-color: #E5E5E5;
   --hover-color: #F2F2F2;
   --primary-text-color: #000000;
   --secondary-text-color: #8E8E8E;
@@ -40,4 +45,3 @@ main > * {
   --toggle-dark-bg: #FFFFFF;
   --toggle-dark-slider: #000000;
 }
-

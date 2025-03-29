@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  width: 220px;
+  width: 225px;
   height: 100vh;
   border-right: 1px solid var(--border-color);
   overflow: visible;
@@ -24,8 +24,8 @@
 }
 
 .sidebar_title {
-  margin: 0px 0px 10px 0px;
-  padding: 20px;
+  margin: 20px 0px;
+  padding: 0px 20px;
 }
 
 .sidebar_item {

@@ -25,7 +25,7 @@ export const SwitchAppearance = ({ closeSwitchApperance }: Props) => {
   return (
     <div className='appearance_container'>
       <div className='appearance_top'>
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <button className='close_switch_appearance_button' onClick={closeSwitchApperance}>
             ˂
           </button>

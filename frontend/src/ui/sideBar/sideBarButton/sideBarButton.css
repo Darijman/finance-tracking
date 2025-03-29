@@ -25,6 +25,7 @@
   text-transform: capitalize;
   cursor: pointer;
   font-size: 15px;
+  color: var(--primary-text-color);
 }
 
 [data-theme='dark'] .icon {
