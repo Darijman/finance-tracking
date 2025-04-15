@@ -11,7 +11,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { Transaction } from 'src/transactions/transaction.entity';
+import { FinanceNote } from 'src/financeNotes/financeNote.entity';
 import { Role } from 'src/roles/role.entity';
 import * as bcrypt from 'bcrypt';
 
@@ -41,8 +41,8 @@ export class User {
   @Exclude()
   password: string;
 
-  @OneToMany(() => Transaction, (transaction) => transaction.userId)
-  transactions: Transaction[];
+  @OneToMany(() => FinanceNote, (financeNote) => financeNote.userId)
+  financeNotes: FinanceNote[];
 
   @CreateDateColumn()
   createdAt: Date;

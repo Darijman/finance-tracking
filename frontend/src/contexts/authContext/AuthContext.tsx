@@ -1,23 +1,23 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@/interfaces/user';
+import { BasicUser } from '@/interfaces/basicUser';
 import api from '../../../axiosInstance';
 
 interface AuthContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
+  user: BasicUser | null;
+  setUser: (user: BasicUser | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<BasicUser | null>(null);
 
   const getUser = async () => {
     try {
-      const { data: user } = await api.get<User>('/auth/profile');
-      setUser(user);
+      const response = await api.get<BasicUser>('/auth/profile');
+      setUser(response.data);
     } catch {
       setUser(null);
     }

@@ -17,6 +17,8 @@ main {
   display: flex;
   flex-grow: 1;
   padding: 20px 50px 50px 50px;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 main > * {

@@ -1,32 +1,32 @@
-import { IsEnum, IsNumber, IsString, IsOptional, IsDate, MaxLength, MinLength, IsNotEmpty } from 'class-validator';
-import { Categories, TransactionType } from './transaction.entity';
+import { IsEnum, IsNumber, IsString, IsOptional, IsDate, MaxLength, MinLength } from 'class-validator';
+import { NoteType } from './financeNote.entity';
 import { Transform } from 'class-transformer';
 
-export class UpdateTransactionDto {
+export class UpdateFinanceNoteDto {
   @IsOptional()
-  @IsDate({ message: 'TransactionDate must be a valid date!' })
+  @IsDate({ message: 'NoteDate must be a valid date!' })
   @Transform(({ value }) => (typeof value === 'string' ? new Date(value) : value))
-  transactionDate?: Date;
+  noteDate?: Date;
 
   @IsOptional()
   @IsNumber()
   amount?: number;
 
   @IsOptional()
-  @IsEnum(TransactionType)
-  type?: TransactionType;
+  @IsEnum(NoteType)
+  type?: NoteType;
 
   @IsOptional()
   @IsNumber()
   userId?: number;
 
   @IsOptional()
-  @IsEnum(Categories)
-  category?: Categories;
+  @IsNumber({}, { message: 'CategoryId must be a number!' })
+  @Transform(({ value }) => parseInt(value, 10))
+  categoryId?: number;
 
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(255, { message: 'Comment must contain no more than 255 letters!' })
   @MinLength(1, { message: 'Comment must contain at least 1 letter!' })
   comment?: string;

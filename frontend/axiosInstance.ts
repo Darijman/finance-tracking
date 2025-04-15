@@ -7,7 +7,12 @@ const api = axios.create({
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth/login';
+      }
+    }
     return Promise.reject(error.response?.data || 'Something went wrong...');
   },
 );

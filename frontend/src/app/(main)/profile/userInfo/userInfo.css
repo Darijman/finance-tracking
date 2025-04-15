@@ -1,0 +1,38 @@
+.user_info {
+  background-color: var(--foreground-color);
+  color: var(--primary-text-color);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.userinfo_title {
+  text-align: center;
+  margin: 0px 0px 10px 0px;
+}
+
+.userinfo_list {
+  margin: 0px;
+  background-color: var(--background-color);
+  padding: 20px;
+  border-radius: 10px;
+  display: grid;
+  gap: 15px;
+}
+
+dt {
+  font-weight: bold;
+}
+
+.userinfo_list_item {
+  display: grid;
+  grid-template-columns: 150px auto;
+  background-color: var(--foreground-color);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.userinfo_list_item:last-child {
+  margin-bottom: 0px;
+}

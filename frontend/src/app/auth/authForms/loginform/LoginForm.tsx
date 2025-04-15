@@ -66,8 +66,8 @@ export const LoginForm = () => {
         setLoginUser({ email: '', password: '' });
         router.push('/');
       })
-      .catch((error) => {
-        setServerError({ error: error.error || 'Something went wrong...', type: error.type || '' });
+      .catch(({ error, type }) => {
+        setServerError({ error: error || 'Something went wrong...', type: type || '' });
       });
   };
 

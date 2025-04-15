@@ -15,6 +15,10 @@
   }
 }
 
+.sidebar_button.active {
+  background-color: var(--hover-color);
+}
+
 .sidebar_button_image {
   cursor: pointer;
   filter: invert(0);

@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
-import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TransactionsModule } from './transactions/transactions.module';
-import { Transaction } from './transactions/transaction.entity';
-import { User } from './users/user.entity';
+import { FinanceNotesModule } from './financeNotes/financeNotes.module';
+import { FinanceCategoriesModule } from './financeCategories/financeCategories.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
+import { FinanceNote } from './financeNotes/financeNote.entity';
+import { FinanceCategory } from './financeCategories/financeCategory.entity';
+import { User } from './users/user.entity';
 import { Role } from './roles/role.entity';
-import * as redisStore from 'cache-manager-redis-store';
+import { RedisModule } from './common/redis/redis.module';
 
 @Module({
   imports: [
@@ -19,21 +20,16 @@ import * as redisStore from 'cache-manager-redis-store';
       username: 'root',
       password: '123456789',
       database: 'finance-tracking',
-      entities: [Transaction, User, Role],
+      entities: [FinanceNote, FinanceCategory, User, Role],
       synchronize: true,
       timezone: 'Z',
     }),
-    CacheModule.register({
-      store: redisStore,
-      host: 'localhost',
-      port: 6379,
-      ttl: 300,
-      isGlobal: true,
-    }),
-    TransactionsModule,
+    FinanceNotesModule,
+    FinanceCategoriesModule,
     UsersModule,
     AuthModule,
     RolesModule,
+    RedisModule,
   ],
   controllers: [],
   providers: [],

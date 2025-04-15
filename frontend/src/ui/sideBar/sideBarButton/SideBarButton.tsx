@@ -21,7 +21,7 @@ export const SideBarButton = ({ iconSrc: Icon, label, href, navigation, onClick 
   return (
     <>
       {navigation && href ? (
-        <button className='sidebar_button' onClick={() => router.push(href)}>
+        <button className={`sidebar_button${isActive ? ' active' : ''}`} onClick={() => router.push(href)}>
           <Icon
             className='icon'
             style={{ stroke: isActive ? 'black' : 'white', strokeWidth: isActive ? 1 : 0, fill: isActive ? 'black' : 'white' }}

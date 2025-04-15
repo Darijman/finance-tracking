@@ -7,6 +7,9 @@ const signika_negative = Signika_Negative({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Finance-Tracking',
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -20,7 +20,7 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
     });
 
     return res.send({ success: true });
@@ -33,10 +33,10 @@ export class AuthController {
     const { access_token } = await this.authService.logIn(logInUserDto);
 
     res.cookie('access_token', access_token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
     });
 
     return res.send({ success: true });
@@ -49,9 +49,15 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
+  @HttpCode(200)
   @Post('logOut')
   logOutUser(@Res() res: Response) {
-    res.clearCookie('access_token');
+    console.log(`da`);
+    res.clearCookie('access_token', {
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: false,
+    });
     return res.send({ success: true });
   }
 }
