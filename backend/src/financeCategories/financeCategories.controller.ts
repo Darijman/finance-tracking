@@ -45,8 +45,6 @@ export class FinanceCategoriesController {
     @UploadedFile() image: Express.Multer.File,
     @Request() req: any,
   ): Promise<FinanceCategory> {
-    console.log(`createFinanceCategoryDto`, createFinanceCategoryDto);
-
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError);
     }

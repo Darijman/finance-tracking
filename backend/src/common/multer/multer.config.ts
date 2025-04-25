@@ -7,7 +7,7 @@ const allowedTypes = /jpeg|jpg|png|svg/;
 export const multerConfig = {
   storage: diskStorage({
     destination: './public/uploads',
-    filename: (req: Request, file: Express.Multer.File, callback) => {
+    filename: (req: Request, file: Express.Multer.File, callback: (error: Error | null, filename: string) => void) => {
       const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
       callback(null, filename);
     },

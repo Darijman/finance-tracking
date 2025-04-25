@@ -1,0 +1,140 @@
+.delete_modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.delete_modal_content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--foreground-color);
+  color: var(--primary-text-color);
+  width: 400px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.close_delete_modal_button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  color: #d32f2f;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.delete_modal_yes_button,
+.delete_modal_no_button {
+  color: #ffffff;
+  text-transform: uppercase;
+  width: 120px;
+  height: 30px;
+  text-align: center;
+  border-radius: 10px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.delete_modal_yes_button {
+  background-color: #d32f2f;
+  border: 1px solid #d32f2f;
+  margin-right: 20px;
+}
+
+.delete_modal_no_button {
+  background-color: #228b22;
+  border: 1px solid #228b22;
+}
+
+.delete_modal_x_icon_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1px solid #d32f2f;
+  color: #d32f2f;
+  font-size: 30px;
+  user-select: none;
+}
+
+.delete_modal_x_icon_container.success {
+  border-color: #228b22;
+  color: #228b22;
+}
+
+.delete_modal_confirm_title {
+  text-align: center;
+  margin: 10px 0px 20px 0px;
+  font-size: 24px;
+}
+
+.delete_modal_text {
+  margin: 0px 0px 20px 0px;
+  max-width: 300px;
+  width: 100%;
+  line-height: 1.5;
+  color: var(--secondary-text-color);
+  text-align: center;
+}
+
+.delete_modal_yes_button:disabled,
+.delete_modal_no_button:disabled {
+  background-color: #d3d3d3;
+  color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+.delete_modal_yes_button:disabled:hover,
+.delete_modal_no_button:disabled:hover {
+  background-color: #d3d3d3;
+}
+
+.server_error {
+  color: #d32f2f;
+  font-size: 22px;
+  margin: 20px 0px;
+  text-transform: uppercase;
+}
+
+[data-theme='dark'] {
+  .close_delete_modal_button {
+    color: #e57373;
+  }
+
+  .delete_modal_yes_button:disabled,
+  .delete_modal_no_button:disabled {
+    background-color: #d3d3d3;
+    border-color: #d3d3d3;
+    color: #a0a0a0;
+    cursor: not-allowed;
+  }
+
+  .delete_modal_yes_button:disabled:hover,
+  .delete_modal_no_button:disabled:hover {
+    background-color: #d3d3d3;
+  }
+
+  .delete_modal_x_icon_container.success {
+    border-color: #98fb98;
+    color: #98fb98;
+  }
+}

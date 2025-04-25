@@ -25,6 +25,7 @@
 
 .history_top_buttons {
   position: sticky;
+  flex-wrap: nowrap;
   top: -20px;
   z-index: 1000;
   display: flex;
@@ -35,6 +36,16 @@
   margin-bottom: 20px;
   background-color: var(--foreground-color);
   border-radius: 10px;
+}
+
+.sortby_date_and_price_buttons {
+  display: flex;
+  align-items: center;
+}
+
+.sortby_type_buttons {
+  display: flex;
+  align-items: center;
 }
 
 .financenotes_grid {
@@ -154,7 +165,7 @@
   .financenotes_type_word.expense {
     color: #e57373;
   }
-  
+
   .financenotes_type_word.income {
     color: #98fb98;
   }
@@ -164,10 +175,46 @@
   .financenotes_grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .history_top_buttons {
+    padding: 10px;
+  }
 }
 
 @media screen and (max-width: 1000px) {
   .financenotes_grid {
     grid-template-columns: repeat(1, 1fr);
   }
+
+  .history_top_buttons {
+    position: static;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .sortby_date_and_price_buttons {
+    flex-direction: column;
+  }
+
+  .sortby_type_buttons {
+    margin-bottom: 20px;
+    flex-direction: column;
+  }
+
+  .financecategory_select {
+    margin: 0px;
+  }
+
+  .sortby_expense_button {
+    margin: 0px 0px 20px 0px;
+  }
+
+  .financecategory_select {
+    margin-bottom: 20px;
+  }
+
+  .sortby_date_button {
+    margin: 0px 0px 20px 0px;
+  } 
 }

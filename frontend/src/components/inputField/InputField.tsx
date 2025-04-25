@@ -5,7 +5,7 @@ import './inputField.css';
 
 interface InputFieldProps {
   type: string;
-  name: string;
+  name?: string;
   value: string;
   placeholder: string;
   error?: string;
@@ -13,6 +13,7 @@ interface InputFieldProps {
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
+  required?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -25,6 +26,7 @@ const InputField: React.FC<InputFieldProps> = ({
   className = 'inputField',
   style,
   children,
+  required,
 }) => {
   return (
     <>
@@ -36,6 +38,7 @@ const InputField: React.FC<InputFieldProps> = ({
         name={name}
         value={value}
         onChange={onChange}
+        required={required}
       />
       {children}
       {error && <div style={{ color: '#e57373', margin: '5px 0px 0px 0px', fontSize: '14px', textAlign: 'center' }}>{error}</div>}

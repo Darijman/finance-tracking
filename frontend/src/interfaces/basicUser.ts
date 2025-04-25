@@ -1,5 +1,5 @@
 export interface BasicUser {
-  id: string;
-  roleId: string;
+  id: number;
+  roleId: number;
   name: string;
 }

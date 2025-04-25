@@ -35,6 +35,12 @@ main > * {
   --border-color: #DBDBDB;
   --toggle-light-bg: #c7c7c7;
   --toggle-light-slider: #FFFFFF;
+
+  --loader-color-main: rgba(0, 0, 0, 1);
+  --loader-color-mid: rgba(0, 0, 0, 0.5);
+  --loader-color-light: rgba(0, 0, 0, 0.25);
+
+  --submit-button-color: #1677ff;
 }
 
 [data-theme='dark'] {
@@ -46,4 +52,8 @@ main > * {
   --border-color: #262626;
   --toggle-dark-bg: #FFFFFF;
   --toggle-dark-slider: #000000;
+
+  --loader-color-main: rgba(255, 255, 255, 1);
+  --loader-color-mid: rgba(255, 255, 255, 0.5);
+  --loader-color-light: rgba(255, 255, 255, 0.25);
 }

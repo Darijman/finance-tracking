@@ -1,9 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { FinanceNote } from '@/interfaces/financeNote';
 import { formatDate } from '@/helpers/formatDate';
+import { DeleteModal } from '../deleteModal/DeleteModal';
 import Image from 'next/image';
+import api from '../../../axiosInstance';
 import './financeNoteCard.css';
+
+import EditIcon from '@/assets/svg/edit-icon.svg';
+import DeleteIcon from '@/assets/svg/delete-icon.svg';
 
 function formatCurrency(amount: number) {
   return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -11,34 +17,63 @@ function formatCurrency(amount: number) {
 
 interface Props {
   financeNote: FinanceNote;
+  onDelete?: (financeNoteId: number) => void;
+  preview?: boolean;
 }
 
-export const FinanceNoteCard = ({ financeNote }: Props) => {
-  const { id, noteDate, amount, type, category, comment, userId, createdAt, updatedAt } = financeNote;
+export const FinanceNoteCard = ({ financeNote, onDelete, preview }: Props) => {
+  const { id, noteDate, amount, type, category, comment } = financeNote;
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 
   const formattedAmountText = formatCurrency(amount);
-
   const amountText = type === `INCOME` ? `+${formattedAmountText}` : `-${formattedAmountText}`;
   const typeClass = type === 'EXPENSE' ? 'expense_text' : '';
+  const imagePath = category.image
+    ? `http://localhost:9000/uploads/${category.image}`
+    : 'http://localhost:9000/uploads/questionMark-icon.svg';
 
-  const imagePath = category.image ? `http://localhost:9000/uploads/${category.image}` : '/default-image.png';
+  const deleteFinanceNoteHandler = async () => {
+    await api.delete(`/finance_notes/${id}`);
+    if (onDelete) {
+      onDelete(id);
+    }
+    setShowDeleteModal(false);
+  };
 
   return (
-    <div className='notecard_container'>
-      <div className='menu_dots'>⋯</div>
-      <div className='category_image_container'>
-        <Image className='category_image' src={imagePath} alt={category.name} width={40} height={40} />
-      </div>
-      <div className='notecard_top'>
-        <div className={`amount_text ${typeClass}`}>{amountText}</div>
-        <div className={`category_text ${typeClass}`}>
-          <span>{category.name}</span>
+    <>
+      <div className='notecard_container'>
+        {!preview ? (
+          <>
+            <div className='edit_button' title='Edit'>
+              <EditIcon className='edit_icon' />
+            </div>
+            <div className='delete_button' onClick={() => setShowDeleteModal(true)} title='Delete'>
+              <DeleteIcon className='delete_icon' />
+            </div>
+          </>
+        ) : null}
+        <div className='category_image_container'>
+          <Image className='category_image' src={imagePath} alt={category.name} width={40} height={40} />
         </div>
+        <div className='notecard_info'>
+          <div className={`amount_text ${typeClass}`}>{amountText}</div>
+          <div className={`category_text ${typeClass}`}>
+            <span>{category.name}</span>
+          </div>
+        </div>
+        <div className='notecard_mid'>
+          <p className='notecard_comment'>{comment}</p>
+        </div>
+        <div className='note_created_date'>{formatDate(noteDate, true)}</div>
       </div>
-      <div className='notecard_mid'>
-        <p className='notecard_comment'>{comment}</p>
-      </div>
-      <div className='note_created_date'>{formatDate(noteDate, true)}</div>
-    </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDelete={deleteFinanceNoteHandler}
+        text='Do you really want to delete this Note? This process cannot be undone.'
+      />
+    </>
   );
 };

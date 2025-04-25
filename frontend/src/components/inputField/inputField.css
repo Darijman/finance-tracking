@@ -10,7 +10,7 @@
 }
 
 .inputField::placeholder {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--secondary-text-color);
 }
 

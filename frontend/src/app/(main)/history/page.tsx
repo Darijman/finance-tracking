@@ -2,14 +2,18 @@
 
 import { FinanceNoteCard } from '@/components/financeNoteCard/FinanceNoteCard';
 import { useAuth } from '@/contexts/authContext/AuthContext';
+import { useLoader } from '@/contexts/loaderContext/LoaderContext';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FinanceNote } from '@/interfaces/financeNote';
 import { FinanceCategory } from '@/interfaces/financeCategory';
-import api from '../../../../axiosInstance';
+import { Loader } from '@/ui/loader/Loader';
+import { getFinanceCategories, getUserNotes } from './requests';
 import './history.css';
 
 const History = () => {
   const { user } = useAuth();
+
+  const { isLoading, showLoader, hideLoader } = useLoader();
   const [userFinanceNotes, setUserFinanceNotes] = useState<FinanceNote[]>([]);
   const [financeCategories, setFinanceCategories] = useState<FinanceCategory[]>([]);
 
@@ -18,26 +22,29 @@ const History = () => {
   const [sortByPrice, setSortByPrice] = useState<'asc' | 'desc' | null>(null);
   const [sortByType, setSortByType] = useState<'INCOME' | 'EXPENSE' | null>(null);
 
-  const getUserNotes = useCallback(async () => {
+  const getData = useCallback(async () => {
     if (user) {
-      const response = await api.get<FinanceNote[]>(`/finance_notes/user/${user?.id}`);
-      setUserFinanceNotes(response.data);
-    }
-  }, [user]);
+      try {
+        // showLoader();
+        const [notes, categories] = await Promise.all([getUserNotes(user.id), getFinanceCategories(user.id)]);
 
-  const getFinanceCategories = useCallback(async () => {
-    if (user) {
-      const mainFinanceCategories = await api.get<FinanceCategory[]>(`/finance_categories/`);
-      const userFinanceCategories = await api.get<FinanceCategory[]>(`/finance_categories/user/${user.id}`);
-      const allCategories = mainFinanceCategories.data.concat(userFinanceCategories.data);
-      setFinanceCategories(allCategories);
+        setUserFinanceNotes(notes);
+        setFinanceCategories(categories);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      } finally {
+        // hideLoader();
+      }
     }
-  }, [user]);
+  }, [user, hideLoader, showLoader]);
 
   useEffect(() => {
-    getUserNotes();
-    getFinanceCategories();
-  }, [getUserNotes, getFinanceCategories]);
+    getData();
+  }, [getData]);
+
+  const deleteFinanceNoteHandler = (noteId: number) => {
+    setUserFinanceNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+  };
 
   const categoryOnChangeHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCategory = event.target.value;
@@ -83,67 +90,75 @@ const History = () => {
   }, [userFinanceNotes, selectedFinanceCategory, sortByType, sortByDate, sortByPrice]);
 
   return (
-    <div className='history_container'>
-      <h2 className='history_title'>History</h2>
-      <div className='history_top_buttons'>
-        <div>
-          <button
-            className={`sortby_expense_button ${sortByType === 'EXPENSE' ? 'active' : ''}`}
-            onClick={() => setSortByType((prev) => (prev === 'EXPENSE' ? null : 'EXPENSE'))}
-          >
-            EXPENSE
-          </button>
-          <button
-            className={`sortby_income_button ${sortByType === 'INCOME' ? 'active' : ''}`}
-            onClick={() => setSortByType((prev) => (prev === 'INCOME' ? null : 'INCOME'))}
-          >
-            INCOME
-          </button>
-        </div>
-        <select className='financecategory_select' value={selectedFinanceCategory} onChange={categoryOnChangeHandler}>
-          <option value=''>Category</option>
-          {financeCategories.map((financeCategory) => {
-            return (
-              <option key={financeCategory.id} value={financeCategory.name}>
-                {financeCategory.name}
-              </option>
-            );
-          })}
-        </select>
-        <div>
-          <button className='sortby_date_button' onClick={sortByDateHandler}>
-            Date
-            {sortByDate === 'asc' && <span className='sort_arrow up'></span>}
-            {sortByDate === 'desc' && <span className='sort_arrow down'></span>}
-          </button>
-          <button className='sortby_price_button' onClick={sortByPriceHandler}>
-            Price
-            {sortByPrice === 'asc' && <span className='sort_arrow up'></span>}
-            {sortByPrice === 'desc' && <span className='sort_arrow down'></span>}
-            {sortByPrice === null && <span className='sort_arrow none'></span>}
-          </button>
-        </div>
-      </div>
-      <hr className='history_divider' />
-      <div>
-        {sortByType || selectedFinanceCategory ? (
-          <h3 className='financenotes_type_title'>
-            ({selectedFinanceCategory})
-            <span className={`financenotes_type_word ${sortByType === 'EXPENSE' ? 'expense' : 'income'}`}>Only {sortByType}</span>
-          </h3>
-        ) : null}
-        {/* {selectedFinanceCategory ? (
+    <>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <div className='history_container'>
+          <h2 className='history_title'>History</h2>
+          <div className='history_top_buttons'>
+            <div className='sortby_type_buttons'>
+              <button
+                className={`sortby_expense_button ${sortByType === 'EXPENSE' ? 'active' : ''}`}
+                onClick={() => setSortByType((prev) => (prev === 'EXPENSE' ? null : 'EXPENSE'))}
+              >
+                EXPENSE
+              </button>
+              <button
+                className={`sortby_income_button ${sortByType === 'INCOME' ? 'active' : ''}`}
+                onClick={() => setSortByType((prev) => (prev === 'INCOME' ? null : 'INCOME'))}
+              >
+                INCOME
+              </button>
+            </div>
+            <select className='financecategory_select' value={selectedFinanceCategory} onChange={categoryOnChangeHandler}>
+              <option value=''>Category</option>
+              {financeCategories.map((financeCategory) => {
+                return (
+                  <option key={financeCategory.id} value={financeCategory.name}>
+                    {financeCategory.name}
+                  </option>
+                );
+              })}
+            </select>
+            <div className='sortby_date_and_price_buttons'>
+              <button className='sortby_date_button' onClick={sortByDateHandler}>
+                Date
+                {sortByDate === 'asc' && <span className='sort_arrow up'></span>}
+                {sortByDate === 'desc' && <span className='sort_arrow down'></span>}
+              </button>
+              <button className='sortby_price_button' onClick={sortByPriceHandler}>
+                Price
+                {sortByPrice === 'asc' && <span className='sort_arrow up'></span>}
+                {sortByPrice === 'desc' && <span className='sort_arrow down'></span>}
+                {sortByPrice === null && <span className='sort_arrow none'></span>}
+              </button>
+            </div>
+          </div>
+          <hr className='history_divider' />
+          <div>
+            {sortByType || selectedFinanceCategory ? (
+              <h3 className='financenotes_type_title'>
+                ({selectedFinanceCategory})
+                <span className={`financenotes_type_word ${sortByType === 'EXPENSE' ? 'expense' : 'income'}`}>Only {sortByType}</span>
+              </h3>
+            ) : null}
+            {/* {selectedFinanceCategory ? (
           <h3 className='financenotes_type_title'>
             Only <span className='financenotes_type_word'>{selectedFinanceCategory}</span>
           </h3>
         ) : null} */}
-        <div className='financenotes_grid'>
-          {filteredAndSortedFinanceNotes.map((financeNote) => {
-            return <FinanceNoteCard key={financeNote.id} financeNote={financeNote} />;
-          })}
+            <div className='financenotes_grid'>
+              {filteredAndSortedFinanceNotes.map((financeNote) => {
+                return (
+                  <FinanceNoteCard key={financeNote.id} financeNote={financeNote} onDelete={() => deleteFinanceNoteHandler(financeNote.id)} />
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
