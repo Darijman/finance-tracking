@@ -4,14 +4,17 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LoginUser } from '@/interfaces/loginUser';
 import { areObjectsEqual } from '@/helpers/areObjectsEqual';
+import { InputField } from '@/components/inputField/InputField';
+import { Form } from 'antd';
+import { Button } from '@/components/button/Button';
 import useAuthValidation from '@/hooks/useAuthValidation/UseAuthValidation';
-import InputField from '@/components/inputField/InputField';
 import api from '../../../../../axiosInstance';
 import Link from 'next/link';
 import './loginForm.css';
 
 export const LoginForm = () => {
   const router = useRouter();
+  const [form] = Form.useForm();
 
   const [loginUser, setLoginUser] = useState<LoginUser>({
     email: '',
@@ -24,8 +27,6 @@ export const LoginForm = () => {
   });
 
   const [serverError, setServerError] = useState<{ error: string; type: 'EMAIL' | 'PASSWORD' | '' }>({ error: '', type: '' });
-  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-
   const { errors, inputsTouched, validateInputs, markFieldAsTouched } = useAuthValidation('login');
 
   const inputOnChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,8 +35,7 @@ export const LoginForm = () => {
 
     setLoginUser((prev) => {
       const updatedUser = { ...prev, [fieldName]: value };
-
-      const hasDataChanged = !areObjectsEqual(updatedUser, submittedUser);
+      const hasDataChanged = !areObjectsEqual(form.getFieldsValue(), submittedUser);
 
       if (serverError.error && hasDataChanged) {
         setServerError({ error: '', type: '' });
@@ -48,32 +48,31 @@ export const LoginForm = () => {
     markFieldAsTouched(fieldName);
   };
 
-  const onSubmitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const onFinishHandler = async (values: LoginUser) => {
     const hasErrors = Object.values(errors).some((error) => error);
     if (hasErrors) {
       setServerError({ error: 'Please fix the validation errors!', type: '' });
       return;
     }
 
-    setSubmittedUser(loginUser);
+    setSubmittedUser(values);
 
     await api
-      .post(`/auth/login`, loginUser)
+      .post(`/auth/login`, values)
       .then(async () => {
         setSubmittedUser({ email: '', password: '' });
         setLoginUser({ email: '', password: '' });
         router.push('/');
       })
-      .catch(({ error, type }) => {
-        setServerError({ error: error || 'Something went wrong...', type: type || '' });
+      .catch((error) => {
+        const errorMessage = error.response.data?.error;
+        const errorType = error.response.data?.type;
+        setServerError({ error: errorMessage || 'Something went wrong...', type: errorType || '' });
       });
   };
 
-  // Show only the first validation error in order: Email → Password
-  const emailError = !errors.name && inputsTouched.email && errors.email ? errors.email : '';
-  const passwordError = !errors.name && !errors.email && inputsTouched.password && errors.password ? errors.password : '';
+  const emailError = inputsTouched.email && errors.email ? errors.email : '';
+  const passwordError = !errors.email && inputsTouched.password && errors.password ? errors.password : '';
 
   const isSubmitButtonDisabled =
     Boolean(errors.name) ||
@@ -90,51 +89,35 @@ export const LoginForm = () => {
         <h1 className='login_title'>Login</h1>
         {serverError && <div className='login_server_error'>{serverError.error}</div>}
         <hr className='login_title_divider' />
-        <form onSubmit={onSubmitHandler}>
+        <Form form={form} onFinish={onFinishHandler} name='login'>
           <div className='login_main'>
-            <div className='login_item'>
+            <Form.Item
+              name='email'
+              rules={[{ required: true, message: emailError || 'Invalid email format!', type: 'email' }]}
+              style={{ maxWidth: '300px', width: '100%', textAlign: 'center', margin: '0px 0px 20px 0px' }}
+            >
+              <InputField placeHolder='Email*' value={loginUser.email} onChange={inputOnChangeHandler} name='email' maxLength={254} />
+            </Form.Item>
+            <Form.Item
+              name='password'
+              rules={[{ required: true, message: passwordError || 'Please input your password!' }]}
+              style={{ maxWidth: '300px', width: '100%', textAlign: 'center', margin: '0px 0px 20px 0px' }}
+            >
               <InputField
-                type='email'
-                placeholder='Email*'
-                name='email'
-                value={loginUser.email}
-                onChange={inputOnChangeHandler}
-                error={emailError}
-                style={{
-                  border: serverError.type === 'EMAIL' ? '1px solid #e57373' : 'none',
-                  boxShadow: serverError.type === 'EMAIL' ? '0 0 5px #e57373' : 'none',
-                }}
-              />
-            </div>
-
-            <div className='password_input_container'>
-              <InputField
-                type='text'
-                placeholder='Password*'
-                name='password'
+                placeHolder='Password*'
                 value={loginUser.password}
                 onChange={inputOnChangeHandler}
-                error={passwordError}
-                style={{
-                  border: serverError.type === 'PASSWORD' ? '1px solid #e57373' : 'none',
-                  boxShadow: serverError.type === 'PASSWORD' ? '0 0 5px #e57373' : 'none',
-                }}
+                name='password'
+                type='password'
+                minLength={6}
+                maxLength={20}
               />
-              <button
-                type='button'
-                className='toggle_password_button'
-                onMouseDown={() => setPasswordVisible((prev) => !prev)}
-                title={passwordVisible ? 'Hide password' : 'Show password'}
-              >
-                {passwordVisible ? '👁️' : '🙈'}
-              </button>
-            </div>
-
-            <button className='login_submit_button' type='submit' disabled={!!isSubmitButtonDisabled}>
-              Login
-            </button>
+            </Form.Item>
+            <Form.Item style={{ maxWidth: '300px', width: '100%', textAlign: 'center' }}>
+              <Button className='login_submit_button' htmlType='submit' disabled={isSubmitButtonDisabled} label='Login' />
+            </Form.Item>
           </div>
-        </form>
+        </Form>
         <div className='no_account'>
           <span style={{ marginRight: '5px' }}>Do not have an account?</span>
           <Link href='/auth/register'>Sign Up</Link>

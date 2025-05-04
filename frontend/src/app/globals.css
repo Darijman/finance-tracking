@@ -14,16 +14,7 @@ body {
 }
 
 main {
-  display: flex;
   flex-grow: 1;
-  padding: 20px 50px 50px 50px;
-  height: 100vh;
-  overflow-y: auto;
-}
-
-main > * {
-  flex-grow: 1;
-  width: 100%;
 }
 
 :root {
@@ -41,6 +32,9 @@ main > * {
   --loader-color-light: rgba(0, 0, 0, 0.25);
 
   --submit-button-color: #1677ff;
+
+  --red-color: #d32f2f;
+  --green-color: #228b22;
 }
 
 [data-theme='dark'] {
@@ -56,4 +50,15 @@ main > * {
   --loader-color-main: rgba(255, 255, 255, 1);
   --loader-color-mid: rgba(255, 255, 255, 0.5);
   --loader-color-light: rgba(255, 255, 255, 0.25);
+
+  --red-color: #e57373;
+  --green-color: #98fb98;;
 }
+
+/* antd start */
+
+.ant-tooltip-inner {
+  color: var(--primary-text-color) !important;
+}
+
+/* antd end */

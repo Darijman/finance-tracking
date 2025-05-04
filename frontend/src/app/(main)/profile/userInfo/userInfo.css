@@ -32,7 +32,3 @@ dt {
   padding: 10px;
   border-radius: 10px;
 }
-
-.userinfo_list_item:last-child {
-  margin-bottom: 0px;
-}

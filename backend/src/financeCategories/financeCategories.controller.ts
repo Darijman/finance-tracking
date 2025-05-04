@@ -67,7 +67,7 @@ export class FinanceCategoriesController {
     }
 
     if (currentUser.id !== financeCategory.userId) {
-      throw new ForbiddenException({ error: 'You do not have permission to access this resource!' });
+      throw new ForbiddenException({ error: 'You do not have permission!' });
     }
 
     return financeCategory;
@@ -82,7 +82,7 @@ export class FinanceCategoriesController {
     }
 
     if (currentUser.id !== userId) {
-      throw new ForbiddenException({ error: 'You do not have permission to access this resource!' });
+      throw new ForbiddenException({ error: 'You do not have permission!' });
     }
 
     return await this.financeCategoriesService.getFinanceCategoriesByUserId(userId);

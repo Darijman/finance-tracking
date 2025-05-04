@@ -2,13 +2,17 @@
 
 import { FinanceNoteCard } from '@/components/financeNoteCard/FinanceNoteCard';
 import { useAuth } from '@/contexts/authContext/AuthContext';
+import { Typography } from 'antd';
 import { useLoader } from '@/contexts/loaderContext/LoaderContext';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FinanceNote } from '@/interfaces/financeNote';
 import { FinanceCategory } from '@/interfaces/financeCategory';
 import { Loader } from '@/ui/loader/Loader';
 import { getFinanceCategories, getUserNotes } from './requests';
+import { AnimatePresence, motion } from 'framer-motion';
 import './history.css';
+
+const { Title } = Typography;
 
 const History = () => {
   const { user } = useAuth();
@@ -23,9 +27,9 @@ const History = () => {
   const [sortByType, setSortByType] = useState<'INCOME' | 'EXPENSE' | null>(null);
 
   const getData = useCallback(async () => {
-    if (user) {
+    if (user.id) {
       try {
-        // showLoader();
+        showLoader();
         const [notes, categories] = await Promise.all([getUserNotes(user.id), getFinanceCategories(user.id)]);
 
         setUserFinanceNotes(notes);
@@ -33,7 +37,7 @@ const History = () => {
       } catch (err) {
         console.error('Error fetching data:', err);
       } finally {
-        // hideLoader();
+        hideLoader();
       }
     }
   }, [user, hideLoader, showLoader]);
@@ -95,7 +99,9 @@ const History = () => {
         <Loader />
       ) : (
         <div className='history_container'>
-          <h2 className='history_title'>History</h2>
+          <Title level={1} style={{ textAlign: 'center', margin: '0px 0px 20px 0px' }}>
+            History
+          </Title>
           <div className='history_top_buttons'>
             <div className='sortby_type_buttons'>
               <button
@@ -137,23 +143,35 @@ const History = () => {
           </div>
           <hr className='history_divider' />
           <div>
-            {sortByType || selectedFinanceCategory ? (
-              <h3 className='financenotes_type_title'>
-                ({selectedFinanceCategory})
-                <span className={`financenotes_type_word ${sortByType === 'EXPENSE' ? 'expense' : 'income'}`}>Only {sortByType}</span>
-              </h3>
-            ) : null}
-            {/* {selectedFinanceCategory ? (
-          <h3 className='financenotes_type_title'>
-            Only <span className='financenotes_type_word'>{selectedFinanceCategory}</span>
-          </h3>
-        ) : null} */}
+            {(sortByType || selectedFinanceCategory) && (
+              <Title level={3} style={{ margin: '0px 0px 10px 0px', textAlign: 'center' }}>
+                {sortByType && (
+                  <span className={`financenotes_type_word ${sortByType === 'EXPENSE' ? 'expense' : 'income'}`}>{sortByType}</span>
+                )}
+                {selectedFinanceCategory && (
+                  <>
+                    {sortByType ? ' ' : ''}({selectedFinanceCategory})
+                  </>
+                )}
+              </Title>
+            )}
             <div className='financenotes_grid'>
-              {filteredAndSortedFinanceNotes.map((financeNote) => {
-                return (
-                  <FinanceNoteCard key={financeNote.id} financeNote={financeNote} onDelete={() => deleteFinanceNoteHandler(financeNote.id)} />
-                );
-              })}
+              <AnimatePresence>
+                {filteredAndSortedFinanceNotes.map((financeNote, index) => (
+                  <motion.div
+                    key={financeNote.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -100 }}
+                    transition={{
+                      delay: index < 6 ? index * 0.03 : 0.15,
+                      duration: 0.2,
+                    }}
+                  >
+                    <FinanceNoteCard financeNote={financeNote} onDelete={() => deleteFinanceNoteHandler(financeNote.id)} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           </div>
         </div>

@@ -15,12 +15,12 @@ async function bootstrap() {
       transform: true,
       stopAtFirstError: true,
       exceptionFactory: (errors) => {
-        const firstError = errors[0];
-        const firstErrorText = Object.values(firstError.constraints)[0];
-        return new BadRequestException({ error: firstErrorText });
+        console.log('Validation errors:', errors);
+        return new BadRequestException({ error: 'Something went wrong...' });
       },
     }),
   );
+
   app.use(express.static('public'));
   app.use(express.json());
   app.use(cors({ origin: 'http://localhost:3000', credentials: true }));

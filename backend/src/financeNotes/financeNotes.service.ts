@@ -36,7 +36,7 @@ export class FinanceNotesService {
     return note;
   }
 
-  async getFinanceNotesByUserId(userId: number): Promise<FinanceNote[]> {
+  async getFinanceNotesByUserId(userId: number, limit?: number): Promise<FinanceNote[]> {
     if (isNaN(userId)) {
       throw new BadRequestException({ error: 'Invalid user ID!' });
     }
@@ -59,6 +59,7 @@ export class FinanceNotesService {
       order: {
         noteDate: 'DESC',
       },
+      take: limit ? limit : undefined,
     });
 
     const transformedNotes = plainToInstance(FinanceNote, userNotes);

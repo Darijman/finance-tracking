@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
     const user = await this.usersService.getUserByIdWithRole(payload?.id);
 
     if (isAdminRequired && user.role.name !== 'ADMIN') {
-      throw new ForbiddenException({ error: 'You do not have permission to access this resource!' });
+      throw new ForbiddenException({ error: 'You do not have permission!' });
     }
 
     request['user'] = payload;

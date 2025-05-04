@@ -1,49 +1,154 @@
 'use client';
 
-import React from 'react';
+import React, { ReactNode } from 'react';
+import { ConfigProvider, Input } from 'antd';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import './inputField.css';
 
-interface InputFieldProps {
-  type: string;
-  name?: string;
-  value: string;
-  placeholder: string;
-  error?: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
+interface Props {
+  variant?: 'outlined' | 'filled' | 'borderless' | 'underlined';
+  size?: 'large' | 'middle' | 'small';
+  value?: string;
+  defaultValue?: string;
+  placeHolder?: string;
+  type?: 'search' | 'password';
   style?: React.CSSProperties;
-  children?: React.ReactNode;
-  required?: boolean;
+  allowClear?: boolean;
+  disabled?: boolean;
+  maxLength?: number;
+  minLength?: number;
+  status?: 'error' | 'warning' | '';
+  loading?: boolean;
+  visible?: boolean;
+  name?: string;
+  className?: string;
+  iconRender?: (visible: boolean) => ReactNode;
+  onVisibleChange?: (visible: boolean) => void;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onSearch?: (
+    value: string,
+    event?: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLInputElement> | undefined,
+    info?: { source?: 'input' | 'clear' },
+  ) => void;
+  onClear?: () => void;
 }
 
-const InputField: React.FC<InputFieldProps> = ({
-  type,
-  name,
+export const InputField = ({
+  variant,
+  size,
   value,
-  placeholder,
-  error,
-  onChange,
-  className = 'inputField',
+  defaultValue,
+  placeHolder,
+  type,
   style,
-  children,
-  required,
-}) => {
+  allowClear,
+  disabled,
+  maxLength,
+  minLength,
+  status,
+  loading,
+  visible,
+  name,
+  className,
+  iconRender = (visible): ReactNode => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />),
+  onVisibleChange,
+  onChange,
+  onSearch,
+  onClear,
+}: Props) => {
   return (
-    <>
-      <input
-        style={style}
-        className={`${className} ${error ? 'error' : ''}`}
-        type={type}
-        placeholder={placeholder}
-        name={name}
-        value={value}
-        onChange={onChange}
-        required={required}
-      />
-      {children}
-      {error && <div style={{ color: '#e57373', margin: '5px 0px 0px 0px', fontSize: '14px', textAlign: 'center' }}>{error}</div>}
-    </>
+    <ConfigProvider
+      theme={{
+        components: {
+          Input: {
+            colorBgContainer: 'var(--background-color)',
+            colorBorder: 'var(--background-color)',
+            colorText: 'var(--primary-text-color)',
+            activeBorderColor: 'var(--primary-text-color)',
+            activeShadow: 'none',
+            hoverBorderColor: 'none',
+
+            colorTextPlaceholder: 'var(--secondary-text-color)',
+            colorError: 'var(--red-color)',
+            colorSuccess: 'var(--green-color)',
+            colorErrorBorder: 'var(--red-color)',
+            colorErrorBorderHover: 'var(--red-color)',
+            colorSuccessBorder: 'var(--green-color)',
+            colorSuccessBorderHover: 'var(--green-color)',
+
+            fontSize: 16,
+            paddingInline: 20,
+            paddingInlineLG: 20,
+            paddingInlineSM: 20,
+            paddingBlockLG: 10,
+            paddingBlockSM: 10,
+            paddingBlock: 10,
+            borderRadiusLG: 10,
+            borderRadiusSM: 10,
+            borderRadiusXS: 10,
+          },
+        },
+      }}
+    >
+      {type === 'password' ? (
+        <Input.Password
+          variant={variant}
+          size={size}
+          value={value}
+          defaultValue={defaultValue}
+          placeholder={placeHolder}
+          style={style}
+          allowClear={allowClear}
+          disabled={disabled}
+          maxLength={maxLength}
+          minLength={minLength}
+          status={status}
+          name={name}
+          className={className}
+          iconRender={iconRender}
+          onChange={onChange}
+          visibilityToggle={{ visible, onVisibleChange }}
+          onClear={onClear}
+        />
+      ) : type === 'search' ? (
+        <Input.Search
+          variant={variant}
+          size={size}
+          value={value}
+          defaultValue={defaultValue}
+          placeholder={placeHolder}
+          style={style}
+          allowClear={allowClear}
+          disabled={disabled}
+          maxLength={maxLength}
+          minLength={minLength}
+          status={status}
+          name={name}
+          className={className}
+          loading={loading}
+          onChange={onChange}
+          onSearch={onSearch}
+          onClear={onClear}
+        />
+      ) : (
+        <Input
+          variant={variant}
+          size={size}
+          value={value}
+          defaultValue={defaultValue}
+          placeholder={placeHolder}
+          style={style}
+          allowClear={allowClear}
+          disabled={disabled}
+          maxLength={maxLength}
+          minLength={minLength}
+          status={status}
+          name={name}
+          className={className}
+          onChange={onChange}
+          onClear={onClear}
+        />
+      )}
+    </ConfigProvider>
   );
 };
-
-export default InputField;

@@ -1,0 +1,5 @@
+.scroll_container {
+  position: relative;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}

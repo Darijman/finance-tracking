@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const { setTheme } = useTheme();
 
   useEffect(() => {
-    setTheme('light');
+    setTheme('dark');
   }, [setTheme]);
 
   return <main>{children}</main>;

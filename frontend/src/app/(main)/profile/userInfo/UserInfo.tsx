@@ -14,18 +14,18 @@ export const UserInfo = () => {
   const { user } = useAuth();
 
   const getUserInfo = useCallback(async () => {
-    if (user) {
+    if (user.id) {
       const response = await api.get<FullUser>(`/users/${user.id}`);
       setUserInfo(response.data);
     }
-  }, [user]);
+  }, [user.id]);
 
   const getNotesByUserId = useCallback(async () => {
-    if (user) {
+    if (user.id) {
       const response = await api.get<FinanceNote[]>(`/finance_notes/user/${user.id}`);
       setUserFinanceNotes(response.data);
     }
-  }, [user]);
+  }, [user.id]);
 
   useEffect(() => {
     getUserInfo();

@@ -10,6 +10,7 @@ import './financeNoteCard.css';
 
 import EditIcon from '@/assets/svg/edit-icon.svg';
 import DeleteIcon from '@/assets/svg/delete-icon.svg';
+// import { EditModal } from '../editFinanceNoteModal/EditFinanceNoteModal';
 
 function formatCurrency(amount: number) {
   return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -24,6 +25,7 @@ interface Props {
 export const FinanceNoteCard = ({ financeNote, onDelete, preview }: Props) => {
   const { id, noteDate, amount, type, category, comment } = financeNote;
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
   const formattedAmountText = formatCurrency(amount);
   const amountText = type === `INCOME` ? `+${formattedAmountText}` : `-${formattedAmountText}`;
@@ -40,12 +42,14 @@ export const FinanceNoteCard = ({ financeNote, onDelete, preview }: Props) => {
     setShowDeleteModal(false);
   };
 
+  const editFinanceNoteHandler = async () => {};
+
   return (
     <>
       <div className='notecard_container'>
         {!preview ? (
           <>
-            <div className='edit_button' title='Edit'>
+            <div className='edit_button' title='Edit' onClick={() => setShowEditModal(true)}>
               <EditIcon className='edit_icon' />
             </div>
             <div className='delete_button' onClick={() => setShowDeleteModal(true)} title='Delete'>
@@ -72,8 +76,15 @@ export const FinanceNoteCard = ({ financeNote, onDelete, preview }: Props) => {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onDelete={deleteFinanceNoteHandler}
-        text='Do you really want to delete this Note? This process cannot be undone.'
+        text='Do you really want to delete this Note? This process cannot be undone!'
       />
+
+      {/* <EditModal
+        isOpen={showEditModal}
+        financeNote={financeNote}
+        onClose={() => setShowEditModal(false)}
+        onConfirm={editFinanceNoteHandler}
+      /> */}
     </>
   );
 };

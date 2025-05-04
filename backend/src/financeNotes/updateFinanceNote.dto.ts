@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsString, IsOptional, IsDate, MaxLength, MinLength } from 'class-validator';
+import { IsEnum, IsNumber, IsString, IsOptional, IsDate, MaxLength } from 'class-validator';
 import { NoteType } from './financeNote.entity';
 import { Transform } from 'class-transformer';
 
@@ -9,7 +9,7 @@ export class UpdateFinanceNoteDto {
   noteDate?: Date;
 
   @IsOptional()
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   amount?: number;
 
   @IsOptional()
@@ -28,6 +28,5 @@ export class UpdateFinanceNoteDto {
   @IsOptional()
   @IsString()
   @MaxLength(255, { message: 'Comment must contain no more than 255 letters!' })
-  @MinLength(1, { message: 'Comment must contain at least 1 letter!' })
   comment?: string;
 }

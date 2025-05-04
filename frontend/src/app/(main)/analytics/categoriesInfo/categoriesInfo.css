@@ -1,0 +1,18 @@
+.only_current_month_button {
+  background-color: #8884d8 !important;
+  border-color: #8884d8 !important;
+  color: var(--primary-text-color) !important;
+  font-size: 16px !important;
+  transform: scale(1);
+  transition: transform 0.2s ease;
+  &:hover {
+    color: var(--primary-text-color) !important;
+    opacity: 0.8;
+  }
+}
+
+.only_current_month_button.active {
+  font-weight: bold;
+  transform: scale(1.2);
+  border-color: var(--primary-text-color) !important;
+}

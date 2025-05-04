@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, UseInterceptors, UseGuards, Request, ForbiddenException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Put,
+  Body,
+  Param,
+  UseInterceptors,
+  UseGuards,
+  Request,
+  ForbiddenException,
+  Query,
+} from '@nestjs/common';
 import { FinanceNotesService } from './financeNotes.service';
 import { CreateFinanceNoteDto } from './createFinanceNote.dto';
 import { UpdateFinanceNoteDto } from './updateFinanceNote.dto';
@@ -38,7 +51,7 @@ export class FinanceNotesController {
     }
 
     if (currentUser.id !== note.userId) {
-      throw new ForbiddenException({ error: 'You do not have permission to access this resource!' });
+      throw new ForbiddenException({ error: 'You do not have permission!' });
     }
 
     return note;
@@ -46,17 +59,21 @@ export class FinanceNotesController {
 
   @UseGuards(AuthGuard)
   @Get('user/:userId')
-  async getFinanceNotesByUserId(@Param('userId') userId: number, @Request() req: any): Promise<FinanceNote[]> {
+  async getFinanceNotesByUserId(
+    @Param('userId') userId: number,
+    @Request() req: any,
+    @Query('limit') limit?: number,
+  ): Promise<FinanceNote[]> {
     const currentUser = await this.usersService.getUserByIdWithRole(req.user.id);
     if (currentUser.role.name === 'ADMIN') {
       return await this.financeNotesService.getFinanceNotesByUserId(userId);
     }
 
     if (currentUser.id !== userId) {
-      throw new ForbiddenException({ error: 'You do not have permission to access this resource!' });
+      throw new ForbiddenException({ error: 'You do not have permission!' });
     }
 
-    return await this.financeNotesService.getFinanceNotesByUserId(userId);
+    return await this.financeNotesService.getFinanceNotesByUserId(userId, limit);
   }
 
   @UseGuards(AuthGuard)

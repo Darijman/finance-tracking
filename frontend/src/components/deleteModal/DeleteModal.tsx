@@ -56,7 +56,7 @@ export const DeleteModal = ({ isOpen, onClose, onDelete, text, style }: Props) =
         )}
 
         {serverError.error ? (
-          <div className='server_error'>{serverError.error}</div>
+          <div className='delete_modal_server_error'>{serverError.error}</div>
         ) : (
           <>
             <h3 className='delete_modal_confirm_title'>Are you sure?</h3>
@@ -67,10 +67,10 @@ export const DeleteModal = ({ isOpen, onClose, onDelete, text, style }: Props) =
         {!serverError.error ? (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <button className='delete_modal_yes_button' onClick={handleDelete} disabled={isDeleting}>
-              Yes
+              Yes, delete
             </button>
             <button className='delete_modal_no_button' onClick={onClose} disabled={isDeleting}>
-              No
+              Cancel
             </button>
           </div>
         ) : null}

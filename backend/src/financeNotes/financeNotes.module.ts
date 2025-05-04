@@ -7,10 +7,14 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 import { RedisModule } from 'src/common/redis/redis.module';
+import { FinanceNotesSummaryService } from './summary/financeNotes.summary.service';
+import { FinanceNotesAnalyticsService } from './analytics/financeNotes.analytics.service';
+import { FinanceNotesAnalyticsController } from './analytics/financeNotes.analytics.controller';
+import { FinanceNotesSummaryController } from './summary/financeNotes.summary.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([FinanceNote]), UsersModule, JwtModule, AuthModule, RedisModule],
-  controllers: [FinanceNotesController],
-  providers: [FinanceNotesService],
+  controllers: [FinanceNotesController, FinanceNotesSummaryController, FinanceNotesAnalyticsController],
+  providers: [FinanceNotesService, FinanceNotesSummaryService, FinanceNotesAnalyticsService],
 })
 export class FinanceNotesModule {}

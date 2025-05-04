@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { RegisterUser } from '@/interfaces/registerUser';
 import { areObjectsEqual } from '@/helpers/areObjectsEqual';
 import useAuthValidation from '@/hooks/useAuthValidation/UseAuthValidation';
-import InputField from '@/components/inputField/InputField';
+import { InputField } from '@/components/inputField/InputField';
 import api from '../../../../../axiosInstance';
 import Link from 'next/link';
 import './registerForm.css';
@@ -98,12 +98,12 @@ export const RegisterForm = () => {
           <div className='register_main'>
             <div className='register_item'>
               <InputField
-                type='text'
-                placeholder='Name*'
+                // type='text'
+                placeHolder='Name*'
                 name='name'
                 value={registrationUser.name}
                 onChange={inputOnChangeHandler}
-                error={nameError}
+                // error={nameError}
                 style={{
                   border: serverError.type === 'NAME' ? '1px solid #e57373' : 'none',
                   boxShadow: serverError.type === 'NAME' ? '0 0 5px #e57373' : 'none',
@@ -113,12 +113,12 @@ export const RegisterForm = () => {
 
             <div className='register_item'>
               <InputField
-                type='email'
-                placeholder='Email*'
+                // type='email'
+                placeHolder='Email*'
                 name='email'
                 value={registrationUser.email}
                 onChange={inputOnChangeHandler}
-                error={emailError}
+                // error={emailError}
                 style={{
                   border: serverError.type === 'EMAIL' ? '1px solid #e57373' : 'none',
                   boxShadow: serverError.type === 'EMAIL' ? '0 0 5px #e57373' : 'none',
@@ -128,12 +128,12 @@ export const RegisterForm = () => {
 
             <div className='password_input_container'>
               <InputField
-                type={passwordVisible ? 'text' : 'password'}
-                placeholder='Password*'
+                // type={passwordVisible ? 'text' : 'password'}
+                placeHolder='Password*'
                 name='password'
                 value={registrationUser.password}
                 onChange={inputOnChangeHandler}
-                error={passwordError}
+                // error={passwordError}
                 style={{
                   border: serverError.type === 'PASSWORD' ? '1px solid #e57373' : 'none',
                   boxShadow: serverError.type === 'PASSWORD' ? '0 0 5px #e57373' : 'none',
