@@ -29,7 +29,7 @@ export const SubMenu = ({ closeSubMenu, buttonRef }: Props) => {
 
   const logOutUser = async () => {
     await api.post(`/auth/logOut`);
-    setUser(null);
+    setUser({ id: 0, name: '', roleId: 0 });
     router.push(`/auth/login`);
   };
 

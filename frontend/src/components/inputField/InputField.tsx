@@ -3,7 +3,6 @@
 import React, { ReactNode } from 'react';
 import { ConfigProvider, Input } from 'antd';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
-import './inputField.css';
 
 interface Props {
   variant?: 'outlined' | 'filled' | 'borderless' | 'underlined';
@@ -50,7 +49,12 @@ export const InputField = ({
   visible,
   name,
   className,
-  iconRender = (visible): ReactNode => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />),
+  iconRender = (visible): ReactNode =>
+    visible ? (
+      <EyeOutlined style={{ color: 'var(--primary-text-color)' }} />
+    ) : (
+      <EyeInvisibleOutlined style={{ color: 'var(--primary-text-color)' }} />
+    ),
   onVisibleChange,
   onChange,
   onSearch,

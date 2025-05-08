@@ -11,12 +11,10 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // console.log(`error`, error);
     if (error.code === 'ECONNABORTED') {
-      // alert('Request timed out. Please try again later.');
       return Promise.reject({ error: 'Request timed out!' });
     }
-    return Promise.reject();
+    return Promise.reject(error);
   },
 );
 

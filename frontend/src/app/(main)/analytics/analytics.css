@@ -1,5 +1,6 @@
-/* .analytics_main {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-} */
+.analytics_summary {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-bottom: 20px;
+}

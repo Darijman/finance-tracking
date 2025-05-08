@@ -1,17 +1,17 @@
 'use client';
 
 import { Typography } from 'antd';
-import './home.css';
 
 const { Title } = Typography;
 
-export default function Home() {
+const AddCategory = () => {
   return (
     <div>
       <Title level={1} style={{ textAlign: 'center', margin: '0px 0px 20px 0px' }}>
-        Home
+        Add Category
       </Title>
-      <div className='home_main'></div>
     </div>
   );
-}
+};
+
+export default AddCategory;

@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { FinanceNote } from '@/interfaces/financeNote';
 import { formatDate } from '@/helpers/formatDate';
 import { DeleteModal } from '../deleteModal/DeleteModal';
+import { EditFinanceNoteModal } from '../editFinanceNoteModal/EditFinanceNoteModal';
 import Image from 'next/image';
 import api from '../../../axiosInstance';
 import './financeNoteCard.css';
 
 import EditIcon from '@/assets/svg/edit-icon.svg';
 import DeleteIcon from '@/assets/svg/delete-icon.svg';
-// import { EditModal } from '../editFinanceNoteModal/EditFinanceNoteModal';
 
 function formatCurrency(amount: number) {
   return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -19,10 +19,11 @@ function formatCurrency(amount: number) {
 interface Props {
   financeNote: FinanceNote;
   onDelete?: (financeNoteId: number) => void;
+  onEdit?: (updatedNote: FinanceNote) => void;
   preview?: boolean;
 }
 
-export const FinanceNoteCard = ({ financeNote, onDelete, preview }: Props) => {
+export const FinanceNoteCard = ({ financeNote, onDelete, onEdit, preview }: Props) => {
   const { id, noteDate, amount, type, category, comment } = financeNote;
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
@@ -42,7 +43,12 @@ export const FinanceNoteCard = ({ financeNote, onDelete, preview }: Props) => {
     setShowDeleteModal(false);
   };
 
-  const editFinanceNoteHandler = async () => {};
+  const editFinanceNoteHandler = (updatedNote: FinanceNote) => {
+    if (onEdit) {
+      onEdit(updatedNote);
+    }
+    setShowEditModal(false);
+  };
 
   return (
     <>
@@ -79,12 +85,12 @@ export const FinanceNoteCard = ({ financeNote, onDelete, preview }: Props) => {
         text='Do you really want to delete this Note? This process cannot be undone!'
       />
 
-      {/* <EditModal
+      <EditFinanceNoteModal
         isOpen={showEditModal}
         financeNote={financeNote}
         onClose={() => setShowEditModal(false)}
-        onConfirm={editFinanceNoteHandler}
-      /> */}
+        onEdit={editFinanceNoteHandler}
+      />
     </>
   );
 };

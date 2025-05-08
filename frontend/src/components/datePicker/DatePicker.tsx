@@ -14,9 +14,10 @@ interface Props {
   needConfirm?: boolean;
   showTime?: boolean;
   showSecond?: boolean;
-  placeHolder?: string;
+  placeholder?: string;
   onChange?: (date: dayjs.Dayjs | null, dateString: string | string[]) => void;
   value?: any;
+  getPopupContainer?: (trigger: HTMLElement) => HTMLElement;
 }
 
 export const DatePicker = ({
@@ -28,9 +29,10 @@ export const DatePicker = ({
   needConfirm,
   showTime,
   showSecond,
-  placeHolder,
+  placeholder,
   onChange,
   value,
+  getPopupContainer,
 }: Props) => {
   return (
     <ConfigProvider
@@ -62,8 +64,9 @@ export const DatePicker = ({
         value={value}
         needConfirm={needConfirm}
         showTime={showTime ? { format: 'HH:mm' } : undefined}
-        placeholder={placeHolder}
+        placeholder={placeholder}
         showSecond={showSecond}
+        getPopupContainer={getPopupContainer}
       />
     </ConfigProvider>
   );

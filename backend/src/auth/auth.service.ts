@@ -12,7 +12,7 @@ export class AuthService {
   ) {}
 
   async registerNewUser(@Body() registerUserDto: RegisterUserDto): Promise<{ access_token: string }> {
-    const { name, email } = registerUserDto;
+    const { name, email, rememberMe } = registerUserDto;
 
     const nameExists = await this.usersService.isUserNameTaken(name);
     if (nameExists) {
@@ -26,13 +26,15 @@ export class AuthService {
 
     const createdUser = await this.usersService.registerNewUser(registerUserDto);
     const payload = { id: createdUser.id, name: createdUser.name, roleId: createdUser.roleId };
+    const expiresIn = rememberMe ? '30d' : '7d';
+
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(payload, { expiresIn }),
     };
   }
 
   async logIn(@Body() logInUserDto: LogInUserDto): Promise<{ access_token: string }> {
-    const { email, password } = logInUserDto;
+    const { email, password, rememberMe } = logInUserDto;
     const user = await this.usersService.getUserByEmail(email);
 
     const isPasswordCorrect = await user.validatePassword(password);
@@ -41,8 +43,10 @@ export class AuthService {
     }
 
     const payload = { id: user.id, name: user.name, roleId: user.roleId };
+    const expiresIn = rememberMe ? '30d' : '7d';
+
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(payload, { expiresIn }),
     };
   }
 }

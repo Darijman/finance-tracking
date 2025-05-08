@@ -2,7 +2,7 @@ import HomeIcon from '@/assets/svg/home-icon.svg';
 import AddNoteIcon from '@/assets/svg/addNote-icon.svg';
 import HistoryIcon from '@/assets/svg/history-icon.svg';
 import AnalyticsIcon from '@/assets/svg/analytics-icon.svg';
-import WalletIcon from '@/assets/svg/wallet-icon.svg';
+import AddCategoryIcon from '@/assets/svg/addCategory-icon.svg';
 import ProfileIcon from '@/assets/svg/profile-icon.svg';
 
 export const icons = {
@@ -10,7 +10,7 @@ export const icons = {
   addNote: AddNoteIcon,
   history: HistoryIcon,
   analytics: AnalyticsIcon,
-  wallet: WalletIcon,
+  addCategory: AddCategoryIcon,
   profile: ProfileIcon,
 };
 
@@ -26,6 +26,6 @@ export const sideBarButtons: SideBarButton[] = [
   { iconKey: 'addNote', label: 'Add Note', href: '/addNote', navigation: true },
   { iconKey: 'history', label: 'History', href: '/history', navigation: true },
   { iconKey: 'analytics', label: 'Analytics', href: '/analytics', navigation: true },
-  { iconKey: 'wallet', label: 'Balance', href: '/balance', navigation: true },
+  { iconKey: 'addCategory', label: 'Add Category', href: '/addCategory', navigation: true },
   { iconKey: 'profile', label: 'Profile', href: '/profile', navigation: true },
 ];

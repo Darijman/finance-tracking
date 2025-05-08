@@ -325,7 +325,7 @@ export const AddNoteForm = () => {
                     value={dayjs(newFinanceNote.noteDate)}
                     showSecond={false}
                     showTime={true}
-                    placeHolder='Date & Time'
+                    placeholder='Date & Time'
                   />
                 </Form.Item>
               </div>

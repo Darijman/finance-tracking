@@ -5,25 +5,29 @@ import { useRouter } from 'next/navigation';
 import { LoginUser } from '@/interfaces/loginUser';
 import { areObjectsEqual } from '@/helpers/areObjectsEqual';
 import { InputField } from '@/components/inputField/InputField';
-import { Form } from 'antd';
+import { Checkbox, CheckboxChangeEvent, Form, Typography } from 'antd';
 import { Button } from '@/components/button/Button';
 import useAuthValidation from '@/hooks/useAuthValidation/UseAuthValidation';
 import api from '../../../../../axiosInstance';
 import Link from 'next/link';
 import './loginForm.css';
 
+const { Title, Paragraph } = Typography;
+
 export const LoginForm = () => {
   const router = useRouter();
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<LoginUser>();
 
   const [loginUser, setLoginUser] = useState<LoginUser>({
     email: '',
     password: '',
+    rememberMe: false,
   });
 
   const [submittedUser, setSubmittedUser] = useState<LoginUser>({
     email: '',
     password: '',
+    rememberMe: false,
   });
 
   const [serverError, setServerError] = useState<{ error: string; type: 'EMAIL' | 'PASSWORD' | '' }>({ error: '', type: '' });
@@ -46,6 +50,14 @@ export const LoginForm = () => {
 
     validateInputs(fieldName, value.trim());
     markFieldAsTouched(fieldName);
+  };
+
+  const checkboxOnChangeHandler = (e: CheckboxChangeEvent) => {
+    setLoginUser((prevState) => ({
+      ...prevState,
+      rememberMe: e.target.checked,
+    }));
+    form.setFieldsValue({ rememberMe: e.target.checked });
   };
 
   const onFinishHandler = async (values: LoginUser) => {
@@ -83,10 +95,17 @@ export const LoginForm = () => {
     !loginUser.password.trim();
 
   return (
-    <div>
-      <h1 className='app_title'>Finance-Tracking</h1>
+    <div className='login'>
+      <Title level={1} style={{ textAlign: 'center', margin: '0px 0px 5px 0px' }}>
+        Finance-Tracking
+      </Title>
+      <Paragraph style={{ textAlign: 'center', color: 'var(--secondary-text-color)', margin: '0px 0px 20px 0px', fontSize: '16px' }}>
+        The best place to track your money
+      </Paragraph>
       <div className='login_container'>
-        <h1 className='login_title'>Login</h1>
+        <Title level={2} style={{ textAlign: 'center', margin: '0px 0px 10px 0px' }}>
+          Log in
+        </Title>
         {serverError && <div className='login_server_error'>{serverError.error}</div>}
         <hr className='login_title_divider' />
         <Form form={form} onFinish={onFinishHandler} name='login'>
@@ -101,7 +120,7 @@ export const LoginForm = () => {
             <Form.Item
               name='password'
               rules={[{ required: true, message: passwordError || 'Please input your password!' }]}
-              style={{ maxWidth: '300px', width: '100%', textAlign: 'center', margin: '0px 0px 20px 0px' }}
+              style={{ maxWidth: '300px', width: '100%', textAlign: 'center', margin: '0px 0px 10px 0px' }}
             >
               <InputField
                 placeHolder='Password*'
@@ -113,8 +132,13 @@ export const LoginForm = () => {
                 maxLength={20}
               />
             </Form.Item>
+            <Form.Item name='rememberMe' style={{ maxWidth: '300px', width: '100%', margin: '0px 0px 10px 0px' }} valuePropName='checked'>
+              <Checkbox checked={loginUser.rememberMe} onChange={checkboxOnChangeHandler}>
+                Remember me
+              </Checkbox>
+            </Form.Item>
             <Form.Item style={{ maxWidth: '300px', width: '100%', textAlign: 'center' }}>
-              <Button className='login_submit_button' htmlType='submit' disabled={isSubmitButtonDisabled} label='Login' />
+              <Button className='login_submit_button' htmlType='submit' disabled={isSubmitButtonDisabled} label='Sign in' />
             </Form.Item>
           </div>
         </Form>

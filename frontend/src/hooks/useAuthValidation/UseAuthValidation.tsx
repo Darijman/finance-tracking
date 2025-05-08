@@ -1,3 +1,4 @@
+import { LoginUser } from '@/interfaces/loginUser';
 import { Errors, RegisterUser } from '@/interfaces/registerUser';
 import { useState } from 'react';
 
@@ -12,7 +13,7 @@ const useAuthValidation = (type: ValidationType) => {
     return regex.test(email);
   };
 
-  const validateInputs = (name: keyof RegisterUser, value: string) => {
+  const validateInputs = (name: keyof RegisterUser | keyof LoginUser, value: string) => {
     let error = '';
 
     if (type === 'register' && name === 'name' && (value.length < 2 || value.length > 40)) {
@@ -34,7 +35,7 @@ const useAuthValidation = (type: ValidationType) => {
     setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
-  const markFieldAsTouched = (name: keyof RegisterUser) => {
+  const markFieldAsTouched = (name: keyof RegisterUser | keyof LoginUser) => {
     if (type === 'login' && name === 'name') return;
     setInputsTouched((prev) => ({ ...prev, [name]: true }));
   };

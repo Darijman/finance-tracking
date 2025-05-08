@@ -9,6 +9,14 @@
   overflow: visible;
 }
 
+.sidebar_app_title {
+  margin: 20px 0px;
+  padding: 0px 20px;
+  text-decoration: none;
+  color: var(--primary-text-color);
+  font-size: 25px;
+}
+
 .sidebar_nav {
   position: relative;
   display: flex;
@@ -24,13 +32,8 @@
   flex-grow: 1;
 }
 
-.sidebar_title {
-  margin: 0px 0px 10px 0px;
-  padding: 0px 20px;
-}
-
 .sidebar_item {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .sidebar_item:nth-last-child(1) {

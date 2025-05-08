@@ -1,13 +1,22 @@
 'use client';
 
-import './profile.css';
+import { Typography } from 'antd';
 import { UserInfo } from './userInfo/UserInfo';
+import { ChangeCurrency } from './changeCurrency/ChangeCurrency';
+import './profile.css';
+
+const { Title } = Typography;
 
 const Profile = () => {
   return (
     <div className='profile_container'>
-      <h1 style={{ textAlign: 'center' }}>Profile</h1>
-      <UserInfo />
+      <Title level={1} style={{ textAlign: 'center', margin: '0px 0px 20px 0px' }}>
+        Profile
+      </Title>
+      <div className='profile_main'>
+        <UserInfo />
+        <ChangeCurrency />
+      </div>
     </div>
   );
 };

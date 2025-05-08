@@ -50,6 +50,10 @@ const History = () => {
     setUserFinanceNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
   };
 
+  const editFinanceNoteHandler = (updatedNote: FinanceNote) => {
+    setUserFinanceNotes((prevNotes) => prevNotes.map((note) => (note.id === updatedNote.id ? { ...note, ...updatedNote } : note)));
+  };
+
   const categoryOnChangeHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCategory = event.target.value;
     setSelectedFinanceCategory(selectedCategory);
@@ -168,7 +172,11 @@ const History = () => {
                       duration: 0.2,
                     }}
                   >
-                    <FinanceNoteCard financeNote={financeNote} onDelete={() => deleteFinanceNoteHandler(financeNote.id)} />
+                    <FinanceNoteCard
+                      financeNote={financeNote}
+                      onDelete={() => deleteFinanceNoteHandler(financeNote.id)}
+                      onEdit={editFinanceNoteHandler}
+                    />
                   </motion.div>
                 ))}
               </AnimatePresence>

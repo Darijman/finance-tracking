@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsString, IsEmail, IsNotEmpty, MinLength, MaxLength, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, MinLength, MaxLength, IsNumber, IsOptional, IsBoolean } from 'class-validator';
 
 export class RegisterUserDto {
   @IsString()
@@ -18,7 +18,7 @@ export class RegisterUserDto {
 
   @IsNumber()
   @IsOptional()
-  roleId: number;
+  roleId?: number;
 
   @IsString()
   @IsNotEmpty()
@@ -26,4 +26,8 @@ export class RegisterUserDto {
   @MaxLength(20, { message: 'Password must contain no more than 20 letters!' })
   @Transform(({ value }) => value.trim())
   password: string;
+
+  @IsOptional()
+  @IsBoolean()
+  rememberMe?: boolean;
 }

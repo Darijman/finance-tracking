@@ -4,12 +4,13 @@ import { useMemo, useRef, useState } from 'react';
 import { SideBarButton } from './sideBarButton/SideBarButton';
 import { SubMenu } from './subMenu/SubMenu';
 import { icons, sideBarButtons } from './sideBarConfig';
+import Link from 'next/link';
 import BurgerMenuIcon from '@/assets/svg/burgerMenu-icon.svg';
 import './sideBar.css';
 
 export const SideBar = () => {
   const [showSubmenu, setShowSubmenu] = useState<boolean>(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   const menuItems = useMemo(
     () =>
@@ -27,7 +28,9 @@ export const SideBar = () => {
 
   return (
     <aside className='sidebar'>
-      <h2 className='sidebar_title'>Finance-Tracking</h2>
+      <Link href='/' className='sidebar_app_title'>
+        Finance-Tracking
+      </Link>
       <nav className='sidebar_nav'>
         <ul className='sidebar_list'>{menuItems}</ul>
 

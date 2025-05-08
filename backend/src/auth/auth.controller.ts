@@ -16,13 +16,16 @@ export class AuthController {
   async registerNewUser(@Body() registerUserDto: RegisterUserDto, @Res() res: Response) {
     const { access_token } = await this.authService.registerNewUser(registerUserDto);
 
+    const isRemembered = registerUserDto.rememberMe === true;
+
     res.cookie('access_token', access_token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
+      maxAge: isRemembered
+        ? 30 * 24 * 60 * 60 * 1000 // 30days
+        : 7 * 24 * 60 * 60 * 1000, // 7days
     });
-
     return res.send({ success: true });
   }
 
@@ -32,11 +35,15 @@ export class AuthController {
   async logInUser(@Body() logInUserDto: LogInUserDto, @Res() res: Response) {
     const { access_token } = await this.authService.logIn(logInUserDto);
 
+    const isRemembered = logInUserDto.rememberMe === true;
+
     res.cookie('access_token', access_token, {
       httpOnly: false,
       secure: false,
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
+      maxAge: isRemembered
+        ? 30 * 24 * 60 * 60 * 1000 // 30days
+        : 7 * 24 * 60 * 60 * 1000, // 7days
     });
 
     return res.send({ success: true });

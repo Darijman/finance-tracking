@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, MinLength, MaxLength, IsEmail } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, MaxLength, IsEmail, IsOptional, IsBoolean } from 'class-validator';
 
 export class LogInUserDto {
   @IsString()
@@ -12,4 +12,8 @@ export class LogInUserDto {
   @MinLength(6, { message: 'Password must contain at least 6 letters!' })
   @MaxLength(20, { message: 'Password must contain no more than 20 letters!' })
   password: string;
+
+  @IsOptional()
+  @IsBoolean()
+  rememberMe?: boolean;
 }

@@ -4,6 +4,8 @@ import { Typography } from 'antd';
 import { MonthsInfo } from './monthsInfo/MonthsInfo';
 import { CategoriesInfo } from './categoriesInfo/CategoriesInfo';
 import './analytics.css';
+import { MonthSummary } from './monthSummary/MonthSummary';
+import { AllTimeSummary } from './allTimeSummary/AllTimeSummary';
 
 const { Title } = Typography;
 
@@ -14,8 +16,14 @@ const Analytics = () => {
         Analytics
       </Title>
       <div className='analytics_main'>
-        <MonthsInfo />
-        <CategoriesInfo />
+        <div className='analytics_summary'>
+          <MonthSummary />
+          <AllTimeSummary />
+        </div>
+        <div>
+          <MonthsInfo />
+          <CategoriesInfo />
+        </div>
       </div>
     </div>
   );

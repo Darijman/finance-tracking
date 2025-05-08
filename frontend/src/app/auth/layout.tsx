@@ -10,5 +10,5 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     setTheme('dark');
   }, [setTheme]);
 
-  return <main>{children}</main>;
+  return <main style={{ padding: '20px 50px 50px 50px' }}>{children}</main>;
 }
