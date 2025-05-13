@@ -218,7 +218,7 @@ export const EditFinanceNoteModal = ({ isOpen, financeNote, onClose, onEdit }: P
                     onChange={amountOnChangeHandler}
                     style={{ marginBottom: '20px' }}
                   />
-                  <Form.Item name='comment' rules={[{ required: false, message: '' }]}>
+                  <Form.Item name='comment' initialValue={editedNote.comment} rules={[{ required: false, message: '' }]}>
                     <TextField
                       className='editNote_comment'
                       placeHolder='Comment'
@@ -256,6 +256,7 @@ export const EditFinanceNoteModal = ({ isOpen, financeNote, onClose, onEdit }: P
                       </div>
                     </div>
                   </Form.Item>
+
                   <div className='editNote_date_container'>
                     <span className='editNote_type_required_mark'>*</span>
                     <Form.Item

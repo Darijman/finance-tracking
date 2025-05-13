@@ -32,12 +32,14 @@
   color: var(--primary-text-color);
 }
 
-[data-theme='dark'] .icon {
-  filter: invert(1);
-}
-
 .icon {
   width: 30px;
   height: 30px;
   margin-right: 10px;
+}
+
+[data-theme='dark'] {
+  .icon {
+    filter: invert(1);
+  }
 }

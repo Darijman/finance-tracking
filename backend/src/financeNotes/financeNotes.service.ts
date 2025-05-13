@@ -46,12 +46,12 @@ export class FinanceNotesService {
       throw new NotFoundException({ error: 'User not found!' });
     }
 
-    const userCacheKey: string = getUserFinanceNotesCacheKey(userId);
-    const cachedUserNotes: string = await this.redisService.getValue(userCacheKey);
+    // const userCacheKey: string = getUserFinanceNotesCacheKey(userId);
+    // const cachedUserNotes: string = await this.redisService.getValue(userCacheKey);
 
-    if (cachedUserNotes) {
-      return JSON.parse(cachedUserNotes);
-    }
+    // if (cachedUserNotes) {
+    //   return JSON.parse(cachedUserNotes);
+    // }
 
     const userNotes = await this.notesRepository.find({
       where: { userId },
@@ -64,9 +64,9 @@ export class FinanceNotesService {
 
     const transformedNotes = plainToInstance(FinanceNote, userNotes);
 
-    if (transformedNotes.length) {
-      await this.redisService.setValue(userCacheKey, JSON.stringify(transformedNotes), 300); // 5min
-    }
+    // if (transformedNotes.length) {
+    //   await this.redisService.setValue(userCacheKey, JSON.stringify(transformedNotes), 300); // 5min
+    // }
     return transformedNotes;
   }
 
@@ -130,7 +130,7 @@ export class FinanceNotesService {
 
     if (newNote.amount && newNote.amount !== Number(note.amount)) isUpdated = true;
     if (newNote.categoryId && newNote.categoryId !== note.categoryId) isUpdated = true;
-    if (newNote.comment && newNote.comment !== note.comment) isUpdated = true;
+    if (newNote.comment !== undefined && newNote.comment !== null && newNote.comment !== note.comment) isUpdated = true;
     if (newNote.type && newNote.type !== note.type) isUpdated = true;
     if (newNote.noteDate && newNote.noteDate.getTime() !== note.noteDate.getTime()) {
       isUpdated = true;

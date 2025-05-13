@@ -66,7 +66,7 @@ export class FinanceNotesController {
   ): Promise<FinanceNote[]> {
     const currentUser = await this.usersService.getUserByIdWithRole(req.user.id);
     if (currentUser.role.name === 'ADMIN') {
-      return await this.financeNotesService.getFinanceNotesByUserId(userId);
+      return await this.financeNotesService.getFinanceNotesByUserId(userId, limit);
     }
 
     if (currentUser.id !== userId) {

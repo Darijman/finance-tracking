@@ -5,8 +5,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { FullUser } from '@/interfaces/fullUser';
 import { formatDate } from '@/helpers/formatDate';
 import { FinanceNote } from '@/interfaces/financeNote';
+import { Typography } from 'antd';
 import api from '../../../../../axiosInstance';
 import './userInfo.css';
+
+const { Title } = Typography;
 
 export const UserInfo = () => {
   const [userInfo, setUserInfo] = useState<FullUser | null>(null);
@@ -34,7 +37,9 @@ export const UserInfo = () => {
 
   return (
     <div className='user_info'>
-      <h2 className='userinfo_title'>Your Info:</h2>
+      <Title level={2} style={{ textAlign: 'center', margin: '0px 0px 10px 0px' }}>
+        Your Info:
+      </Title>
       <dl className='userinfo_list'>
         <div className='userinfo_list_item'>
           <dt>Name:</dt>

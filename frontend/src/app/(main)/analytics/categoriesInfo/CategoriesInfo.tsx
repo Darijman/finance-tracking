@@ -107,7 +107,7 @@ export const CategoriesInfo = () => {
         {chartData.length ? (
           <BarChart data={chartData}>
             <XAxis dataKey='name' tick={CustomTick} interval={0} height={80} />
-            <YAxis />
+            <YAxis tick={{ fontSize: 10 }} />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
             <Bar dataKey='totalExpense' fill='#8884d8' barSize={40} name='Total Expenses' />
           </BarChart>

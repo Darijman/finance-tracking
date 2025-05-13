@@ -1,6 +1,6 @@
 'use client';
 
-import { AddNoteForm } from './addNoteForm/addNoteForm';
+import { AddNoteForm } from './addNoteForm/AddNoteForm';
 import { Typography } from 'antd';
 
 const { Title } = Typography;

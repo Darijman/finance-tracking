@@ -2,7 +2,7 @@
 
 import { Typography } from 'antd';
 import { UserInfo } from './userInfo/UserInfo';
-import { ChangeCurrency } from './changeCurrency/ChangeCurrency';
+import { SelectCurrency } from './selectCurrency/SelectCurrency';
 import './profile.css';
 
 const { Title } = Typography;
@@ -15,7 +15,7 @@ const Profile = () => {
       </Title>
       <div className='profile_main'>
         <UserInfo />
-        <ChangeCurrency />
+        <SelectCurrency />
       </div>
     </div>
   );

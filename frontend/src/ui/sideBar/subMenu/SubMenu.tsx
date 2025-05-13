@@ -9,9 +9,9 @@ import api from '../../../../axiosInstance';
 import SettingsIcon from '@/assets/svg/settings-icon.svg';
 import SunIcon from '@/assets/svg/sun-icon.svg';
 import MoonIcon from '@/assets/svg/moon-icon.svg';
-import './subMenu.css';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { useRouter } from 'next/navigation';
+import './subMenu.css';
 
 interface Props {
   closeSubMenu: () => void;

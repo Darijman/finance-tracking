@@ -3,9 +3,9 @@
 import { Typography } from 'antd';
 import { MonthsInfo } from './monthsInfo/MonthsInfo';
 import { CategoriesInfo } from './categoriesInfo/CategoriesInfo';
-import './analytics.css';
 import { MonthSummary } from './monthSummary/MonthSummary';
 import { AllTimeSummary } from './allTimeSummary/AllTimeSummary';
+import './analytics.css';
 
 const { Title } = Typography;
 

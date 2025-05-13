@@ -1,0 +1,59 @@
+.home_main {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.home_images_list_container {
+  overflow-y: scroll;
+  background-color: var(--foreground-color);
+  border-radius: 10px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE и Edge */
+}
+
+.home_images_list_container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.home_benefits_list {
+  border-radius: 10px;
+  padding: 30px 30px 0px 30px;
+  margin: 0px;
+  text-align: center;
+  max-height: 600px;
+  max-width: 600px;
+  height: 100%;
+  width: 100%;
+  list-style-type: none;
+}
+
+.home_benefits_list_item {
+  margin: 0px 0px 10px 0px;
+  padding: 20px;
+  background-color: var(--background-color);
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+.home_productivity_image {
+  width: 50%;
+  height: 50%;
+  object-fit: cover;
+}
+
+.home_left {
+  margin-right: 50px;
+}
+
+.home_right {
+  flex: 1;
+  margin-top: 55px;
+}
+
+[data-theme='dark'] {
+  .home_productivity_image {
+    filter: invert(1);
+  }
+}

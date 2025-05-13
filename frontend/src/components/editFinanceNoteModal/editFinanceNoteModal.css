@@ -21,6 +21,7 @@
   color: var(--primary-text-color);
   padding: 20px;
   border-radius: 8px;
+  border: 0.1px solid gray;
 }
 
 .editNote_container {
