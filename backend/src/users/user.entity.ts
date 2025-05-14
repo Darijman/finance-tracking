@@ -13,10 +13,15 @@ import {
 import { Exclude } from 'class-transformer';
 import { FinanceNote } from 'src/financeNotes/financeNote.entity';
 import { Role } from 'src/roles/role.entity';
+import { Currency } from 'src/currencies/currency.entity';
 import * as bcrypt from 'bcrypt';
 
 @Entity('users')
 export class User {
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
@@ -27,9 +32,12 @@ export class User {
   @JoinColumn({ name: 'roleId' })
   role: Role;
 
-  constructor(partial: Partial<User>) {
-    Object.assign(this, partial);
-  }
+  @ManyToOne(() => Currency)
+  @JoinColumn({ name: 'currencyId' })
+  currency: Currency;
+
+  @Column({ type: 'int', default: 1 })
+  currencyId: number;
 
   @Column({ unique: true })
   name: string;

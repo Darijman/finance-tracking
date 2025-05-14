@@ -20,6 +20,10 @@ export class RegisterUserDto {
   @IsOptional()
   roleId?: number;
 
+  @IsNumber()
+  @IsOptional()
+  currencyId?: number;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(6, { message: 'Password must contain at least 6 letters!' })

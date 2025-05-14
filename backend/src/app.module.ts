@@ -10,6 +10,8 @@ import { FinanceCategory } from './financeCategories/financeCategory.entity';
 import { User } from './users/user.entity';
 import { Role } from './roles/role.entity';
 import { RedisModule } from './common/redis/redis.module';
+import { CurrenciesModule } from './currencies/currencies.module';
+import { Currency } from './currencies/currency.entity';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { RedisModule } from './common/redis/redis.module';
       username: 'root',
       password: '123456789',
       database: 'finance-tracking',
-      entities: [FinanceNote, FinanceCategory, User, Role],
+      entities: [FinanceNote, FinanceCategory, User, Role, Currency],
       synchronize: true,
       timezone: 'Z',
     }),
@@ -30,6 +32,7 @@ import { RedisModule } from './common/redis/redis.module';
     AuthModule,
     RolesModule,
     RedisModule,
+    CurrenciesModule,
   ],
   controllers: [],
   providers: [],
