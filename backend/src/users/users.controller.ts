@@ -1,4 +1,4 @@
-import { Controller, Get, Delete, Body, Param, UseInterceptors, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Delete, Body, Param, UseInterceptors, Put, UseGuards, Patch, Req, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './updateUser.dto';
 import { ClassSerializerInterceptor } from '@nestjs/common';
@@ -39,5 +39,16 @@ export class UsersController {
   @Put(':id')
   async updateUserById(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return await this.usersService.updateUserById(id, updateUserDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('/currency/:currencyId')
+  async changeUserCurrencyId(@Param('currencyId') currencyId: number, @Req() req: any): Promise<boolean> {
+    const userId = req?.user?.id;
+
+    if (!userId) {
+      throw new UnauthorizedException({ error: 'Something went wrong..' });
+    }
+    return await this.usersService.changeUserCurrencyId(userId, currencyId);
   }
 }

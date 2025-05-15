@@ -15,6 +15,12 @@ export class UpdateCurrencyDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(1, { message: 'Flag must contain only 1 letter!' })
+  @MinLength(1, { message: 'Flag must contain only 1 letter!' })
+  flag: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(20, { message: 'Code must contain no more than 20 letters!' })
   @MinLength(1, { message: 'Code must contain at least 1 letter!' })
   code?: string;

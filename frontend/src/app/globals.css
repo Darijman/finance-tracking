@@ -18,14 +18,14 @@ main {
 }
 
 :root {
-  --background-color: #FFFFFF;
-  --foreground-color: #E5E5E5;
-  --hover-color: #F2F2F2;
+  --background-color: #ffffff;
+  --foreground-color: #e5e5e5;
+  --hover-color: #f2f2f2;
   --primary-text-color: #000000;
-  --secondary-text-color: #8E8E8E;
-  --border-color: #DBDBDB;
+  --secondary-text-color: #8e8e8e;
+  --border-color: #dbdbdb;
   --toggle-light-bg: #c7c7c7;
-  --toggle-light-slider: #FFFFFF;
+  --toggle-light-slider: #ffffff;
 
   --loader-color-main: rgba(0, 0, 0, 1);
   --loader-color-mid: rgba(0, 0, 0, 0.5);
@@ -39,12 +39,12 @@ main {
 
 [data-theme='dark'] {
   --background-color: #000000;
-  --foreground-color: #1A1A1A;
+  --foreground-color: #1a1a1a;
   --hover-color: #262626;
-  --primary-text-color: #FFFFFF;
-  --secondary-text-color: #A8A8A8;
+  --primary-text-color: #ffffff;
+  --secondary-text-color: #a8a8a8;
   --border-color: #262626;
-  --toggle-dark-bg: #FFFFFF;
+  --toggle-dark-bg: #ffffff;
   --toggle-dark-slider: #000000;
 
   --loader-color-main: rgba(255, 255, 255, 1);
@@ -52,13 +52,17 @@ main {
   --loader-color-light: rgba(255, 255, 255, 0.25);
 
   --red-color: #e57373;
-  --green-color: #98fb98;;
+  --green-color: #98fb98;
 }
 
 /* antd start */
 
 .ant-tooltip-inner {
   color: var(--primary-text-color) !important;
+}
+
+.ant-message .ant-message-notice-error {
+  color: var(--red-color) !important;
 }
 
 /* antd end */

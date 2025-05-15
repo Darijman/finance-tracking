@@ -59,7 +59,6 @@ export class AuthController {
   @HttpCode(200)
   @Post('logOut')
   logOutUser(@Res() res: Response) {
-    console.log(`da`);
     res.clearCookie('access_token', {
       httpOnly: false,
       sameSite: 'lax',

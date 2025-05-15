@@ -44,6 +44,7 @@ export class CurrenciesService {
   }
 
   async createNewCurrency(createCurrencyDto: CreateCurrencyDto): Promise<Currency> {
+    await this.redisService.deleteValue(CURRENCIES_CACHE_KEY);
     return this.currenciesRepository.save(createCurrencyDto);
   }
 

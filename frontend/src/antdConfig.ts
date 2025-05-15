@@ -5,6 +5,9 @@ export const theme: ThemeConfig = {
     Card: {
       headerFontSize: 20,
     },
+    Message: {
+      contentBg: 'var(--foreground-color)',
+    },
   },
   token: {
     fontFamily: 'Signika Negative, sans-serif',

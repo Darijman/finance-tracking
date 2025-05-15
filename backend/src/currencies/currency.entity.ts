@@ -14,6 +14,9 @@ export class Currency {
   @Column({ unique: true })
   code: string; // USD, EUR, RUB
 
+  @Column({ unique: true })
+  flag: string; // 🇺🇸
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

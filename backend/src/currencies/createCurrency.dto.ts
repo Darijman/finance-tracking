@@ -15,6 +15,10 @@ export class CreateCurrencyDto {
 
   @IsNotEmpty()
   @IsString()
+  flag: string;
+
+  @IsNotEmpty()
+  @IsString()
   @MaxLength(20, { message: 'Code must contain no more than 20 letters!' })
   @MinLength(1, { message: 'Code must contain at least 1 letter!' })
   code: string;

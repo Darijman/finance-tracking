@@ -1,8 +1,9 @@
 export interface FullUser {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  roleId: string;
+  roleId: number;
+  currencyId: number;
   createdAt: string;
   updatedAt: string;
 }

@@ -12,7 +12,8 @@
   padding: 20px;
   border-radius: 10px;
   overflow-y: auto;
-  height: 245px;
+  min-height: 245px;
+  margin-bottom: 10px;
 }
 
 .currency_list {
@@ -48,4 +49,15 @@
 
 .flag {
   font-size: 1.2rem;
+}
+
+.currency_bottom {
+  display: flex;
+  justify-content: center;
+}
+
+.currency_save_button:disabled {
+  background-color: #4d4d4d !important;
+  border-color: #4d4d4d !important;
+  color: #808080 !important;
 }

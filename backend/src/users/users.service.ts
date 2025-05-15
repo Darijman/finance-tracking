@@ -4,12 +4,18 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { RegisterUserDto } from 'src/auth/registerUser.dto';
 import { UpdateUserDto } from './updateUser.dto';
+// import { Currency } from 'src/currencies/currency.entity';
+import { CurrenciesService } from 'src/currencies/currencies.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+
+    private readonly currenciesService: CurrenciesService,
+    private jwtService: JwtService,
   ) {}
 
   async getAllUsers(): Promise<User[]> {
@@ -100,6 +106,27 @@ export class UsersService {
 
     Object.assign(user, updateUserDto);
     return await this.usersRepository.save(user);
+  }
+
+  async changeUserCurrencyId(userId: number, currencyId: number): Promise<boolean> {
+    if (isNaN(userId) || isNaN(currencyId)) {
+      throw new BadRequestException({ error: 'Invalid ID!' });
+    }
+
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException({ error: 'User not found!' });
+    }
+
+    if (user.currencyId === currencyId) {
+      throw new BadRequestException({ error: 'Invalid currency ID!' });
+    }
+
+    await this.currenciesService.getCurrencyById(currencyId);
+
+    user.currencyId = currencyId;
+    await this.usersRepository.save(user);
+    return true;
   }
 
   async verifyChanges(user: User, updateUserDto: UpdateUserDto): Promise<boolean> {

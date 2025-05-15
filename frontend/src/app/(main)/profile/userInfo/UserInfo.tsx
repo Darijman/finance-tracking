@@ -11,29 +11,30 @@ import './userInfo.css';
 
 const { Title } = Typography;
 
-export const UserInfo = () => {
-  const [userInfo, setUserInfo] = useState<FullUser | null>(null);
-  const [userFinanceNotes, setUserFinanceNotes] = useState<FinanceNote[]>([]);
+interface Props {
+  fullUser: FullUser;
+}
+
+export const UserInfo = ({ fullUser }: Props) => {
   const { user } = useAuth();
 
-  const getUserInfo = useCallback(async () => {
-    if (user.id) {
-      const response = await api.get<FullUser>(`/users/${user.id}`);
-      setUserInfo(response.data);
-    }
-  }, [user.id]);
+  const [userFinanceNotes, setUserFinanceNotes] = useState<FinanceNote[]>([]);
+  const [serverError, setServerError] = useState<{ error: string }>({ error: '' });
 
   const getNotesByUserId = useCallback(async () => {
     if (user.id) {
-      const response = await api.get<FinanceNote[]>(`/finance_notes/user/${user.id}`);
-      setUserFinanceNotes(response.data);
+      try {
+        const response = await api.get<FinanceNote[]>(`/finance_notes/user/${user.id}`);
+        setUserFinanceNotes(response.data);
+      } catch (error: any) {
+        setServerError(error.response?.data || 'Something went wrong...');
+      }
     }
   }, [user.id]);
 
   useEffect(() => {
-    getUserInfo();
     getNotesByUserId();
-  }, [getUserInfo, getNotesByUserId]);
+  }, [getNotesByUserId]);
 
   return (
     <div className='user_info'>
@@ -41,22 +42,30 @@ export const UserInfo = () => {
         Your Info:
       </Title>
       <dl className='userinfo_list'>
-        <div className='userinfo_list_item'>
-          <dt>Name:</dt>
-          <dd>{userInfo?.name}</dd>
-        </div>
-        <div className='userinfo_list_item'>
-          <dt>Email:</dt>
-          <dd>{userInfo?.email}</dd>
-        </div>
-        <div className='userinfo_list_item'>
-          <dt>Registration Date:</dt>
-          <dd>{userInfo?.createdAt ? formatDate(userInfo.createdAt) : 'N/A'}</dd>
-        </div>
-        <div className='userinfo_list_item'>
-          <dt>Finance-Notes:</dt>
-          <dd>{userFinanceNotes.length}</dd>
-        </div>
+        {serverError.error ? (
+          <Title level={3} style={{ color: 'var(--red-color)', textAlign: 'center' }}>
+            {serverError.error}
+          </Title>
+        ) : (
+          <>
+            <div className='userinfo_list_item'>
+              <dt>Name:</dt>
+              <dd>{fullUser.name}</dd>
+            </div>
+            <div className='userinfo_list_item'>
+              <dt>Email:</dt>
+              <dd>{fullUser.email}</dd>
+            </div>
+            <div className='userinfo_list_item'>
+              <dt>Registration Date:</dt>
+              <dd>{fullUser.createdAt ? formatDate(fullUser.createdAt) : 'N/A'}</dd>
+            </div>
+            <div className='userinfo_list_item'>
+              <dt>Finance-Notes:</dt>
+              <dd>{userFinanceNotes.length}</dd>
+            </div>
+          </>
+        )}
       </dl>
     </div>
   );

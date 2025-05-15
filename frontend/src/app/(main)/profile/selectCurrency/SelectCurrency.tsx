@@ -1,34 +1,111 @@
 'use client';
 
-import { Typography } from 'antd';
-import { currencies } from './currencies';
-import { useState } from 'react';
+import { Button, message, Typography } from 'antd';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
+import { Currency } from '@/interfaces/currency';
+import { useAuth } from '@/contexts/authContext/AuthContext';
+import { FullUser } from '@/interfaces/fullUser';
+import api from '../../../../../axiosInstance';
 import './selectCurrency.css';
 
 const { Title } = Typography;
 
-export const SelectCurrency = () => {
-  const [selectedCurrency, setSelectedCurrency] = useState<string>('');
+interface Props {
+  fullUser: FullUser;
+  setFullUser: Dispatch<SetStateAction<FullUser>>;
+}
+
+export const SelectCurrency = ({ fullUser, setFullUser }: Props) => {
+  const { user } = useAuth();
+  const [allCurrencies, setAllCurrencies] = useState<Currency[]>([]);
+
+  const [messageApi, contextHolder] = message.useMessage({ maxCount: 1 });
+  const [selectedCurrencyId, setSelectedCurrencyId] = useState<number>(0);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [serverError, setServerError] = useState<{ error: string }>({ error: '' });
+
+  const getAllCurrencies = useCallback(async () => {
+    if (user.id) {
+      try {
+        const response = await api.get<Currency[]>(`/currencies`);
+        setAllCurrencies(response.data);
+      } catch (error: any) {
+        setServerError(error.response?.data || 'Something went wrong...');
+      }
+    }
+  }, [user.id]);
+
+  useEffect(() => {
+    getAllCurrencies();
+  }, [getAllCurrencies]);
+
+  useEffect(() => {
+    if (fullUser?.currencyId) {
+      setSelectedCurrencyId(fullUser.currencyId);
+    }
+  }, [fullUser.currencyId]);
+
+  const currencyOnSaveHandler = async () => {
+    try {
+      setIsSaving(true);
+      await api.patch(`/users/currency/${selectedCurrencyId}`);
+      setFullUser((prevState) => ({ ...prevState, currencyId: selectedCurrencyId }));
+
+      messageApi.open({
+        type: 'success',
+        content: 'Your currency has been changed!',
+      });
+    } catch (error: any) {
+      const errorText: string = error.response?.data.error;
+
+      messageApi.open({
+        type: 'error',
+        content: errorText,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const saveButtonDisabled = fullUser?.currencyId === selectedCurrencyId || !selectedCurrencyId;
 
   return (
     <div className='select_currency'>
+      {contextHolder}
       <Title level={2} style={{ textAlign: 'center', margin: '0px 0px 10px 0px' }}>
         Select Currency:
       </Title>
       <div className='currency_container'>
-        <ul className='currency_list'>
-          {currencies.map((currency) => (
-            <li
-              key={currency.code}
-              className={`currency_list_item ${selectedCurrency === currency.code ? 'selected' : ''}`}
-              onClick={() => setSelectedCurrency(currency.code)}
-            >
-              <span className='flag'>{currency.flag}</span>
-              <span className='code'>{currency.code}</span>
-              <span className='symbol'>{currency.symbol}</span>
-            </li>
-          ))}
-        </ul>
+        {serverError.error ? (
+          <Title level={3} style={{ color: 'var(--red-color)', textAlign: 'center' }}>
+            {serverError.error}
+          </Title>
+        ) : (
+          <ul className='currency_list'>
+            {allCurrencies.map((currency) => (
+              <li
+                key={currency.code}
+                className={`currency_list_item ${selectedCurrencyId === currency.id ? 'selected' : ''}`}
+                onClick={() => setSelectedCurrencyId(currency.id)}
+              >
+                <span className='flag'>{currency.flag}</span>
+                <span className='code'>{currency.code}</span>
+                <span className='symbol'>{currency.symbol}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div className='currency_bottom'>
+        <Button
+          className='currency_save_button'
+          type='primary'
+          disabled={saveButtonDisabled}
+          loading={isSaving}
+          onClick={currencyOnSaveHandler}
+        >
+          Save Currency
+        </Button>
       </div>
     </div>
   );
