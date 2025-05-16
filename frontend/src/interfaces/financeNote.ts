@@ -1,5 +1,5 @@
+import { Currency } from './currency';
 import { FinanceCategory } from './financeCategory';
-import { FullUser } from './fullUser';
 
 export enum Categories {
   'FOOD' = 'FOOD',
@@ -22,7 +22,7 @@ export interface FinanceNote {
   type: NoteType;
   category: FinanceCategory;
   comment?: string;
-  user: FullUser;
+  user: { id: 0; name: ''; email: ''; createdAt: ''; updatedAt: ''; roleId: 0; currency: Currency };
   createdAt: string;
   updatedAt: string;
 }

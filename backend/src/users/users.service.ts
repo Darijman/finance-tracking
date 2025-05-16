@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { RegisterUserDto } from 'src/auth/registerUser.dto';
 import { UpdateUserDto } from './updateUser.dto';
-// import { Currency } from 'src/currencies/currency.entity';
 import { CurrenciesService } from 'src/currencies/currencies.service';
-import { JwtService } from '@nestjs/jwt';
+import { RedisService } from 'src/common/redis/redis.service';
+import { getUserFinanceNotesCacheKey } from 'src/financeNotes/financeNotes.service';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +15,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
 
     private readonly currenciesService: CurrenciesService,
-    private jwtService: JwtService,
+    private redisService: RedisService,
   ) {}
 
   async getAllUsers(): Promise<User[]> {
@@ -123,6 +123,9 @@ export class UsersService {
     }
 
     await this.currenciesService.getCurrencyById(currencyId);
+
+    const userCacheKey: string = getUserFinanceNotesCacheKey(userId);
+    await this.redisService.deleteValue(userCacheKey); // delete cached FinanceNotes since currency changed
 
     user.currencyId = currencyId;
     await this.usersRepository.save(user);

@@ -6,9 +6,10 @@ import { User } from './user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { RolesModule } from 'src/roles/roles.module';
 import { CurrenciesModule } from 'src/currencies/currencies.module';
+import { RedisModule } from 'src/common/redis/redis.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), AuthModule, RolesModule, forwardRef(() => CurrenciesModule)],
+  imports: [TypeOrmModule.forFeature([User]), AuthModule, RolesModule, RedisModule, forwardRef(() => CurrenciesModule)],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

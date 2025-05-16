@@ -8,7 +8,7 @@ import { UsersService } from 'src/users/users.service';
 import { plainToInstance } from 'class-transformer';
 import { RedisService } from 'src/common/redis/redis.service';
 
-const getUserFinanceNotesCacheKey = (userId: number) => `userFinanceNotes_${userId}`;
+export const getUserFinanceNotesCacheKey = (userId: number) => `userFinanceNotes_${userId}`;
 
 @Injectable()
 export class FinanceNotesService {
@@ -46,16 +46,16 @@ export class FinanceNotesService {
       throw new NotFoundException({ error: 'User not found!' });
     }
 
-    // const userCacheKey: string = getUserFinanceNotesCacheKey(userId);
-    // const cachedUserNotes: string = await this.redisService.getValue(userCacheKey);
+    const userCacheKey: string = getUserFinanceNotesCacheKey(userId);
+    const cachedUserNotes: string = await this.redisService.getValue(userCacheKey);
 
-    // if (cachedUserNotes) {
-    //   return JSON.parse(cachedUserNotes);
-    // }
+    if (cachedUserNotes) {
+      return JSON.parse(cachedUserNotes);
+    }
 
     const userNotes = await this.notesRepository.find({
       where: { userId },
-      relations: ['category', 'user'],
+      relations: ['category', 'user', 'user.currency'],
       order: {
         noteDate: 'DESC',
       },
@@ -64,9 +64,9 @@ export class FinanceNotesService {
 
     const transformedNotes = plainToInstance(FinanceNote, userNotes);
 
-    // if (transformedNotes.length) {
-    //   await this.redisService.setValue(userCacheKey, JSON.stringify(transformedNotes), 300); // 5min
-    // }
+    if (transformedNotes.length) {
+      await this.redisService.setValue(userCacheKey, JSON.stringify(transformedNotes), 300); // 5min
+    }
     return transformedNotes;
   }
 

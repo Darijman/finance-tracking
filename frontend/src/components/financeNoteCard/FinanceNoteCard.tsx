@@ -12,8 +12,13 @@ import './financeNoteCard.css';
 import EditIcon from '@/assets/svg/edit-icon.svg';
 import DeleteIcon from '@/assets/svg/delete-icon.svg';
 
-function formatCurrency(amount: number) {
-  return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+function formatCurrency(amount: number, currencyCode: string) {
+  return amount.toLocaleString('en-US', {
+    style: 'currency',
+    currency: currencyCode,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 interface Props {
@@ -25,12 +30,16 @@ interface Props {
 
 export const FinanceNoteCard = ({ financeNote, onDelete, onEdit, preview }: Props) => {
   const { id, noteDate, amount, type, category, comment, user } = financeNote;
+
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
-  const formattedAmountText = formatCurrency(amount);
+  const userCurrencyCode = user?.currency?.code || 'USD';
+  const formattedAmountText = formatCurrency(amount, userCurrencyCode);
+
   const amountText = type === `INCOME` ? `+${formattedAmountText}` : `-${formattedAmountText}`;
   const typeClass = type === 'EXPENSE' ? 'expense_text' : '';
+
   const imagePath = category.image
     ? `http://localhost:9000/uploads/${category.image}`
     : 'http://localhost:9000/uploads/questionMark-icon.svg';
@@ -49,8 +58,6 @@ export const FinanceNoteCard = ({ financeNote, onDelete, onEdit, preview }: Prop
     }
     setShowEditModal(false);
   };
-
-  console.log(`user`, user);
 
   return (
     <>

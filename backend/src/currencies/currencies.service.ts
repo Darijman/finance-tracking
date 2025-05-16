@@ -7,7 +7,6 @@ import { UpdateCurrencyDto } from './updateCurrency.dto';
 import { RedisService } from 'src/common/redis/redis.service';
 
 const CURRENCIES_CACHE_KEY: string = `all_currencies`;
-const getCurrencyCacheKey = (currencyId: number) => `currency_${currencyId}`;
 
 @Injectable()
 export class CurrenciesService {
@@ -36,18 +35,10 @@ export class CurrenciesService {
       throw new BadRequestException({ error: 'Invalid ID!' });
     }
 
-    const currencyCacheKey = getCurrencyCacheKey(id);
-    const cachedCurrency = await this.redisService.getValue(currencyCacheKey);
-    if (cachedCurrency) {
-      return JSON.parse(cachedCurrency);
-    }
-
     const currency = await this.currenciesRepository.findOneBy({ id });
     if (!currency) {
       throw new NotFoundException({ error: 'Currency not found!' });
     }
-
-    await this.redisService.setValue(currencyCacheKey, JSON.stringify(currency), 86400); // 1day
     return currency;
   }
 
