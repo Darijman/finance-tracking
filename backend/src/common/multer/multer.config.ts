@@ -8,7 +8,9 @@ export const multerConfig = {
   storage: diskStorage({
     destination: './public/uploads',
     filename: (req: Request, file: Express.Multer.File, callback: (error: Error | null, filename: string) => void) => {
-      const filename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
+      const name = path.parse(file.originalname).name;
+      const ext = path.extname(file.originalname);
+      const filename = `${name}-${Date.now()}${ext}`;
       callback(null, filename);
     },
   }),

@@ -55,7 +55,7 @@ export class FinanceNotesService {
 
     const userNotes = await this.notesRepository.find({
       where: { userId },
-      relations: ['category'],
+      relations: ['category', 'user'],
       order: {
         noteDate: 'DESC',
       },

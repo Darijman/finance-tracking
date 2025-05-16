@@ -24,7 +24,7 @@ interface Props {
 }
 
 export const FinanceNoteCard = ({ financeNote, onDelete, onEdit, preview }: Props) => {
-  const { id, noteDate, amount, type, category, comment } = financeNote;
+  const { id, noteDate, amount, type, category, comment, user } = financeNote;
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
@@ -49,6 +49,8 @@ export const FinanceNoteCard = ({ financeNote, onDelete, onEdit, preview }: Prop
     }
     setShowEditModal(false);
   };
+
+  console.log(`user`, user);
 
   return (
     <>

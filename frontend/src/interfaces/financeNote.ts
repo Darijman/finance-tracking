@@ -1,4 +1,5 @@
 import { FinanceCategory } from './financeCategory';
+import { FullUser } from './fullUser';
 
 export enum Categories {
   'FOOD' = 'FOOD',
@@ -21,7 +22,7 @@ export interface FinanceNote {
   type: NoteType;
   category: FinanceCategory;
   comment?: string;
-  userId: number;
+  user: FullUser;
   createdAt: string;
   updatedAt: string;
 }

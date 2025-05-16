@@ -3,15 +3,6 @@ import { User } from 'src/users/user.entity';
 import { FinanceCategory } from 'src/financeCategories/financeCategory.entity';
 import { Exclude, Expose } from 'class-transformer';
 
-// export enum Categories {
-//   'FOOD' = 'FOOD',
-//   'TRANSPORT' = 'TRANSPORT',
-//   'ENTERTAINMENT' = 'ENTERTAINMENT',
-//   'CLOTHES' = 'CLOTHES',
-//   'HEALTH' = 'HEALTH',
-//   'DIFFERENT' = 'DIFFERENT',
-// }
-
 export enum NoteType {
   'INCOME' = 'INCOME',
   'EXPENSE' = 'EXPENSE',
@@ -44,10 +35,12 @@ export class FinanceNote {
   @Column({ nullable: true, default: null, length: 255 })
   comment?: string;
 
+  @Expose()
   @ManyToOne(() => User, (user) => user.financeNotes)
   @JoinColumn({ name: 'userId' })
   user: User;
 
+  @Exclude()
   @Column({ type: 'int' })
   userId: number;
 
