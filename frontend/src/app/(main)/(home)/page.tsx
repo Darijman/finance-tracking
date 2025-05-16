@@ -75,24 +75,36 @@ export default function Home() {
         </div>
 
         <div className='home_right'>
-          <Title level={3} style={{ margin: 0, color: 'var(--submit-button-color)' }}>
+          <Title level={3} style={{ margin: 0, color: 'var(--submit-button-color)', textAlign: 'center' }}>
             Finance-Tracking Benefits:
           </Title>
           <hr style={{ border: '2px solid var(--border-color)', borderRadius: '10px' }} />
-          <Paragraph style={{ fontSize: '18px' }}>
-            Keep your financial thoughts organized with Finance-Tracking Notes. Jot down your budgeting ideas, savings goals all in one place.
-            Stay on top of your financial planning by adding quick notes on your expenses, future financial plans, or just reflections on your
-            money habits.
-          </Paragraph>
-
-          <Paragraph style={{ fontSize: '18px' }}>
+          <ul className='home_right_benefits_list'>
+            <li className='home_right_benefits_list_item'>
+              {' '}
+              Keep your <span style={{ color: 'var(--red-color)' }}>financial thoughts</span> organized with Finance-Tracking Notes.
+            </li>
+            <li className='home_right_benefits_list_item'>
+              Jot down your budgeting <span style={{ color: 'var(--red-color)' }}>ideas</span>, savings{' '}
+              <span style={{ color: 'var(--red-color)' }}>goals</span> all in one place.
+            </li>
+            <li className='home_right_benefits_list_item'>
+              {' '}
+              Stay on top of your financial planning by adding quick notes on your expenses, future{' '}
+              <span style={{ color: 'var(--red-color)' }}>financial plans</span>, or just reflections on your money habits.
+            </li>
+          </ul>
+          <hr style={{ border: '2px solid var(--border-color)', borderRadius: '10px' }} />
+          <Paragraph style={{ fontSize: '18px', padding: '10px', textAlign: 'center' }}>
             Whether you’re tracking spending trends or brainstorming your next big investment, this app helps you keep everything organized
             and accessible — making financial planning simple and stress-free.
           </Paragraph>
 
-          <Button type='primary' onClick={() => router.push(`/addNote`)}>
-            Start Tracking
-          </Button>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button type='primary' onClick={() => router.push(`/addNote`)}>
+              Start Tracking
+            </Button>
+          </div>
         </div>
       </div>
     </div>
