@@ -17,8 +17,11 @@ export class FinanceNotesAnalyticsService {
     private readonly redisService: RedisService,
   ) {}
 
-  // CATEGORIES EXPENSES FOR CURRENT MONTH OR ALL TIME - TOTAL
-  async getCategoriesExpensesByUserId(userId: number, period: 'month' | 'all' = 'month'): Promise<GetCategoriesExpensesByUserId[]> {
+  // CATEGORIES EXPENSES FOR SELECTED DATE OR ALL TIME - TOTAL
+  async getCategoriesExpensesByUserId(
+    userId: number,
+    options: { year?: number; month?: number } = {},
+  ): Promise<GetCategoriesExpensesByUserId[]> {
     if (isNaN(userId)) {
       throw new BadRequestException({ error: 'Invalid user ID!' });
     }
@@ -28,13 +31,18 @@ export class FinanceNotesAnalyticsService {
       throw new NotFoundException({ error: 'User not found!' });
     }
 
+    const { year, month } = options;
+
     let start: Date | undefined;
     let end: Date | undefined;
 
-    if (period === 'month') {
-      const now = new Date();
-      start = new Date(now.getFullYear(), now.getMonth(), 1);
-      end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    // Если передан и год, и месяц — строим период месяца
+    if (year !== undefined && month !== undefined) {
+      if (month < 1 || month > 12) {
+        throw new BadRequestException({ error: 'Invalid month! Must be from 1 to 12.' });
+      }
+      start = new Date(year, month - 1, 1);
+      end = new Date(year, month, 0); // последний день месяца
     }
 
     const query = this.notesRepository
@@ -47,7 +55,7 @@ export class FinanceNotesAnalyticsService {
       .where('note.userId = :userId', { userId })
       .andWhere('note.type = :type', { type: 'EXPENSE' });
 
-    if (period === 'month') {
+    if (start && end) {
       query.andWhere('note.noteDate BETWEEN :start AND :end', { start, end });
     }
 

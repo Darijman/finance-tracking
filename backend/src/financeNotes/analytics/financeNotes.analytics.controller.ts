@@ -9,13 +9,14 @@ import { GetCategoriesExpensesByUserId } from './interfaces';
 export class FinanceNotesAnalyticsController {
   constructor(private readonly financeNotesAnalyticsService: FinanceNotesAnalyticsService) {}
 
-  // CATEGORIES EXPENSES FOR CURRENT MONTH OR ALL TIME - TOTAL
+  // CATEGORIES EXPENSES FOR SELECTED DATE OR ALL TIME - TOTAL
   @UseGuards(AuthGuard)
   @Get('expenses_category/:userId')
   async getCategoriesExpensesByUserId(
     @Param('userId') userId: number,
-    @Query('period') period?: 'month' | 'all',
+    @Query('year') year?: number,
+    @Query('month') month?: number,
   ): Promise<GetCategoriesExpensesByUserId[]> {
-    return this.financeNotesAnalyticsService.getCategoriesExpensesByUserId(userId, period);
+    return this.financeNotesAnalyticsService.getCategoriesExpensesByUserId(userId, { year, month });
   }
 }

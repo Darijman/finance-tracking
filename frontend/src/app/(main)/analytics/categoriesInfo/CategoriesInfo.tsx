@@ -1,88 +1,52 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Card } from 'antd';
-import { useTheme } from 'next-themes';
-import { Button } from '@/components/button/Button';
+import { AvailableDate } from '../monthSummary/interfaces';
+import { Select } from '@/components/select/Select';
+import { CustomTooltip } from './customTooltip';
+import { CategoryInfo } from './interfaces';
+import { CreateCustomTick } from './createCustomTick';
 import api from '../../../../../axiosInstance';
-import './categoriesInfo.css';
 
-const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
+const now = new Date();
+const currentYear = now.getFullYear();
+const currentMonth = now.getMonth() + 1;
+const currentDate = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div
-        style={{
-          background: 'var(--foreground-color)',
-          padding: 10,
-          border: 'none',
-          borderRadius: '10px',
-          color: 'var(--primary-text-color)',
-        }}
-      >
-        <p style={{ margin: 0 }}>{label}</p>
-        <p style={{ margin: 0, color: '#8884d8' }}>{`Total Spent: ${payload[0].value}`}</p>
-      </div>
-    );
-  }
-  return null;
-};
-
-interface CustomTickProps {
-  x: number;
-  y: number;
-  payload: { value: string };
+interface Props {
+  availableDates: AvailableDate[];
 }
 
-interface CategoryInfo {
-  category: { id: number; name: string; image: string };
-  totalExpense: number;
-}
-
-export const CategoriesInfo = () => {
+export const CategoriesInfo = ({ availableDates }: Props) => {
   const { user } = useAuth();
-  const { resolvedTheme } = useTheme();
 
   const [categoriesInfo, setCategoriesInfo] = useState<CategoryInfo[]>([]);
-  const [onlyCurrentMonth, setOnlyCurrentMonth] = useState<boolean>(false);
 
-  const getCategoriesInfo = useCallback(async () => {
-    if (user.id) {
-      const response = await api.get<CategoryInfo[]>(`/finance_notes_analytics/expenses_category/${user.id}`, {
-        params: { period: onlyCurrentMonth ? 'month' : 'all' },
-      });
-      setCategoriesInfo(response.data);
-    }
-  }, [user.id, onlyCurrentMonth]);
+  const [selectedDate, setSelectedDate] = useState<string>(currentDate);
+
+  const getCategoriesInfo = useCallback(
+    async (year: number, month: number) => {
+      if (user.id) {
+        const response = await api.get<CategoryInfo[]>(`/finance_notes_analytics/expenses_category/${user.id}`, { params: { year, month } });
+        setCategoriesInfo(response.data);
+      }
+    },
+    [user.id],
+  );
 
   useEffect(() => {
-    getCategoriesInfo();
+    getCategoriesInfo(currentYear, currentMonth);
   }, [getCategoriesInfo]);
 
-  const CustomTick = ({ x, y, payload }: CustomTickProps) => {
-    const category = categoriesInfo.find((c) => c.category.name === payload.value);
-    const imagePath = category?.category.image
-      ? `http://localhost:9000/uploads/${category.category.image}`
-      : 'http://localhost:9000/uploads/questionMark-icon.svg';
+  const monthOnChangeHandler = (value: string | string[]) => {
+    if (Array.isArray(value)) return;
+    setSelectedDate(value);
 
-    return (
-      <g transform={`translate(${x},${y + 10})`}>
-        <image
-          href={imagePath}
-          width={30}
-          height={30}
-          x={-15}
-          y={0}
-          style={{ filter: resolvedTheme === 'dark' ? 'invert(1)' : 'invert(0)' }}
-        />
-        <text x={0} y={45} textAnchor='middle' fill='#666' fontSize={12}>
-          {payload.value}
-        </text>
-      </g>
-    );
+    const [year, month] = value.split('-').map(Number);
+    getCategoriesInfo(year, month);
   };
 
   const chartData = categoriesInfo.map((item) => ({
@@ -90,23 +54,41 @@ export const CategoriesInfo = () => {
     totalExpense: item.totalExpense,
   }));
 
+  const dates = useMemo(() => {
+    return [
+      ...availableDates.map(({ month, year }) => {
+        const date = new Date(year, month - 1);
+        const label = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        const value = `${year}-${month.toString().padStart(2, '0')}`;
+        return { value, label };
+      }),
+    ];
+  }, [availableDates]);
+
   return (
     <Card
-      title={onlyCurrentMonth ? `Categories (${currentMonth})` : `Categories (All Time)`}
+      title={'Categories'}
       style={{ width: '100%', backgroundColor: 'var(--foreground-color)', textAlign: 'center' }}
       variant='borderless'
       extra={
-        <Button
-          className={onlyCurrentMonth ? 'only_current_month_button active' : 'only_current_month_button'}
-          onClick={() => setOnlyCurrentMonth((prevState) => !prevState)}
-          label={`Only ${currentMonth}`}
+        <Select
+          placeholder='Select a date'
+          value={selectedDate}
+          onChange={monthOnChangeHandler}
+          style={{ width: 200, position: 'absolute', right: 10, top: 10 }}
+          options={dates}
         />
       }
     >
       <ResponsiveContainer width='100%' height={400} style={{ backgroundColor: 'var(--background-color)' }}>
         {chartData.length ? (
           <BarChart data={chartData}>
-            <XAxis dataKey='name' tick={CustomTick} interval={0} height={80} />
+            <XAxis
+              dataKey='name'
+              interval={0}
+              height={80}
+              tick={(tickProps) => <CreateCustomTick {...tickProps} categoriesInfo={categoriesInfo} />}
+            />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
             <Bar dataKey='totalExpense' fill='#8884d8' barSize={40} name='Total Expenses' />

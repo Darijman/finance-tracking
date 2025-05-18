@@ -35,7 +35,7 @@ export const MonthsInfo = () => {
       style={{ width: '100%', backgroundColor: 'var(--foreground-color)', textAlign: 'center', marginBottom: 20 }}
       variant='borderless'
     >
-      <ResponsiveContainer width='100%' height={400}>
+      <ResponsiveContainer width='100%' height={400} style={{ backgroundColor: 'var(--background-color)' }}>
         <div className='scroll_container'>
           <LineChart width={months.length * 200} height={400} data={months}>
             <CartesianGrid strokeDasharray='3 3' />

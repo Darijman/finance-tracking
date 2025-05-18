@@ -4,9 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Typography } from 'antd';
 import { Select } from '@/components/select/Select';
 import { useAuth } from '@/contexts/authContext/AuthContext';
-import { FinanceNote } from '@/interfaces/financeNote';
-import { useLoader } from '@/contexts/loaderContext/LoaderContext';
-import { Loader } from '@/ui/loader/Loader';
+import { AvailableDate, IMonthSummary } from './interfaces';
 import api from '../../../../../axiosInstance';
 import './monthSummary.css';
 
@@ -16,24 +14,15 @@ const now = new Date();
 const currentYear = now.getFullYear();
 const currentMonth = now.getMonth() + 1;
 const currentDate = now.toLocaleString('en-US', { month: 'long', year: 'numeric' }) + `:`;
+const currentStateDate = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
 
-interface AvailableMonth {
-  month: number;
-  year: number;
+interface Props {
+  availableDates: AvailableDate[];
 }
 
-interface MonthSummary {
-  incomeTotal: number;
-  expenseTotal: number;
-  balance: number;
-  recentNotes: FinanceNote[];
-  noteCount: number;
-}
-
-export const MonthSummary = () => {
+export const MonthSummary = ({ availableDates }: Props) => {
   const { user } = useAuth();
-  const { isLoading, showLoader, hideLoader } = useLoader();
-  const [monthSummary, setMonthSummary] = useState<MonthSummary>({
+  const [monthSummary, setMonthSummary] = useState<IMonthSummary>({
     incomeTotal: 0,
     expenseTotal: 0,
     balance: 0,
@@ -41,103 +30,73 @@ export const MonthSummary = () => {
     noteCount: 0,
   });
 
-  const [availableMonths, setAvailableMonths] = useState<AvailableMonth[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(currentStateDate);
   const [serverError, setServerError] = useState<{ error: string }>({ error: '' });
 
   const getMonthSummary = useCallback(
-    async (year?: number, month?: number) => {
-      showLoader();
+    async (year: number, month: number) => {
       try {
         if (user.id) {
-          const response = await api.get<MonthSummary>(`/finance_notes_summary/${user.id}?year=${year}&month=${month}`);
+          const response = await api.get<IMonthSummary>(`/finance_notes_summary/${user.id}`, { params: { year, month } });
           setMonthSummary(response.data);
         }
       } catch (error: any) {
         setServerError(error);
-      } finally {
-        hideLoader();
       }
     },
-    [user.id, showLoader, hideLoader],
+    [user.id],
   );
-
-  const getAvailableMonths = useCallback(async () => {
-    showLoader();
-    try {
-      if (user.id) {
-        const response = await api.get<AvailableMonth[]>(`/finance_notes_summary/months/${user.id}`);
-        setAvailableMonths(response.data);
-      }
-    } catch (error: any) {
-      setServerError(error);
-    } finally {
-      hideLoader();
-    }
-  }, [user.id, showLoader, hideLoader]);
 
   useEffect(() => {
     getMonthSummary(currentYear, currentMonth);
-    getAvailableMonths();
-  }, [getMonthSummary, getAvailableMonths]);
+  }, [getMonthSummary]);
 
   const monthOnChangeHandler = (value: string | string[]) => {
     if (Array.isArray(value)) return;
-
-    setSelectedMonth(value);
-
-    if (value === '') {
-      getMonthSummary(currentYear, currentMonth);
-      return;
-    }
+    setSelectedDate(value);
 
     const [year, month] = value.split('-').map(Number);
     getMonthSummary(year, month);
   };
 
-  const displayedMonth = useMemo(() => {
-    if (!selectedMonth) return currentDate;
+  const displayedDate = useMemo(() => {
+    if (!selectedDate) return currentDate;
 
-    const [year, month] = selectedMonth.split('-').map(Number);
+    const [year, month] = selectedDate.split('-').map(Number);
     const date = new Date(year, month - 1);
     return date.toLocaleString('en-US', { month: 'long', year: 'numeric' }) + `:`;
-  }, [selectedMonth]);
+  }, [selectedDate]);
 
-  const months = useMemo(() => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;
-
+  const dates = useMemo(() => {
     return [
-      { value: '', label: 'Select a month', style: { color: 'var(--secondary-text-color)' } },
-      ...availableMonths
-        .filter(({ year, month }) => {
-          return !(year === currentYear && month === currentMonth);
-        })
-        .map(({ month, year }) => {
-          const date = new Date(year, month - 1);
-          const label = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-          const value = `${year}-${month.toString().padStart(2, '0')}`;
-          return { value, label };
-        }),
+      ...availableDates.map(({ month, year }) => {
+        const date = new Date(year, month - 1);
+        const label = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        const value = `${year}-${month.toString().padStart(2, '0')}`;
+        return { value, label };
+      }),
     ];
-  }, [availableMonths]);
+  }, [availableDates]);
 
   return (
     <div className='month_summary'>
       <div className='month_summary_top'>
-        {isLoading ? (
-          <Loader style={{ width: '30px' }} />
-        ) : serverError.error ? (
+        {serverError.error ? (
           <Title level={3} style={{ margin: 0, color: '#d32f2f' }}>
             {serverError.error}
           </Title>
         ) : (
           <Title level={3} style={{ margin: 0 }}>
-            {displayedMonth}
+            {displayedDate}
           </Title>
         )}
-        <Select placeholder='Select a month' value={selectedMonth} onChange={monthOnChangeHandler} style={{ width: 200 }} options={months} />
+        <Select
+          placeholder='Select a date'
+          value={selectedDate}
+          onChange={monthOnChangeHandler}
+          style={{ width: 200, textAlign: 'center' }}
+          options={dates}
+        />
       </div>
       <dl className='month_summary_list'>
         <div className='month_summary_list_item income'>
