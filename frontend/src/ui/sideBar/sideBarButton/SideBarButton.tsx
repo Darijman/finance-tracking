@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import './sideBarButton.css';
+import './responsive.css';
 
 interface Props {
   iconSrc: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -10,9 +11,11 @@ interface Props {
   href?: string;
   onClick?: React.MouseEventHandler;
   navigation?: boolean;
+  style?: React.CSSProperties;
+  buttonRef?: any;
 }
 
-export const SideBarButton = ({ iconSrc: Icon, label, href, navigation, onClick }: Props) => {
+export const SideBarButton = ({ iconSrc: Icon, label, href, onClick, navigation, style, buttonRef }: Props) => {
   const router = useRouter();
   const pathName = usePathname();
 
@@ -21,18 +24,13 @@ export const SideBarButton = ({ iconSrc: Icon, label, href, navigation, onClick 
   return (
     <>
       {navigation && href ? (
-        <button className={`sidebar_button${isActive ? ' active' : ''}`} onClick={() => router.push(href)}>
-          <Icon
-            className='icon'
-            style={{ stroke: isActive ? 'black' : 'white', strokeWidth: isActive ? 1 : 0, fill: isActive ? 'black' : 'white' }}
-          />
-          <span className='sidebar_button_text' style={{ fontWeight: isActive ? 'bold' : 'normal', fontSize: isActive ? '16px' : '15px' }}>
-            {label}
-          </span>
+        <button style={style} ref={buttonRef} className={`sidebar_button ${isActive ? 'active' : ''}`} onClick={() => router.push(href)}>
+          <Icon className={`sidebar_icon ${isActive ? 'active' : ''}`} />
+          <span className={`sidebar_button_text ${isActive ? 'active' : ''}`}>{label}</span>
         </button>
       ) : (
-        <button className='sidebar_button' onClick={onClick}>
-          <Icon className='icon' />
+        <button style={style} ref={buttonRef} className='sidebar_button' onClick={onClick}>
+          <Icon className='sidebar_icon' />
           <span className='sidebar_button_text'>{label}</span>
         </button>
       )}

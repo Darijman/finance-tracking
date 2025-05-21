@@ -1,0 +1,6 @@
+@media screen and (max-width: 1200px) {
+  .profile_main {
+    flex-direction: column;
+    align-items: center;
+  }
+}

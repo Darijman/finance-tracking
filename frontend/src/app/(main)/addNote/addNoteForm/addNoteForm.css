@@ -11,8 +11,6 @@
 
 .addNote_form_container {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   background-color: var(--foreground-color);
   padding: 20px;
   border-radius: 10px;

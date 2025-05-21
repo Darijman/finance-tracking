@@ -1,0 +1,16 @@
+@media screen and (max-width: 1200px) {
+  .month_summary {
+    margin-bottom: 20px;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .month_summary_list_item {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .month_summary_list_item dd {
+    margin: 0px;
+  }
+}

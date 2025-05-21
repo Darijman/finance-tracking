@@ -1,0 +1,9 @@
+@media screen and (max-width: 1300px) {
+  .sidebar_button_text {
+    display: none;
+  }
+
+  .sidebar_icon {
+    margin-right: 0px;
+  }
+}

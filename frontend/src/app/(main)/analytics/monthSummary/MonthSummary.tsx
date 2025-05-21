@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/authContext/AuthContext';
 import { AvailableDate, IMonthSummary } from './interfaces';
 import api from '../../../../../axiosInstance';
 import './monthSummary.css';
+import './responsive.css';
 
 const { Title } = Typography;
 

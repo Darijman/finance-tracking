@@ -1,0 +1,58 @@
+.addNoteMobile_form_container {
+  display: none;
+  background-color: var(--foreground-color);
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 900px;
+  max-height: 500px;
+  height: 100%;
+  width: 100%;
+}
+
+.addNoteMobile_categories {
+  position: relative;
+  background-color: var(--background-color);
+  border-radius: 10px;
+  width: 250px;
+  justify-self: center;
+  padding: 0px 10px;
+}
+
+.addNoteMobile_categories.error {
+  border: 1px solid var(--red-color);
+}
+
+@media screen and (max-width: 800px) {
+  .addNoteMobile_form_container {
+    display: flex;
+  }
+
+  .addNoteMobile_form_container {
+    flex-direction: column;
+    overflow-y: scroll;
+  }
+
+  .addNote_categories {
+    justify-self: center;
+    width: 230px;
+    padding: 0px 10px;
+  }
+
+  .addNote_categories_list {
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    height: 80px;
+    justify-content: flex-start;
+  }
+
+  .addNote_categories_list_item {
+    margin-bottom: 0px;
+    margin-right: 10px;
+  }
+
+  .addNote_type_buttons_container,
+  .addNote_date_container {
+    justify-self: center;
+  }
+}

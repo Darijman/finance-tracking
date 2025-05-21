@@ -1,0 +1,10 @@
+@media screen and (max-width: 550px) {
+  .alltime_summary_list_item {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .alltime_summary_list_item dd {
+    margin: 0px;
+  }
+}

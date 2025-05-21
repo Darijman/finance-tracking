@@ -7,6 +7,7 @@ import { icons, sideBarButtons } from './sideBarConfig';
 import Link from 'next/link';
 import BurgerMenuIcon from '@/assets/svg/burgerMenu-icon.svg';
 import './sideBar.css';
+import './responsive.css';
 
 export const SideBar = () => {
   const [showSubmenu, setShowSubmenu] = useState<boolean>(false);
@@ -36,15 +37,14 @@ export const SideBar = () => {
 
         {showSubmenu && <SubMenu closeSubMenu={() => setShowSubmenu((prev) => !prev)} buttonRef={buttonRef} />}
 
-        <button ref={buttonRef} className='sidebar_more_button' onClick={() => setShowSubmenu((prev) => !prev)}>
-          <BurgerMenuIcon className='icon' />
-          <span
-            className='sidebar_button_text'
-            style={{ fontWeight: showSubmenu ? 'bold' : 'normal', fontSize: showSubmenu ? '16px' : '15px' }}
-          >
-            More
-          </span>
-        </button>
+        <SideBarButton
+          iconSrc={BurgerMenuIcon}
+          label='More'
+          navigation={false}
+          onClick={() => setShowSubmenu((prev) => !prev)}
+          style={{ marginTop: '5px' }}
+          buttonRef={buttonRef}
+        />
       </nav>
     </aside>
   );

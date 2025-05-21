@@ -10,6 +10,7 @@ import { AvailableDate } from './monthSummary/interfaces';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import api from '../../../../axiosInstance';
 import './analytics.css';
+import './responsive.css';
 
 const { Title } = Typography;
 

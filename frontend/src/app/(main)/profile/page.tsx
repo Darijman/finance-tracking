@@ -6,8 +6,9 @@ import { UserInfo } from './userInfo/UserInfo';
 import { SelectCurrency } from './selectCurrency/SelectCurrency';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { FullUser } from '@/interfaces/fullUser';
-import './profile.css';
 import api from '../../../../axiosInstance';
+import './profile.css';
+import './responsive.css';
 
 const { Title } = Typography;
 

@@ -1,0 +1,15 @@
+@media screen and (max-width: 1300px) {
+  .sidebar {
+    width: 70px;
+  }
+
+  .sidebar_app_title {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 770px) {
+  .sidebar {
+    display: none;
+  }
+}

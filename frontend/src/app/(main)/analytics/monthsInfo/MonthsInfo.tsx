@@ -4,15 +4,10 @@ import { useAuth } from '@/contexts/authContext/AuthContext';
 import { Card } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Month } from './interfaces';
+import { CustomTooltip } from './customTooltip';
 import api from '../../../../../axiosInstance';
 import './monthsInfo.css';
-
-interface Month {
-  monthRaw: string;
-  monthLabel: string;
-  income: number;
-  expense: number;
-}
 
 export const MonthsInfo = () => {
   const { user } = useAuth();
@@ -41,7 +36,7 @@ export const MonthsInfo = () => {
             <CartesianGrid strokeDasharray='3 3' />
             <XAxis dataKey='monthLabel' />
             <YAxis tick={{ fontSize: 10 }} />
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
             <Legend />
             <Line type='monotone' dataKey='income' stroke='var(--green-color)' name='Income' />
             <Line type='monotone' dataKey='expense' stroke='var(--red-color)' name='Expense' />

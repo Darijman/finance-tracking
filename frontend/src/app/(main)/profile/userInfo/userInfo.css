@@ -14,10 +14,10 @@
   border-radius: 10px;
   display: grid;
   gap: 15px;
-  height: 245px;
+  min-height: 245px;
 }
 
-dt {
+.userinfo_list_item dt {
   font-weight: bold;
 }
 

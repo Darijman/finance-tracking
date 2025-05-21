@@ -1,4 +1,4 @@
-.sidebar_button {
+.submenu_button {
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -15,42 +15,42 @@
   }
 }
 
-.sidebar_button.active {
+.submenu_button.active {
   background-color: var(--hover-color);
 }
 
-.sidebar_button_image {
+.submenu_button_image {
   cursor: pointer;
   filter: invert(0);
   margin-right: 15px;
 }
 
-.sidebar_button_text {
+.submenu_button_text {
   text-transform: capitalize;
   cursor: pointer;
   font-size: 15px;
   color: var(--primary-text-color);
 }
 
-.sidebar_button_text.active {
+.submenu_button_text.active {
   font-weight: bold;
   font-size: 16px;
 }
 
-.sidebar_icon {
+.submenu_icon {
   width: 30px;
   height: 30px;
   margin-right: 10px;
 }
 
-.sidebar_icon.active {
+.submenu_icon.active {
   stroke: black;
   stroke-width: 1;
   fill: black;
 }
 
 [data-theme='dark'] {
-  .sidebar_icon {
+  .submenu_icon {
     filter: invert(1);
   }
 }

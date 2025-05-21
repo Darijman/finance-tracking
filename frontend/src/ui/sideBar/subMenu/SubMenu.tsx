@@ -1,16 +1,16 @@
 'use client';
 
-import { SideBarButton } from '../sideBarButton/SideBarButton';
+import { SubMenuButton } from './subMenuButton/SubMenuButton';
 import { useRef, useState } from 'react';
 import { SwitchAppearance } from './switchAppearance/SwitchAppearance';
 import { useTheme } from 'next-themes';
 import { useClickOutside } from '@/hooks/useClickOutside/UseClickOutside';
+import { useAuth } from '@/contexts/authContext/AuthContext';
+import { useRouter } from 'next/navigation';
 import api from '../../../../axiosInstance';
 import SettingsIcon from '@/assets/svg/settings-icon.svg';
 import SunIcon from '@/assets/svg/sun-icon.svg';
 import MoonIcon from '@/assets/svg/moon-icon.svg';
-import { useAuth } from '@/contexts/authContext/AuthContext';
-import { useRouter } from 'next/navigation';
 import './subMenu.css';
 
 interface Props {
@@ -41,10 +41,10 @@ export const SubMenu = ({ closeSubMenu, buttonRef }: Props) => {
         <div className='submenu'>
           <ul className='submenu_list'>
             <li className='submenu_item'>
-              <SideBarButton iconSrc={SettingsIcon} label='Settings' href='/settings' navigation={true} />
+              <SubMenuButton iconSrc={SettingsIcon} label='Settings' href='/settings' navigation={true} />
             </li>
             <li className='submenu_item'>
-              <SideBarButton
+              <SubMenuButton
                 iconSrc={theme === 'light' ? SunIcon : MoonIcon}
                 label='Switch appearance'
                 navigation={false}

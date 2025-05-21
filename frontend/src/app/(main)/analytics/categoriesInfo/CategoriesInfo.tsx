@@ -3,13 +3,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { Card } from 'antd';
+import { Card, Typography } from 'antd';
 import { AvailableDate } from '../monthSummary/interfaces';
 import { Select } from '@/components/select/Select';
 import { CustomTooltip } from './customTooltip';
 import { CategoryInfo } from './interfaces';
 import { CreateCustomTick } from './createCustomTick';
 import api from '../../../../../axiosInstance';
+import './categoriesInfo.css';
+
+const { Title } = Typography;
 
 const now = new Date();
 const currentYear = now.getFullYear();
@@ -24,7 +27,6 @@ export const CategoriesInfo = ({ availableDates }: Props) => {
   const { user } = useAuth();
 
   const [categoriesInfo, setCategoriesInfo] = useState<CategoryInfo[]>([]);
-
   const [selectedDate, setSelectedDate] = useState<string>(currentDate);
 
   const getCategoriesInfo = useCallback(
@@ -65,20 +67,35 @@ export const CategoriesInfo = ({ availableDates }: Props) => {
     ];
   }, [availableDates]);
 
+  const formattedDate = new Date(selectedDate).toLocaleString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+
   return (
     <Card
-      title={'Categories'}
-      style={{ width: '100%', backgroundColor: 'var(--foreground-color)', textAlign: 'center' }}
-      variant='borderless'
-      extra={
-        <Select
-          placeholder='Select a date'
-          value={selectedDate}
-          onChange={monthOnChangeHandler}
-          style={{ width: 200, position: 'absolute', right: 10, top: 10 }}
-          options={dates}
-        />
+      title={
+        <div className='card_title_wrapper'>
+          <Title level={4} style={{ margin: '10px 0px' }}>
+            Categories ({formattedDate})
+          </Title>
+          <div className='card_select_wrapper'>
+            <Select
+              placeholder='Select a date'
+              value={selectedDate}
+              onChange={monthOnChangeHandler}
+              style={{ width: 200, marginBottom: '10px' }}
+              options={dates}
+            />
+          </div>
+        </div>
       }
+      style={{
+        width: '100%',
+        backgroundColor: 'var(--foreground-color)',
+        textAlign: 'center',
+      }}
+      variant='borderless'
     >
       <ResponsiveContainer width='100%' height={400} style={{ backgroundColor: 'var(--background-color)' }}>
         {chartData.length ? (

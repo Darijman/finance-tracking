@@ -11,6 +11,7 @@ import { Loader } from '@/ui/loader/Loader';
 import { getFinanceCategories, getUserNotes } from './requests';
 import { AnimatePresence, motion } from 'framer-motion';
 import './history.css';
+import './responsive.css';
 
 const { Title } = Typography;
 

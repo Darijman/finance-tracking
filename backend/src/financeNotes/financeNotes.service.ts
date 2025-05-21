@@ -50,7 +50,8 @@ export class FinanceNotesService {
     const cachedUserNotes: string = await this.redisService.getValue(userCacheKey);
 
     if (cachedUserNotes) {
-      return JSON.parse(cachedUserNotes);
+      const parsedNotes = JSON.parse(cachedUserNotes);
+      return limit ? parsedNotes.slice(0, limit) : parsedNotes;
     }
 
     const userNotes = await this.notesRepository.find({

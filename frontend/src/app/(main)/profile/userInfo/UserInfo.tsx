@@ -8,6 +8,7 @@ import { FinanceNote } from '@/interfaces/financeNote';
 import { Typography } from 'antd';
 import api from '../../../../../axiosInstance';
 import './userInfo.css';
+import './responsive.css';
 
 const { Title } = Typography;
 

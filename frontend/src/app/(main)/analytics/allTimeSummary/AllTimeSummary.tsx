@@ -3,23 +3,16 @@
 import { Typography } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/authContext/AuthContext';
-import { FinanceNote } from '@/interfaces/financeNote';
+import { IAllTimeSummary } from './interfaces';
 import api from '../../../../../axiosInstance';
 import './allTimeSummary.css';
+import './responsive.css';
 
 const { Title } = Typography;
 
-interface AllTimeSummary {
-  incomeTotal: number;
-  expenseTotal: number;
-  balance: number;
-  recentNotes: FinanceNote[];
-  noteCount: number;
-}
-
 export const AllTimeSummary = () => {
   const { user } = useAuth();
-  const [allTimeSummary, setAllTimeSummary] = useState<AllTimeSummary>({
+  const [allTimeSummary, setAllTimeSummary] = useState<IAllTimeSummary>({
     incomeTotal: 0,
     expenseTotal: 0,
     balance: 0,
@@ -29,7 +22,7 @@ export const AllTimeSummary = () => {
 
   const getAllTimeSummary = useCallback(async () => {
     if (user.id) {
-      const response = await api.get<AllTimeSummary>(`/finance_notes_summary/all-time/${user.id}`);
+      const response = await api.get<IAllTimeSummary>(`/finance_notes_summary/all-time/${user.id}`);
       setAllTimeSummary(response.data);
     }
   }, [user.id]);
