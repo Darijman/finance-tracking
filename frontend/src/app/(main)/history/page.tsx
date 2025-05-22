@@ -107,46 +107,55 @@ const History = () => {
       <Title level={1} style={{ textAlign: 'center', margin: '0px 0px 20px 0px' }}>
         History
       </Title>
-      <div className='history_top_buttons'>
-        <div className='sortby_type_buttons'>
-          <button
-            className={`sortby_expense_button ${sortByType === 'EXPENSE' ? 'active' : ''}`}
-            onClick={() => setSortByType((prev) => (prev === 'EXPENSE' ? null : 'EXPENSE'))}
-          >
-            EXPENSE
-          </button>
-          <button
-            className={`sortby_income_button ${sortByType === 'INCOME' ? 'active' : ''}`}
-            onClick={() => setSortByType((prev) => (prev === 'INCOME' ? null : 'INCOME'))}
-          >
-            INCOME
-          </button>
-        </div>
-        <select className='financecategory_select' value={selectedFinanceCategory} onChange={categoryOnChangeHandler}>
-          <option value=''>Category</option>
-          {financeCategories.map((financeCategory) => {
-            return (
-              <option key={financeCategory.id} value={financeCategory.name}>
-                {financeCategory.name}
-              </option>
-            );
-          })}
-        </select>
-        <div className='sortby_date_and_price_buttons'>
-          <button className='sortby_date_button' onClick={sortByDateHandler}>
-            Date
-            {sortByDate === 'asc' && <span className='sort_arrow up'></span>}
-            {sortByDate === 'desc' && <span className='sort_arrow down'></span>}
-          </button>
-          <button className='sortby_price_button' onClick={sortByPriceHandler}>
-            Price
-            {sortByPrice === 'asc' && <span className='sort_arrow up'></span>}
-            {sortByPrice === 'desc' && <span className='sort_arrow down'></span>}
-            {sortByPrice === null && <span className='sort_arrow none'></span>}
-          </button>
-        </div>
-      </div>
-      <hr className='history_divider' />
+      {!userFinanceNotes.length ? (
+        <Title level={3} style={{ textAlign: 'center', margin: 0, color: 'var(--red-color)' }}>
+          There is nothing here
+        </Title>
+      ) : (
+        <>
+          <div className='history_top_buttons'>
+            <div className='sortby_type_buttons'>
+              <button
+                className={`sortby_expense_button ${sortByType === 'EXPENSE' ? 'active' : ''}`}
+                onClick={() => setSortByType((prev) => (prev === 'EXPENSE' ? null : 'EXPENSE'))}
+              >
+                EXPENSE
+              </button>
+              <button
+                className={`sortby_income_button ${sortByType === 'INCOME' ? 'active' : ''}`}
+                onClick={() => setSortByType((prev) => (prev === 'INCOME' ? null : 'INCOME'))}
+              >
+                INCOME
+              </button>
+            </div>
+            <select className='financecategory_select' value={selectedFinanceCategory} onChange={categoryOnChangeHandler}>
+              <option value=''>Category</option>
+              {financeCategories.map((financeCategory) => {
+                return (
+                  <option key={financeCategory.id} value={financeCategory.name}>
+                    {financeCategory.name}
+                  </option>
+                );
+              })}
+            </select>
+            <div className='sortby_date_and_price_buttons'>
+              <button className='sortby_date_button' onClick={sortByDateHandler}>
+                Date
+                {sortByDate === 'asc' && <span className='sort_arrow up'></span>}
+                {sortByDate === 'desc' && <span className='sort_arrow down'></span>}
+              </button>
+              <button className='sortby_price_button' onClick={sortByPriceHandler}>
+                Price
+                {sortByPrice === 'asc' && <span className='sort_arrow up'></span>}
+                {sortByPrice === 'desc' && <span className='sort_arrow down'></span>}
+                {sortByPrice === null && <span className='sort_arrow none'></span>}
+              </button>
+            </div>
+          </div>
+          <hr className='history_divider' />
+        </>
+      )}
+
       <div>
         {(sortByType || selectedFinanceCategory) && (
           <Title level={3} style={{ margin: '0px 0px 10px 0px', textAlign: 'center' }}>

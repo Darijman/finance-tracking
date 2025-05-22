@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Lenis from 'lenis';
 import './home.css';
+import './responsive.css';
 
 const { Title, Paragraph } = Typography;
 

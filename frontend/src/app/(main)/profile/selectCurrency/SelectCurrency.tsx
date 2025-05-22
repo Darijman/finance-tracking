@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/authContext/AuthContext';
 import { FullUser } from '@/interfaces/fullUser';
 import api from '../../../../../axiosInstance';
 import './selectCurrency.css';
+import './responsive.css';
 
 const { Title } = Typography;
 

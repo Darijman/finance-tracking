@@ -19,7 +19,8 @@
   align-items: center;
   background-color: var(--foreground-color);
   color: var(--primary-text-color);
-  width: 400px;
+  max-width: 400px;
+  width: 100%;
   padding: 20px;
   border-radius: 8px;
 }

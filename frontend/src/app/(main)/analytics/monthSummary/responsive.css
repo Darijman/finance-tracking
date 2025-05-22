@@ -5,6 +5,14 @@
 }
 
 @media screen and (max-width: 550px) {
+  .month_summary_top {
+    flex-direction: column;
+  }
+  
+  .month_summary_top_title {
+    margin-bottom: 10px !important;
+  }
+  
   .month_summary_list_item {
     grid-template-columns: 1fr;
     text-align: center;

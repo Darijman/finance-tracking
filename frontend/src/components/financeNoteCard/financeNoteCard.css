@@ -35,7 +35,7 @@
 .delete_icon {
   width: 30px;
   height: 30px;
-  fill: #d32f2f;
+  fill: var(--red-color);
   cursor: pointer;
   &:hover {
     opacity: 0.8;
@@ -71,7 +71,6 @@
 
 .notecard_info,
 .notecard_mid {
-  max-width: 100%;
   width: 310px;
   display: flex;
   align-items: center;
@@ -113,11 +112,11 @@
 
 .amount_text,
 .category_text {
-  color: #228b22;
+  color: var(--green-color);
 }
 
 .expense_text {
-  color: #d32f2f;
+  color: var(--red-color);
 }
 
 .note_created_date {
@@ -128,19 +127,6 @@
 [data-theme='dark'] {
   .category_image {
     filter: invert(1);
-  }
-
-  .amount_text,
-  .category_text {
-    color: #98fb98;
-  }
-
-  .expense_text {
-    color: #e57373;
-  }
-
-  .delete_icon {
-    fill: #e57373;
   }
 
   .edit_icon {

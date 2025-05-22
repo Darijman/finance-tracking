@@ -4,6 +4,7 @@ import { Typography, Tooltip } from 'antd';
 import { useTheme } from 'next-themes';
 import { tools, socials } from './footerConfig';
 import './footer.css';
+import './responsive.css';
 
 const { Title } = Typography;
 

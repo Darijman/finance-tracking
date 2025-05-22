@@ -32,7 +32,7 @@ export const MonthsInfo = () => {
     >
       <ResponsiveContainer width='100%' height={400} style={{ backgroundColor: 'var(--background-color)' }}>
         <div className='scroll_container'>
-          <LineChart width={months.length * 200} height={400} data={months}>
+          <LineChart width={months.length * 400} height={400} data={months}>
             <CartesianGrid strokeDasharray='3 3' />
             <XAxis dataKey='monthLabel' />
             <YAxis tick={{ fontSize: 10 }} />

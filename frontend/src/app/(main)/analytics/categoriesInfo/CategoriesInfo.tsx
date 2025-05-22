@@ -82,7 +82,7 @@ export const CategoriesInfo = ({ availableDates }: Props) => {
           <div className='card_select_wrapper'>
             <Select
               placeholder='Select a date'
-              value={selectedDate}
+              value={formattedDate}
               onChange={monthOnChangeHandler}
               style={{ width: 200, marginBottom: '10px' }}
               options={dates}

@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 export class CreateCurrencyDto {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(20, { message: 'Name must contain no more than 20 letters!' })
+  @MaxLength(50, { message: 'Name must contain no more than 50 letters!' })
   @MinLength(1, { message: 'Name must contain at least 1 letter!' })
   name: string;
 

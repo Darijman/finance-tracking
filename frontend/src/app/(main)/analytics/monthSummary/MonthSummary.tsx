@@ -83,17 +83,17 @@ export const MonthSummary = ({ availableDates }: Props) => {
     <div className='month_summary'>
       <div className='month_summary_top'>
         {serverError.error ? (
-          <Title level={3} style={{ margin: 0, color: '#d32f2f' }}>
+          <Title level={3} style={{ margin: '0px', color: '#d32f2f' }} className='month_summary_top_title'>
             {serverError.error}
           </Title>
         ) : (
-          <Title level={3} style={{ margin: 0 }}>
+          <Title level={3} style={{ margin: '0px' }} className='month_summary_top_title'>
             {displayedDate}
           </Title>
         )}
         <Select
           placeholder='Select a date'
-          value={selectedDate}
+          value={displayedDate}
           onChange={monthOnChangeHandler}
           style={{ width: 200, textAlign: 'center' }}
           options={dates}

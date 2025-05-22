@@ -6,11 +6,26 @@
 
 @media screen and (max-width: 550px) {
   .userinfo_list_item {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     text-align: center;
+    align-items: center;
   }
 
+  .userinfo_list_item dt,
   .userinfo_list_item dd {
-    margin: 0px;
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  .userinfo_list {
+    justify-content: center;
+  }
+
+  .userinfo_list_item {
+    padding: 5px;
+    font-size: 13px;
   }
 }

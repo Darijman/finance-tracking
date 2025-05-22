@@ -13,7 +13,7 @@
   position: relative;
   background-color: var(--background-color);
   border-radius: 10px;
-  width: 250px;
+  width: 230px;
   justify-self: center;
   padding: 0px 10px;
 }
@@ -23,6 +23,10 @@
 }
 
 @media screen and (max-width: 800px) {
+  .addNote_page_wrapper {
+    justify-content: center;
+  }
+
   .addNoteMobile_form_container {
     display: flex;
   }
@@ -31,13 +35,7 @@
     flex-direction: column;
     overflow-y: scroll;
   }
-
-  .addNote_categories {
-    justify-self: center;
-    width: 230px;
-    padding: 0px 10px;
-  }
-
+  
   .addNote_categories_list {
     display: flex;
     overflow-x: scroll;

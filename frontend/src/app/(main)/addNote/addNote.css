@@ -5,9 +5,10 @@
   width: 100%;
 }
 
-@media screen and (max-width: 870px) {
+@media screen and (max-width: 1230px) {
   .last_three_notes {
     display: flex;
     flex-direction: column;
+    justify-content: center;
   }
 }

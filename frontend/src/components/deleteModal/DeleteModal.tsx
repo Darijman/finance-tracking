@@ -10,10 +10,11 @@ interface Props {
   onClose: () => void;
   onDelete: () => Promise<void>;
   text: string;
+  deleteButtonText?: string;
   style?: React.CSSProperties;
 }
 
-export const DeleteModal = ({ isOpen, onClose, onDelete, text, style }: Props) => {
+export const DeleteModal = ({ isOpen, onClose, onDelete, text, deleteButtonText, style }: Props) => {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [serverError, setServerError] = useState<{ error: string }>({ error: '' });
 
@@ -67,7 +68,7 @@ export const DeleteModal = ({ isOpen, onClose, onDelete, text, style }: Props) =
         {!serverError.error ? (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <button className='delete_modal_yes_button' onClick={handleDelete} disabled={isDeleting}>
-              Yes, delete
+              {deleteButtonText ?? 'Yes, delete'}
             </button>
             <button className='delete_modal_no_button' onClick={onClose} disabled={isDeleting}>
               Cancel

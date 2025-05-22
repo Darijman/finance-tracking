@@ -1,0 +1,14 @@
+.burger_navigation_list_container {
+  position: fixed;
+  right: 20px;
+  background-color: var(--foreground-color);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.burger_navigation_list {
+  list-style-type: none;
+  padding: 0px;
+  margin: 0px;
+  padding: 10px;
+}

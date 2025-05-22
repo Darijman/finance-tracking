@@ -8,6 +8,7 @@ import { EditFinanceNoteModal } from '../editFinanceNoteModal/EditFinanceNoteMod
 import Image from 'next/image';
 import api from '../../../axiosInstance';
 import './financeNoteCard.css';
+import './responsive.css';
 
 import EditIcon from '@/assets/svg/edit-icon.svg';
 import DeleteIcon from '@/assets/svg/delete-icon.svg';

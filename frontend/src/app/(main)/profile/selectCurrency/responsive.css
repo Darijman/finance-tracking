@@ -1,0 +1,11 @@
+@media screen and (max-width: 500px) {
+  .currency_list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .currency_list {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

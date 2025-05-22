@@ -1,9 +1,27 @@
+.layout_container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+}
+
 .main_layout {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  padding: 20px 50px 50px 50px;
+  padding: 20px 50px 40px 50px;
   margin-top: 20px;
   height: 100vh;
   overflow-y: auto;
+}
+
+.burger_wrapper {
+  display: flex;
+  justify-content: end;
+}
+
+@media screen and (max-width: 850px) {
+  .main_layout {
+    padding: 20pxж;
+  }
 }

@@ -22,7 +22,13 @@ export const SubMenuButton = ({ iconSrc: Icon, label, href, onClick, navigation 
   return (
     <>
       {navigation && href ? (
-        <button className={`submenu_button ${isActive ? 'active' : ''}`} onClick={() => router.push(href)}>
+        <button
+          className={`submenu_button ${isActive ? 'active' : ''}`}
+          onClick={(e) => {
+            if (onClick) onClick(e);
+            router.push(href);
+          }}
+        >
           <Icon className={`submenu_icon ${isActive ? 'active' : ''}`} />
           <span className={`submenu_button_text ${isActive ? 'active' : ''}`}>{label}</span>
         </button>

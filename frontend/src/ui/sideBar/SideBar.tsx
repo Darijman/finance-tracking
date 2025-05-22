@@ -35,14 +35,20 @@ export const SideBar = () => {
       <nav className='sidebar_nav'>
         <ul className='sidebar_list'>{menuItems}</ul>
 
-        {showSubmenu && <SubMenu closeSubMenu={() => setShowSubmenu((prev) => !prev)} buttonRef={buttonRef} />}
+        {showSubmenu && (
+          <SubMenu
+            switchAppearanceStyle={{ position: 'fixed', bottom: '70px' }}
+            subMenuStyle={{ position: 'fixed', bottom: '70px' }}
+            closeSubMenu={() => setShowSubmenu((prev) => !prev)}
+            buttonRef={buttonRef}
+          />
+        )}
 
         <SideBarButton
           iconSrc={BurgerMenuIcon}
           label='More'
           navigation={false}
           onClick={() => setShowSubmenu((prev) => !prev)}
-          style={{ marginTop: '5px' }}
           buttonRef={buttonRef}
         />
       </nav>
