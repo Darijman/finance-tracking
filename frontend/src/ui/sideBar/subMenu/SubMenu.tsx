@@ -42,9 +42,7 @@ export const SubMenu = ({ closeSubMenu, buttonRef, switchAppearanceStyle, subMen
   return (
     <div ref={subMenuRef}>
       {showSwitchAppearance ? (
-        <div style={switchAppearanceStyle}>
-          <SwitchAppearance closeSwitchApperance={() => setShowSwitchAppearance(false)} />
-        </div>
+        <SwitchAppearance style={switchAppearanceStyle} closeSwitchApperance={() => setShowSwitchAppearance(false)} />
       ) : (
         <div className='submenu' style={subMenuStyle}>
           <ul className='submenu_list'>

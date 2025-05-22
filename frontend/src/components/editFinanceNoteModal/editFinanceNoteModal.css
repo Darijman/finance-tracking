@@ -15,7 +15,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   background-color: var(--background-color);
   color: var(--primary-text-color);
@@ -41,10 +40,10 @@
   background-color: var(--foreground-color);
   padding: 20px;
   border-radius: 10px;
-  max-width: 900px;
-  max-height: 500px;
-  height: 100%;
-  width: 100%;
+}
+
+.editNote_form_wrapper {
+  margin-right: 50px;
 }
 
 .editNote_form_main {

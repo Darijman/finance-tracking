@@ -67,6 +67,7 @@ export const DatePicker = ({
         placeholder={placeholder}
         showSecond={showSecond}
         getPopupContainer={getPopupContainer}
+        placement='bottomRight'
       />
     </ConfigProvider>
   );

@@ -1,0 +1,58 @@
+@media screen and (max-width: 1100px) {
+  .editNote_container {
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .editNote_form_wrapper {
+    margin-right: 0px;
+  }
+
+  .editNote_form_container {
+    margin-bottom: 20px;
+  }
+
+  .edit_note_modal_content {
+    height: 600px;
+    overflow-y: scroll;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .editNote_form_container {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .editNote_categories {
+    width: 230px;
+    padding: 0px 10px;
+  }
+
+  .editNote_categories_list_item {
+    margin-bottom: 0px;
+    margin-right: 10px;
+  }
+
+  .editNote_categories_list {
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    height: 80px;
+    justify-content: flex-start;
+  }
+
+  .editNote_type_buttons_container,
+  .editNote_date_container {
+    width: 200px;
+    justify-self: center;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .edit_modal_save_button,
+  .edit_modal_cancel_button {
+    width: 120px;
+  }
+}

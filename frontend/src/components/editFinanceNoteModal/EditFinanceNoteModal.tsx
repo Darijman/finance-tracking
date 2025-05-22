@@ -15,6 +15,7 @@ import Image from 'next/image';
 import dayjs from 'dayjs';
 import api from '../../../axiosInstance';
 import './editFinanceNoteModal.css';
+import './responsive.css';
 
 const { Title, Paragraph } = Typography;
 
@@ -171,7 +172,7 @@ export const EditFinanceNoteModal = ({ isOpen, financeNote, onClose, onEdit }: P
         </button>
         <Title level={2}>Edit Note</Title>
         <div className='editNote_container'>
-          <div style={{ marginRight: '50px' }}>
+          <div className='editNote_form_wrapper'>
             <Form
               form={form}
               id='editFinanceNoteForm'

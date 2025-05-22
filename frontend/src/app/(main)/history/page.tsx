@@ -2,7 +2,7 @@
 
 import { FinanceNoteCard } from '@/components/financeNoteCard/FinanceNoteCard';
 import { useAuth } from '@/contexts/authContext/AuthContext';
-import { Typography } from 'antd';
+import { message, Typography } from 'antd';
 import { useLoader } from '@/contexts/loaderContext/LoaderContext';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FinanceNote } from '@/interfaces/financeNote';
@@ -18,6 +18,7 @@ const { Title } = Typography;
 const History = () => {
   const { user } = useAuth();
 
+  const [messageApi, contextHolder] = message.useMessage({ maxCount: 2 });
   const { isLoading, showLoader, hideLoader } = useLoader();
   const [userFinanceNotes, setUserFinanceNotes] = useState<FinanceNote[]>([]);
   const [financeCategories, setFinanceCategories] = useState<FinanceCategory[]>([]);
@@ -49,10 +50,20 @@ const History = () => {
 
   const deleteFinanceNoteHandler = (noteId: number) => {
     setUserFinanceNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+
+    messageApi.open({
+      type: 'success',
+      content: 'Note has been removed!',
+    });
   };
 
   const editFinanceNoteHandler = (updatedNote: FinanceNote) => {
     setUserFinanceNotes((prevNotes) => prevNotes.map((note) => (note.id === updatedNote.id ? { ...note, ...updatedNote } : note)));
+
+    messageApi.open({
+      type: 'success',
+      content: 'Note updated successfully!',
+    });
   };
 
   const categoryOnChangeHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -104,57 +115,50 @@ const History = () => {
 
   return (
     <div className='history_container'>
+      {contextHolder}
       <Title level={1} style={{ textAlign: 'center', margin: '0px 0px 20px 0px' }}>
         History
       </Title>
-      {!userFinanceNotes.length ? (
-        <Title level={3} style={{ textAlign: 'center', margin: 0, color: 'var(--red-color)' }}>
-          There is nothing here
-        </Title>
-      ) : (
-        <>
-          <div className='history_top_buttons'>
-            <div className='sortby_type_buttons'>
-              <button
-                className={`sortby_expense_button ${sortByType === 'EXPENSE' ? 'active' : ''}`}
-                onClick={() => setSortByType((prev) => (prev === 'EXPENSE' ? null : 'EXPENSE'))}
-              >
-                EXPENSE
-              </button>
-              <button
-                className={`sortby_income_button ${sortByType === 'INCOME' ? 'active' : ''}`}
-                onClick={() => setSortByType((prev) => (prev === 'INCOME' ? null : 'INCOME'))}
-              >
-                INCOME
-              </button>
-            </div>
-            <select className='financecategory_select' value={selectedFinanceCategory} onChange={categoryOnChangeHandler}>
-              <option value=''>Category</option>
-              {financeCategories.map((financeCategory) => {
-                return (
-                  <option key={financeCategory.id} value={financeCategory.name}>
-                    {financeCategory.name}
-                  </option>
-                );
-              })}
-            </select>
-            <div className='sortby_date_and_price_buttons'>
-              <button className='sortby_date_button' onClick={sortByDateHandler}>
-                Date
-                {sortByDate === 'asc' && <span className='sort_arrow up'></span>}
-                {sortByDate === 'desc' && <span className='sort_arrow down'></span>}
-              </button>
-              <button className='sortby_price_button' onClick={sortByPriceHandler}>
-                Price
-                {sortByPrice === 'asc' && <span className='sort_arrow up'></span>}
-                {sortByPrice === 'desc' && <span className='sort_arrow down'></span>}
-                {sortByPrice === null && <span className='sort_arrow none'></span>}
-              </button>
-            </div>
-          </div>
-          <hr className='history_divider' />
-        </>
-      )}
+      <div className='history_top_buttons'>
+        <div className='sortby_type_buttons'>
+          <button
+            className={`sortby_expense_button ${sortByType === 'EXPENSE' ? 'active' : ''}`}
+            onClick={() => setSortByType((prev) => (prev === 'EXPENSE' ? null : 'EXPENSE'))}
+          >
+            EXPENSE
+          </button>
+          <button
+            className={`sortby_income_button ${sortByType === 'INCOME' ? 'active' : ''}`}
+            onClick={() => setSortByType((prev) => (prev === 'INCOME' ? null : 'INCOME'))}
+          >
+            INCOME
+          </button>
+        </div>
+        <select className='financecategory_select' value={selectedFinanceCategory} onChange={categoryOnChangeHandler}>
+          <option value=''>Category</option>
+          {financeCategories.map((financeCategory) => {
+            return (
+              <option key={financeCategory.id} value={financeCategory.name}>
+                {financeCategory.name}
+              </option>
+            );
+          })}
+        </select>
+        <div className='sortby_date_and_price_buttons'>
+          <button className='sortby_date_button' onClick={sortByDateHandler}>
+            Date
+            {sortByDate === 'asc' && <span className='sort_arrow up'></span>}
+            {sortByDate === 'desc' && <span className='sort_arrow down'></span>}
+          </button>
+          <button className='sortby_price_button' onClick={sortByPriceHandler}>
+            Price
+            {sortByPrice === 'asc' && <span className='sort_arrow up'></span>}
+            {sortByPrice === 'desc' && <span className='sort_arrow down'></span>}
+            {sortByPrice === null && <span className='sort_arrow none'></span>}
+          </button>
+        </div>
+      </div>
+      <hr className='history_divider' />
 
       <div>
         {(sortByType || selectedFinanceCategory) && (

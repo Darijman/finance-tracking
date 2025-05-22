@@ -8,9 +8,10 @@ import './switchAppearance.css';
 
 interface Props {
   closeSwitchApperance: () => void;
+  style: React.CSSProperties;
 }
 
-export const SwitchAppearance = ({ closeSwitchApperance }: Props) => {
+export const SwitchAppearance = ({ closeSwitchApperance, style }: Props) => {
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -23,7 +24,7 @@ export const SwitchAppearance = ({ closeSwitchApperance }: Props) => {
   const isDarkMode = resolvedTheme === 'dark';
 
   return (
-    <div className='appearance_container'>
+    <div className='appearance_container' style={style}>
       <div className='appearance_top'>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <button className='close_switch_appearance_button' onClick={closeSwitchApperance}>
