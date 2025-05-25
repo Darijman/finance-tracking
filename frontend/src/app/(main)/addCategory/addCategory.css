@@ -1,0 +1,7 @@
+.user_finance_categories_list_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+}

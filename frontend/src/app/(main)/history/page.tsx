@@ -32,7 +32,7 @@ const History = () => {
     if (user.id) {
       try {
         showLoader();
-        const [notes, categories] = await Promise.all([getUserNotes(user.id), getFinanceCategories(user.id)]);
+        const [notes, categories] = await Promise.all([getUserNotes(user.id), getFinanceCategories()]);
 
         setUserFinanceNotes(notes);
         setFinanceCategories(categories);

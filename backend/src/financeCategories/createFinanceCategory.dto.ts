@@ -4,7 +4,7 @@ import { Transform } from 'class-transformer';
 export class CreateFinanceCategoryDto {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(100, { message: 'Name must contain no more than 100 letters!' })
+  @MaxLength(30, { message: 'Name must contain no more than 30 letters!' })
   @MinLength(1, { message: 'Name must contain at least 1 letter!' })
   name: string;
 

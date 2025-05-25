@@ -33,7 +33,8 @@ export const DeleteModal = ({ isOpen, onClose, onDelete, text, deleteButtonText,
       setIsDeleting(true);
       await onDelete();
     } catch (error: any) {
-      setServerError(error || { error: 'Something went wrong' });
+      const errorText: string = error.response?.data.error || 'Something went wrong..';
+      setServerError({ error: errorText || 'Something went wrong' });
     } finally {
       setIsDeleting(false);
     }

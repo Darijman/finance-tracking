@@ -31,7 +31,7 @@ const AddNote = () => {
     if (user.id) {
       try {
         showLoader();
-        const [financeCategories, lastThreeUserNotes] = await Promise.all([getFinanceCategories(user.id), getUserNotes(user.id, 3)]);
+        const [financeCategories, lastThreeUserNotes] = await Promise.all([getFinanceCategories(), getUserNotes(user.id, 3)]);
 
         setFinanceCategories(financeCategories);
         setLastThreeUserNotes(lastThreeUserNotes);

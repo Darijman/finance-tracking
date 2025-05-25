@@ -7,9 +7,7 @@ export const getUserNotes = async (userId: number, limit?: number) => {
   return response.data;
 };
 
-export const getFinanceCategories = async (userId: number) => {
-  const basicFinanceCategories = await api.get<FinanceCategory[]>(`/finance_categories/`);
-  const userFinanceCategories = await api.get<FinanceCategory[]>(`/finance_categories/user/${userId}`);
-  const combinedCategories = basicFinanceCategories.data.concat(userFinanceCategories.data);
-  return combinedCategories;
+export const getFinanceCategories = async () => {
+  const response = await api.get<FinanceCategory[]>(`/finance_categories/combined`);
+  return response.data;
 };

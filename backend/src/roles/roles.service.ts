@@ -4,16 +4,27 @@ import { Repository } from 'typeorm';
 import { CreateRoleDto } from './createRole.dto';
 import { UpdateRoleDto } from './updateRole.dto';
 import { Role } from './role.entity';
+import { RedisService } from 'src/common/redis/redis.service';
+
+const ALL_ROLES_CACHE_KEY = `all_roles`;
 
 @Injectable()
 export class RolesService {
   constructor(
     @InjectRepository(Role)
     private rolesRepository: Repository<Role>,
+    private readonly redisService: RedisService,
   ) {}
 
   async getAllRoles(): Promise<Role[]> {
-    return await this.rolesRepository.find();
+    const cachedRoles: string = await this.redisService.getValue(ALL_ROLES_CACHE_KEY);
+    if (cachedRoles) {
+      return JSON.parse(cachedRoles);
+    }
+
+    const allRoles: Role[] = await this.rolesRepository.find();
+    await this.redisService.setValue(ALL_ROLES_CACHE_KEY, JSON.stringify(allRoles), 86400); //1day
+    return allRoles;
   }
 
   async getRoleById(id: number): Promise<Role> {
