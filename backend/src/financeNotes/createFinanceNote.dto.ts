@@ -19,11 +19,6 @@ export class CreateFinanceNoteDto {
   @Transform(({ value }) => parseInt(value, 10))
   categoryId: number;
 
-  @IsNotEmpty({ message: 'UserId is required!' })
-  @IsNumber({}, { message: 'UserId must be a number!' })
-  @Transform(({ value }) => parseInt(value, 10))
-  userId: number;
-
   @IsOptional()
   @IsString()
   @MaxLength(255, { message: 'Comment must contain no more than 255 letters!' })

@@ -11,10 +11,11 @@ import { FinanceNotesSummaryService } from './summary/financeNotes.summary.servi
 import { FinanceNotesAnalyticsService } from './analytics/financeNotes.analytics.service';
 import { FinanceNotesAnalyticsController } from './analytics/financeNotes.analytics.controller';
 import { FinanceNotesSummaryController } from './summary/financeNotes.summary.controller';
+import { FinanceNoteGuard } from '../guards/financeNote.guard';
 
 @Module({
   imports: [TypeOrmModule.forFeature([FinanceNote]), UsersModule, JwtModule, AuthModule, RedisModule],
   controllers: [FinanceNotesController, FinanceNotesSummaryController, FinanceNotesAnalyticsController],
-  providers: [FinanceNotesService, FinanceNotesSummaryService, FinanceNotesAnalyticsService],
+  providers: [FinanceNotesService, FinanceNotesSummaryService, FinanceNotesAnalyticsService, FinanceNoteGuard],
 })
 export class FinanceNotesModule {}

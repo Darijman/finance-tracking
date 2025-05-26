@@ -17,10 +17,6 @@ export class UpdateFinanceNoteDto {
   type?: NoteType;
 
   @IsOptional()
-  @IsNumber()
-  userId?: number;
-
-  @IsOptional()
   @IsNumber({}, { message: 'CategoryId must be a number!' })
   @Transform(({ value }) => parseInt(value, 10))
   categoryId?: number;

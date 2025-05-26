@@ -4,7 +4,7 @@ import { jwtConstants } from './auth.constants';
 import { IS_PUBLIC_KEY, IS_ADMIN_KEY } from './auth.decorators';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
-import { UsersService } from '../users/users.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -41,7 +41,7 @@ export class AuthGuard implements CanActivate {
       throw new ForbiddenException({ error: 'You do not have permission!' });
     }
 
-    request['user'] = payload;
+    request['user'] = { id: user.id, name: user.name, roleName: user.role.name };
     return true;
   }
 

@@ -7,6 +7,10 @@ import { UpdateUserDto } from './updateUser.dto';
 import { CurrenciesService } from 'src/currencies/currencies.service';
 import { RedisService } from 'src/common/redis/redis.service';
 import { getUserFinanceNotesCacheKey } from 'src/financeNotes/financeNotes.service';
+import { plainToInstance } from 'class-transformer';
+
+const getUserWithRoleCacheKey = (userId: number) => `userWithRole_${userId}`;
+const getUserByIdCacheKey = (userId: number) => `userById_${userId}`;
 
 @Injectable()
 export class UsersService {
@@ -15,34 +19,44 @@ export class UsersService {
     private usersRepository: Repository<User>,
 
     private readonly currenciesService: CurrenciesService,
-    private redisService: RedisService,
+    private readonly redisService: RedisService,
   ) {}
 
   async getAllUsers(): Promise<User[]> {
     return await this.usersRepository.find();
   }
 
-  async getUserById(id: number): Promise<User> {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
+  async getUserById(userId: number): Promise<User> {
+    const cacheKey: string = getUserByIdCacheKey(userId);
+    const cachedUser: string = await this.redisService.getValue(cacheKey);
+    if (cachedUser) {
+      return JSON.parse(cachedUser);
     }
 
-    const user = await this.usersRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) {
       throw new NotFoundException({ error: 'User not found!' });
     }
+
+    const transformedUser = plainToInstance(User, user);
+    await this.redisService.setValue(cacheKey, JSON.stringify(transformedUser), 3600); //1hour
     return user;
   }
 
-  async getUserByIdWithRole(id: number): Promise<User> {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
+  async getUserByIdWithRole(userId: number): Promise<User> {
+    const cacheKey: string = getUserWithRoleCacheKey(userId);
+    const cachedUser: string = await this.redisService.getValue(cacheKey);
+    if (cachedUser) {
+      return JSON.parse(cachedUser);
     }
 
-    const user = await this.usersRepository.findOne({ where: { id }, relations: ['role'] });
+    const user = await this.usersRepository.findOne({ where: { id: userId }, relations: ['role'] });
     if (!user) {
       throw new NotFoundException({ error: 'User not found!' });
     }
+
+    const transformedUser = plainToInstance(User, user);
+    await this.redisService.setValue(cacheKey, JSON.stringify(transformedUser), 3600); //1hour
     return user;
   }
 
@@ -71,30 +85,24 @@ export class UsersService {
   }
 
   async registerNewUser(user: RegisterUserDto): Promise<User> {
-    const newUser = this.usersRepository.create(user);
-    return await this.usersRepository.save(newUser);
+    return await this.usersRepository.save(user);
   }
 
-  async deleteUserById(id: number): Promise<User> {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
-    }
-
-    const user = await this.usersRepository.findOneBy({ id });
+  async deleteUserById(userId: number): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) {
       throw new NotFoundException({ error: 'User not found!' });
     }
 
-    await this.usersRepository.delete(id);
+    await this.usersRepository.delete(userId);
+
+    await this.redisService.deleteValue(getUserWithRoleCacheKey(userId));
+    await this.redisService.deleteValue(getUserByIdCacheKey(userId));
     return user;
   }
 
-  async updateUserById(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
-    }
-
-    const user = await this.usersRepository.findOneBy({ id });
+  async updateUserById(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) {
       throw new NotFoundException({ error: 'User not found!' });
     }
@@ -109,8 +117,8 @@ export class UsersService {
   }
 
   async changeUserCurrencyId(userId: number, currencyId: number): Promise<boolean> {
-    if (isNaN(userId) || isNaN(currencyId)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
+    if (isNaN(currencyId)) {
+      throw new BadRequestException({ error: 'Invalid Currency ID!' });
     }
 
     const user = await this.usersRepository.findOneBy({ id: userId });
@@ -124,8 +132,8 @@ export class UsersService {
 
     await this.currenciesService.getCurrencyById(currencyId);
 
-    const userCacheKey: string = getUserFinanceNotesCacheKey(userId);
-    await this.redisService.deleteValue(userCacheKey); // delete cached FinanceNotes since currency changed
+    await this.redisService.deleteValue(getUserFinanceNotesCacheKey(userId)); // delete cached FinanceNotes since currency changed
+    await this.redisService.deleteValue(getUserWithRoleCacheKey(userId)); // delete cached UserWithRole since currency changed
 
     user.currencyId = currencyId;
     await this.usersRepository.save(user);

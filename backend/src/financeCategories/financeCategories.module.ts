@@ -8,7 +8,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from 'src/auth/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { RedisModule } from 'src/common/redis/redis.module';
-import { RolesModule } from 'src/roles/roles.module';
 import { FinanceNotesModule } from 'src/financeNotes/financeNotes.module';
 import { FinanceNote } from 'src/financeNotes/financeNote.entity';
 
@@ -20,7 +19,6 @@ import { FinanceNote } from 'src/financeNotes/financeNote.entity';
     AuthModule,
     RedisModule,
     MulterModule,
-    RolesModule,
     FinanceNotesModule,
   ],
   controllers: [FinanceCategoriesController],

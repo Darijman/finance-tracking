@@ -1,8 +1,8 @@
-import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsEnum } from 'class-validator';
+import { Roles } from './role.entity';
 
 export class UpdateRoleDto {
-  @IsString()
+  @IsEnum(Roles, { message: 'Role must be either ADMIN or USER' })
   @IsNotEmpty()
-  @MaxLength(100, { message: 'Name must contain no more than 100 letters!' })
-  name: string;
+  name: Roles;
 }

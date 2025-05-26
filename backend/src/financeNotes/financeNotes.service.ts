@@ -23,24 +23,11 @@ export class FinanceNotesService {
     return await this.notesRepository.find();
   }
 
-  async getFinanceNoteById(id: number): Promise<FinanceNote> {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
-    }
-
-    const note = await this.notesRepository.findOneBy({ id });
-    if (!note) {
-      throw new NotFoundException({ error: 'Note not found!' });
-    }
-
-    return note;
+  async getFinanceNoteById(financeNoteId: number): Promise<FinanceNote> {
+    return await this.notesRepository.findOneBy({ id: financeNoteId });
   }
 
   async getFinanceNotesByUserId(userId: number, limit?: number): Promise<FinanceNote[]> {
-    if (isNaN(userId)) {
-      throw new BadRequestException({ error: 'Invalid user ID!' });
-    }
-
     const user = await this.usersService.getUserById(userId);
     if (!user) {
       throw new NotFoundException({ error: 'User not found!' });
@@ -64,64 +51,37 @@ export class FinanceNotesService {
     });
 
     const transformedNotes = plainToInstance(FinanceNote, userNotes);
-
     if (transformedNotes.length) {
       await this.redisService.setValue(userCacheKey, JSON.stringify(transformedNotes), 300); // 5min
     }
     return transformedNotes;
   }
 
-  async createNewFinanceNote(createFinanceNoteDto: CreateFinanceNoteDto): Promise<FinanceNote> {
-    const { userId } = createFinanceNoteDto;
+  async createNewFinanceNote(createFinanceNoteDto: CreateFinanceNoteDto, currentUserId: number): Promise<FinanceNote> {
+    const createdNote = await this.notesRepository.save({ ...createFinanceNoteDto, userId: currentUserId });
 
-    const existingUser = await this.usersService.getUserById(userId);
-    if (!existingUser) {
-      throw new NotFoundException({ error: 'User not found!' });
-    }
-
-    const newNote = this.notesRepository.create(createFinanceNoteDto);
-    const createdNote = await this.notesRepository.save(newNote);
-
-    const userCacheKey = getUserFinanceNotesCacheKey(userId);
+    const userCacheKey = getUserFinanceNotesCacheKey(currentUserId);
     await this.redisService.deleteValue(userCacheKey);
     return createdNote;
   }
 
-  async deleteFinanceNoteById(id: number): Promise<FinanceNote> {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
-    }
-
-    const note = await this.notesRepository.findOneBy({ id });
-    if (!note) {
-      throw new NotFoundException({ error: 'Note not found!' });
-    }
-
+  async deleteFinanceNote(note: FinanceNote): Promise<FinanceNote> {
     const userCacheKey = getUserFinanceNotesCacheKey(note.userId);
-    await this.notesRepository.delete(id);
+    await this.notesRepository.delete(note.id);
     await this.redisService.deleteValue(userCacheKey);
     return note;
   }
 
-  async updateFinanceNoteById(id: number, updateFinanceNoteDto: UpdateFinanceNoteDto): Promise<FinanceNote> {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
-    }
-
-    const note = await this.notesRepository.findOneBy({ id });
-    if (!note) {
-      throw new NotFoundException({ error: 'Note not found!' });
-    }
-
-    const isUpdated = this.verifyChanges(note, updateFinanceNoteDto);
+  async updateFinanceNote(financeNote: FinanceNote, updateFinanceNoteDto: UpdateFinanceNoteDto): Promise<FinanceNote> {
+    const isUpdated = this.verifyChanges(financeNote, updateFinanceNoteDto);
     if (!isUpdated) {
       throw new BadRequestException({ error: 'No changes were made!' });
     }
 
-    Object.assign(note, updateFinanceNoteDto);
-    const updatedNote = await this.notesRepository.save(note);
+    Object.assign(financeNote, updateFinanceNoteDto);
+    const updatedNote = await this.notesRepository.save(financeNote);
 
-    const userCacheKey = getUserFinanceNotesCacheKey(note.userId);
+    const userCacheKey = getUserFinanceNotesCacheKey(financeNote.userId);
     await this.redisService.deleteValue(userCacheKey);
     return updatedNote;
   }

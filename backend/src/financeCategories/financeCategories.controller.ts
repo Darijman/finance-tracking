@@ -116,7 +116,7 @@ export class FinanceCategoriesController {
     @Param('financeCategoryId') financeCategoryId: number,
     @Request() req: ExpressRequest,
   ): Promise<FinanceCategory> {
-    return await this.financeCategoriesService.deleteFinanceCategoryById(financeCategoryId, req.user.id, req.user.roleId);
+    return await this.financeCategoriesService.deleteFinanceCategoryById(financeCategoryId, req.user.id);
   }
 
   @UseGuards(AuthGuard)
@@ -124,7 +124,8 @@ export class FinanceCategoriesController {
   async updateFinanceCategoryById(
     @Param('id') id: number,
     @Body() updateFinanceCategoryDto: UpdateFinanceCategoryDto,
+    @Request() req: ExpressRequest,
   ): Promise<FinanceCategory> {
-    return await this.financeCategoriesService.updateFinanceCategoryById(id, updateFinanceCategoryDto);
+    return await this.financeCategoriesService.updateFinanceCategoryById(id, updateFinanceCategoryDto, req.user.id);
   }
 }

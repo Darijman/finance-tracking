@@ -3,25 +3,35 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from './registerUser.dto';
 import { LogInUserDto } from './logInUser.dto';
+import { RolesService } from 'src/roles/roles.service';
+import { Role } from 'src/roles/role.entity';
+import { Roles } from 'src/roles/role.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private rolesService: RolesService,
   ) {}
 
   async registerNewUser(@Body() registerUserDto: RegisterUserDto): Promise<{ access_token: string }> {
     const { name, email, rememberMe } = registerUserDto;
 
-    const nameExists = await this.usersService.isUserNameTaken(name);
+    const nameExists: boolean = await this.usersService.isUserNameTaken(name);
     if (nameExists) {
       throw new BadRequestException({ error: 'This name is taken!', type: 'NAME' });
     }
 
-    const emailExists = await this.usersService.isUserEmailTaken(email);
+    const emailExists: boolean = await this.usersService.isUserEmailTaken(email);
     if (emailExists) {
       throw new BadRequestException({ error: 'This email is already in use!', type: 'EMAIL' });
+    }
+
+    if (!registerUserDto.roleId) {
+      const allRoles: Role[] = await this.rolesService.getAllRoles();
+      const userRoleId: number = allRoles.find((role) => role.name === Roles.USER).id;
+      registerUserDto.roleId = userRoleId;
     }
 
     const createdUser = await this.usersService.registerNewUser(registerUserDto);

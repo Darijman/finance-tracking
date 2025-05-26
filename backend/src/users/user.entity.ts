@@ -18,14 +18,16 @@ import * as bcrypt from 'bcrypt';
 
 @Entity('users')
 export class User {
-  constructor(partial: Partial<User>) {
-    Object.assign(this, partial);
+  constructor(partial?: Partial<User>) {
+    if (partial) {
+      Object.assign(this, partial);
+    }
   }
 
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'int', default: 1 })
+  @Column({ type: 'int' })
   roleId: number;
 
   @ManyToOne(() => Role, (role) => role.users)
@@ -61,7 +63,7 @@ export class User {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    if (this.password) {
+    if (this.password && !this.password.startsWith('$2b$')) {
       const salt = await bcrypt.genSalt();
       this.password = await bcrypt.hash(this.password, salt);
     }
