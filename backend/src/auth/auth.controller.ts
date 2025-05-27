@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpCode, Post, Request, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './registerUser.dto';
 import { Public } from './auth.decorators';
 import { LogInUserDto } from './logInUser.dto';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -51,8 +51,9 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req: any) {
-    return req.user;
+  getProfile(@Req() req: Request) {
+    const { id, name, roleName } = req.user;
+    return { id, name, roleName }; // return without roleId
   }
 
   @UseGuards(AuthGuard)

@@ -75,6 +75,9 @@ export default function Home() {
           </div>
         </div>
 
+        <span className='blur'></span>
+        <span className='blur'></span>
+
         <div className='home_right'>
           <Title level={3} style={{ margin: 0, color: 'var(--submit-button-color)', textAlign: 'center' }}>
             Finance-Tracking Benefits:

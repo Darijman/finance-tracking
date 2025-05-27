@@ -1,4 +1,5 @@
 import 'express';
+import { FinanceCategory } from 'src/financeCategories/financeCategory.entity';
 import { FinanceNote } from 'src/financeNotes/financeNote.entity';
 
 declare module 'express' {
@@ -6,9 +7,10 @@ declare module 'express' {
     user: {
       id: number;
       name: string;
-      email: string;
+      roleId: number;
       roleName: string;
     };
     financeNote?: FinanceNote;
+    financeCategory?: FinanceCategory;
   }
 }

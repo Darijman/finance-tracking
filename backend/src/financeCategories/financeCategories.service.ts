@@ -37,26 +37,8 @@ export class FinanceCategoriesService {
     return allFinanceCategories;
   }
 
-  async getFinanceCategoryById(id: number): Promise<FinanceCategory> {
-    if (isNaN(id)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
-    }
-
-    const category = await this.financeCategoriesRepository.findOneBy({ id });
-    if (!category) {
-      throw new NotFoundException({ error: 'Finance-Category not found!' });
-    }
-
-    return category;
-  }
-
-  async getFinanceCategoriesByUserId(userId: number): Promise<FinanceCategory[]> {
-    if (isNaN(userId)) {
-      throw new BadRequestException({ error: 'Invalid user ID!' });
-    }
-
-    await this.usersService.getUserById(userId);
-    return await this.financeCategoriesRepository.find({ where: { userId } });
+  async getFinanceCategoryById(financeCategoryId: number): Promise<FinanceCategory> {
+    return await this.financeCategoriesRepository.findOneBy({ id: financeCategoryId });
   }
 
   async getCombinedFinanceCategories(userId: number): Promise<FinanceCategory[]> {
@@ -73,7 +55,9 @@ export class FinanceCategoriesService {
     ]);
 
     const combined = baseCategories.concat(userCategories);
-    await this.redisService.setValue(cacheKey, JSON.stringify(combined), 3600); // 1hour
+    if (userCategories.length) {
+      await this.redisService.setValue(cacheKey, JSON.stringify(combined), 3600); // 1hour
+    }
     return combined;
   }
 
@@ -121,26 +105,9 @@ export class FinanceCategoriesService {
     return await this.financeCategoriesRepository.save(newCategory);
   }
 
-  async deleteFinanceCategoryById(financeCategoryId: number, userId: number): Promise<FinanceCategory> {
-    if (isNaN(financeCategoryId)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
-    }
-
-    const financeCategory = await this.financeCategoriesRepository.findOneBy({ id: financeCategoryId });
-    if (!financeCategory) {
-      throw new NotFoundException({ error: 'Finance-Category not found!' });
-    }
-
-    const user = await this.usersService.getUserByIdWithRole(userId);
-    const isOwner: boolean = financeCategory.userId === userId;
-    const isAdmin: boolean = user.role.name === 'ADMIN';
-
-    if (!isOwner && !isAdmin) {
-      throw new ForbiddenException({ error: 'You do not have permission!' });
-    }
-
-    await this.financeNotesRepository.delete({ categoryId: financeCategoryId });
-    await this.financeCategoriesRepository.delete(financeCategoryId);
+  async deleteFinanceCategory(financeCategory: FinanceCategory): Promise<FinanceCategory> {
+    await this.financeNotesRepository.delete({ categoryId: financeCategory.id });
+    await this.financeCategoriesRepository.delete(financeCategory.id);
 
     await this.redisService.deleteValue(getCombinedFinanceCategoriesCacheKey(financeCategory.userId));
     await this.redisService.deleteValue(getOnlyUserFinanceCategoriesCacheKey(financeCategory.userId));
@@ -148,27 +115,9 @@ export class FinanceCategoriesService {
   }
 
   async updateFinanceCategoryById(
-    financeCategoryId: number,
+    financeCategory: FinanceCategory,
     updateFinanceCategoryDto: UpdateFinanceCategoryDto,
-    userId: number,
   ): Promise<FinanceCategory> {
-    if (isNaN(financeCategoryId)) {
-      throw new BadRequestException({ error: 'Invalid ID!' });
-    }
-
-    const financeCategory = await this.financeCategoriesRepository.findOneBy({ id: financeCategoryId });
-    if (!financeCategory) {
-      throw new NotFoundException({ error: 'Finance-Category not found!' });
-    }
-
-    const user = await this.usersService.getUserByIdWithRole(userId);
-    const isOwner: boolean = financeCategory.userId === userId;
-    const isAdmin: boolean = user.role.name === 'ADMIN';
-
-    if (!isOwner && !isAdmin) {
-      throw new ForbiddenException({ error: 'You do not have permission!' });
-    }
-
     const isUpdated = this.verifyChanges(financeCategory, updateFinanceCategoryDto);
     if (!isUpdated) {
       throw new BadRequestException({ error: 'No changes were made!' });
@@ -177,11 +126,8 @@ export class FinanceCategoriesService {
     Object.assign(financeCategory, updateFinanceCategoryDto);
     const updatedFinanceCategory = await this.financeCategoriesRepository.save(financeCategory);
 
-    const userCacheKeyCombined = getCombinedFinanceCategoriesCacheKey(financeCategory.userId);
-    const userCacheKeyOnly = getOnlyUserFinanceCategoriesCacheKey(financeCategory.userId);
-
-    await this.redisService.deleteValue(userCacheKeyCombined);
-    await this.redisService.deleteValue(userCacheKeyOnly);
+    await this.redisService.deleteValue(getCombinedFinanceCategoriesCacheKey(financeCategory.userId));
+    await this.redisService.deleteValue(getOnlyUserFinanceCategoriesCacheKey(financeCategory.userId));
     return updatedFinanceCategory;
   }
 

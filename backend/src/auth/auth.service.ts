@@ -28,14 +28,15 @@ export class AuthService {
       throw new BadRequestException({ error: 'This email is already in use!', type: 'EMAIL' });
     }
 
+    const allRoles: Role[] = await this.rolesService.getAllRoles();
+    const userRole: Role = allRoles.find((role) => role.name === Roles.USER);
+
     if (!registerUserDto.roleId) {
-      const allRoles: Role[] = await this.rolesService.getAllRoles();
-      const userRoleId: number = allRoles.find((role) => role.name === Roles.USER).id;
-      registerUserDto.roleId = userRoleId;
+      registerUserDto.roleId = userRole.id;
     }
 
     const createdUser = await this.usersService.registerNewUser(registerUserDto);
-    const payload = { id: createdUser.id, name: createdUser.name, roleId: createdUser.roleId };
+    const payload = { id: createdUser.id, name: createdUser.name, roleId: createdUser.roleId, roleName: userRole.name };
     const expiresIn = rememberMe ? '30d' : '7d';
 
     return {
@@ -52,7 +53,7 @@ export class AuthService {
       throw new UnauthorizedException({ error: 'Incorrect password!' });
     }
 
-    const payload = { id: user.id, name: user.name, roleId: user.roleId };
+    const payload = { id: user.id, name: user.name, roleId: user.roleId, roleName: user.role.name };
     const expiresIn = rememberMe ? '30d' : '7d';
 
     return {

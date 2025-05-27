@@ -1,5 +1,7 @@
+import { Roles } from './roles';
+
 export interface BasicUser {
   id: number;
-  roleId: number;
+  roleName: Roles;
   name: string;
 }

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { BasicUser } from '@/interfaces/basicUser';
+import { Roles } from '@/interfaces/roles';
 import api from '../../../axiosInstance';
 
 interface AuthContextType {
@@ -14,7 +15,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<BasicUser>({
     id: 0,
-    roleId: 0,
+    roleName: Roles.USER,
     name: '',
   });
 
@@ -23,7 +24,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await api.get<BasicUser>('/auth/profile');
       setUser(response.data);
     } catch {
-      setUser({ id: 0, roleId: 0, name: '' });
+      setUser({ id: 0, roleName: Roles.USER, name: '' });
     }
   };
 

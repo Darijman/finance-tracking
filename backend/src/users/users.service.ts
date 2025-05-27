@@ -8,6 +8,8 @@ import { CurrenciesService } from 'src/currencies/currencies.service';
 import { RedisService } from 'src/common/redis/redis.service';
 import { getUserFinanceNotesCacheKey } from 'src/financeNotes/financeNotes.service';
 import { plainToInstance } from 'class-transformer';
+import { FinanceCategory } from 'src/financeCategories/financeCategory.entity';
+import { FinanceNote } from 'src/financeNotes/financeNote.entity';
 
 const getUserWithRoleCacheKey = (userId: number) => `userWithRole_${userId}`;
 const getUserByIdCacheKey = (userId: number) => `userById_${userId}`;
@@ -20,6 +22,12 @@ export class UsersService {
 
     private readonly currenciesService: CurrenciesService,
     private readonly redisService: RedisService,
+
+    @InjectRepository(FinanceNote)
+    private readonly financeNotesRepository: Repository<FinanceNote>,
+
+    @InjectRepository(FinanceCategory)
+    private readonly financeCategoriesRepository: Repository<FinanceCategory>,
   ) {}
 
   async getAllUsers(): Promise<User[]> {
@@ -69,7 +77,11 @@ export class UsersService {
   }
 
   async getUserByEmail(email: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ email });
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      relations: ['role'],
+    });
+
     if (!user) {
       throw new NotFoundException({ error: 'User not found!' });
     }
@@ -88,17 +100,15 @@ export class UsersService {
     return await this.usersRepository.save(user);
   }
 
-  async deleteUserById(userId: number): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id: userId });
-    if (!user) {
-      throw new NotFoundException({ error: 'User not found!' });
-    }
-
+  async deleteUserById(userId: number): Promise<{ success: boolean }> {
     await this.usersRepository.delete(userId);
 
     await this.redisService.deleteValue(getUserWithRoleCacheKey(userId));
     await this.redisService.deleteValue(getUserByIdCacheKey(userId));
-    return user;
+
+    await this.financeNotesRepository.delete({ userId });
+    await this.financeCategoriesRepository.delete({ userId });
+    return { success: true };
   }
 
   async updateUserById(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
@@ -116,7 +126,7 @@ export class UsersService {
     return await this.usersRepository.save(user);
   }
 
-  async changeUserCurrencyId(userId: number, currencyId: number): Promise<boolean> {
+  async changeUserCurrencyId(userId: number, currencyId: number): Promise<{ success: boolean }> {
     if (isNaN(currencyId)) {
       throw new BadRequestException({ error: 'Invalid Currency ID!' });
     }
@@ -137,7 +147,7 @@ export class UsersService {
 
     user.currencyId = currencyId;
     await this.usersRepository.save(user);
-    return true;
+    return { success: true };
   }
 
   async verifyChanges(user: User, updateUserDto: UpdateUserDto): Promise<boolean> {

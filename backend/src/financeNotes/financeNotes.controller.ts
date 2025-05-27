@@ -6,7 +6,7 @@ import { ParseInterceptor } from './parseInterceptor';
 import { Admin } from 'src/auth/auth.decorators';
 import { FinanceNote } from './financeNote.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { Request as ExpressRequest } from 'express';
+import { Request } from 'express';
 import { FinanceNoteGuard } from '../guards/financeNote.guard';
 import { OwnerOrAdminGuard } from 'src/guards/ownerOrAdmin.guard';
 
@@ -29,25 +29,25 @@ export class FinanceNotesController {
 
   @UseGuards(AuthGuard)
   @Post()
-  async createNewFinanceNote(@Body() createNoteDto: CreateFinanceNoteDto, @Req() req: ExpressRequest): Promise<FinanceNote> {
+  async createNewFinanceNote(@Body() createNoteDto: CreateFinanceNoteDto, @Req() req: Request): Promise<FinanceNote> {
     return await this.financeNotesService.createNewFinanceNote(createNoteDto, req.user.id);
   }
 
   @UseGuards(AuthGuard, FinanceNoteGuard)
   @Get(':financeNoteId')
-  async getFinanceNoteById(@Req() req: ExpressRequest): Promise<FinanceNote> {
+  async getFinanceNoteById(@Req() req: Request): Promise<FinanceNote> {
     return req.financeNote;
   }
 
   @UseGuards(AuthGuard, FinanceNoteGuard)
   @Delete(':financeNoteId')
-  async deleteFinanceNote(@Req() req: ExpressRequest): Promise<FinanceNote> {
+  async deleteFinanceNote(@Req() req: Request): Promise<FinanceNote> {
     return await this.financeNotesService.deleteFinanceNote(req.financeNote);
   }
 
   @UseGuards(AuthGuard, FinanceNoteGuard)
   @Put(':financeNoteId')
-  async updateFinanceNoteById(@Req() req: ExpressRequest, @Body() updateNoteDto: UpdateFinanceNoteDto): Promise<FinanceNote> {
+  async updateFinanceNote(@Req() req: Request, @Body() updateNoteDto: UpdateFinanceNoteDto): Promise<FinanceNote> {
     return await this.financeNotesService.updateFinanceNote(req.financeNote, updateNoteDto);
   }
 }

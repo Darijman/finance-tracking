@@ -7,30 +7,27 @@ import {
   Body,
   Param,
   UseGuards,
-  Request,
-  ForbiddenException,
+  Req,
   UseInterceptors,
   BadRequestException,
   UploadedFile,
 } from '@nestjs/common';
-import { Request as ExpressRequest } from 'express';
+import { Request } from 'express';
 import { FinanceCategoriesService } from './financeCategories.service';
 import { CreateFinanceCategoryDto } from './createFinanceCategory.dto';
 import { UpdateFinanceCategoryDto } from './updateFinanceCategory.dto';
 import { Admin } from 'src/auth/auth.decorators';
 import { FinanceCategory } from './financeCategory.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { UsersService } from 'src/users/users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerConfig } from 'src/common/multer/multer.config';
 import { CreateUserFinanceCategoryDto } from './createUserFinanceCategory.dto';
+import { FinanceCategoryGuard } from 'src/guards/financeCategory.guard';
+import { OwnerOrAdminGuard } from 'src/guards/ownerOrAdmin.guard';
 
 @Controller('finance_categories')
 export class FinanceCategoriesController {
-  constructor(
-    private readonly financeCategoriesService: FinanceCategoriesService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly financeCategoriesService: FinanceCategoriesService) {}
 
   @UseGuards(AuthGuard)
   @Get()
@@ -42,21 +39,21 @@ export class FinanceCategoriesController {
   @Post('user')
   async createNewUserFinanceCategory(
     @Body() createUserFinanceCategoryDto: CreateUserFinanceCategoryDto,
-    @Request() req: ExpressRequest,
+    @Req() req: Request,
   ): Promise<FinanceCategory> {
     return await this.financeCategoriesService.createNewUserFinanceCategory(createUserFinanceCategoryDto, req.user.id);
   }
 
-  @UseGuards(AuthGuard)
-  @Get('combined')
-  async getCombinedFinanceCategories(@Request() req: ExpressRequest): Promise<FinanceCategory[]> {
-    return this.financeCategoriesService.getCombinedFinanceCategories(req.user.id);
+  @UseGuards(AuthGuard, OwnerOrAdminGuard)
+  @Get('combined/:userId')
+  async getCombinedFinanceCategories(@Param('userId') userId: number): Promise<FinanceCategory[]> {
+    return this.financeCategoriesService.getCombinedFinanceCategories(userId);
   }
 
-  @UseGuards(AuthGuard)
-  @Get('user')
-  async getOnlyUserCategories(@Request() req: ExpressRequest): Promise<FinanceCategory[]> {
-    return this.financeCategoriesService.getOnlyUserCategories(req.user.id);
+  @UseGuards(AuthGuard, OwnerOrAdminGuard)
+  @Get('user/:userId')
+  async getOnlyUserCategories(@Param('userId') userId: number): Promise<FinanceCategory[]> {
+    return this.financeCategoriesService.getOnlyUserCategories(userId);
   }
 
   @Admin()
@@ -65,7 +62,7 @@ export class FinanceCategoriesController {
   async createNewFinanceCategory(
     @Body() createFinanceCategoryDto: CreateFinanceCategoryDto,
     @UploadedFile() image: Express.Multer.File,
-    @Request() req: any,
+    @Req() req: any,
   ): Promise<FinanceCategory> {
     if (req.fileValidationError) {
       throw new BadRequestException(req.fileValidationError);
@@ -79,53 +76,21 @@ export class FinanceCategoriesController {
     return await this.financeCategoriesService.createNewFinanceCategory(createFinanceCategoryDto);
   }
 
-  @UseGuards(AuthGuard)
-  @Get(':id')
-  async getFinanceCategoryById(@Param('id') id: number, @Request() req: ExpressRequest): Promise<FinanceCategory> {
-    const currentUser = await this.usersService.getUserByIdWithRole(req.user.id);
-    const financeCategory = await this.financeCategoriesService.getFinanceCategoryById(id);
-    if (currentUser.role.name === 'ADMIN') {
-      return financeCategory;
-    }
-
-    if (currentUser.id !== financeCategory.userId) {
-      throw new ForbiddenException({ error: 'You do not have permission!' });
-    }
-
-    return financeCategory;
+  @UseGuards(AuthGuard, FinanceCategoryGuard)
+  @Get(':financeCategoryId')
+  async getFinanceCategoryById(@Req() req: Request): Promise<FinanceCategory> {
+    return req.financeCategory;
   }
 
-  @UseGuards(AuthGuard)
-  @Get('user/:userId')
-  async getFinanceCategoriesByUserId(@Param('userId') userId: number, @Request() req: ExpressRequest): Promise<FinanceCategory[]> {
-    const currentUser = await this.usersService.getUserByIdWithRole(req.user.id);
-    if (currentUser.role.name === 'ADMIN') {
-      return await this.financeCategoriesService.getFinanceCategoriesByUserId(userId);
-    }
-
-    if (currentUser.id !== userId) {
-      throw new ForbiddenException({ error: 'You do not have permission!' });
-    }
-
-    return await this.financeCategoriesService.getFinanceCategoriesByUserId(userId);
-  }
-
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, FinanceCategoryGuard)
   @Delete(':financeCategoryId')
-  async deleteFinanceCategoryById(
-    @Param('financeCategoryId') financeCategoryId: number,
-    @Request() req: ExpressRequest,
-  ): Promise<FinanceCategory> {
-    return await this.financeCategoriesService.deleteFinanceCategoryById(financeCategoryId, req.user.id);
+  async deleteFinanceCategory(@Req() req: Request): Promise<FinanceCategory> {
+    return await this.financeCategoriesService.deleteFinanceCategory(req.financeCategory);
   }
 
-  @UseGuards(AuthGuard)
-  @Put(':id')
-  async updateFinanceCategoryById(
-    @Param('id') id: number,
-    @Body() updateFinanceCategoryDto: UpdateFinanceCategoryDto,
-    @Request() req: ExpressRequest,
-  ): Promise<FinanceCategory> {
-    return await this.financeCategoriesService.updateFinanceCategoryById(id, updateFinanceCategoryDto, req.user.id);
+  @UseGuards(AuthGuard, FinanceCategoryGuard)
+  @Put(':financeCategoryId')
+  async updateFinanceCategoryById(@Body() updateFinanceCategoryDto: UpdateFinanceCategoryDto, @Req() req: Request): Promise<FinanceCategory> {
+    return await this.financeCategoriesService.updateFinanceCategoryById(req.financeCategory, updateFinanceCategoryDto);
   }
 }

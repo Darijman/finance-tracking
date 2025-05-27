@@ -2,6 +2,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  position: relative;
 }
 
 .home_images_list_container {
@@ -73,6 +74,14 @@
 
 .home_right_benefits_list_item:last-child {
   margin-bottom: 0px;
+}
+
+.blur {
+  position: absolute;
+  box-shadow: 0 0 1000px 50px var(--submit-button-color);
+  z-index: -100;
+  top: 50px;
+  left: 100px;
 }
 
 [data-theme='dark'] {

@@ -4,7 +4,7 @@ import { CreateCurrencyDto } from './createCurrency.dto';
 import { UpdateCurrencyDto } from './updateCurrency.dto';
 import { Currency } from './currency.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { Admin, Public } from 'src/auth/auth.decorators';
+import { Admin } from 'src/auth/auth.decorators';
 
 @Controller('currencies')
 export class CurrenciesController {
@@ -16,8 +16,7 @@ export class CurrenciesController {
     return await this.currenciesService.getAllCurrencies();
   }
 
-  @Public()
-  // @Admin()
+  @Admin()
   @Post()
   async createNewCurrency(@Body() createCurrencyDto: CreateCurrencyDto): Promise<Currency> {
     return await this.currenciesService.createNewCurrency(createCurrencyDto);

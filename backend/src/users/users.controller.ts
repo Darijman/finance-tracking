@@ -33,7 +33,7 @@ export class UsersController {
 
   @UseGuards(AuthGuard, OwnerOrAdminGuard)
   @Delete(':userId')
-  async deleteUserById(@Param('userId') userId: number): Promise<User> {
+  async deleteUserById(@Param('userId') userId: number): Promise<{ success: boolean }> {
     return await this.usersService.deleteUserById(userId);
   }
 
@@ -45,7 +45,7 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Patch('/currency/:currencyId')
-  async changeUserCurrencyId(@Param('currencyId') currencyId: number, @Req() req: ExpressRequest): Promise<boolean> {
+  async changeUserCurrencyId(@Param('currencyId') currencyId: number, @Req() req: ExpressRequest): Promise<{ success: boolean }> {
     return await this.usersService.changeUserCurrencyId(req.user.id, currencyId);
   }
 }
