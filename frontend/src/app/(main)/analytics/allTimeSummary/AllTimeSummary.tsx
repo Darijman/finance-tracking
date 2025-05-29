@@ -20,10 +20,18 @@ export const AllTimeSummary = () => {
     noteCount: 0,
   });
 
+  const [hasError, setHasError] = useState<boolean>(false);
+
   const getAllTimeSummary = useCallback(async () => {
     if (user.id) {
-      const response = await api.get<IAllTimeSummary>(`/finance_notes_summary/all-time/${user.id}`);
-      setAllTimeSummary(response.data);
+      try {
+        setHasError(false);
+
+        const response = await api.get<IAllTimeSummary>(`/finance_notes_summary/all-time/${user.id}`);
+        setAllTimeSummary(response.data);
+      } catch {
+        setHasError(true);
+      }
     }
   }, [user.id]);
 
@@ -37,22 +45,30 @@ export const AllTimeSummary = () => {
         All Time:
       </Title>
       <dl className='alltime_summary_list'>
-        <div className='alltime_summary_list_item income'>
-          <dt>INCOME TOTAL:</dt>
-          <dd>+{allTimeSummary.incomeTotal}</dd>
-        </div>
-        <div className='alltime_summary_list_item expense'>
-          <dt>EXPENSE TOTAL:</dt>
-          <dd>-{allTimeSummary.expenseTotal}</dd>
-        </div>
-        <div className='alltime_summary_list_item'>
-          <dt>BALANCE:</dt>
-          <dd>{allTimeSummary.balance}</dd>
-        </div>
-        <div className='alltime_summary_list_item'>
-          <dt>NOTES DONE:</dt>
-          <dd>{allTimeSummary.noteCount}</dd>
-        </div>
+        {hasError ? (
+          <Title level={5} style={{ color: 'var(--red-color)', textAlign: 'center', margin: 0 }}>
+            Sorry, data is unavailable
+          </Title>
+        ) : (
+          <>
+            <div className='alltime_summary_list_item income'>
+              <dt>INCOME TOTAL:</dt>
+              <dd>+{allTimeSummary.incomeTotal}</dd>
+            </div>
+            <div className='alltime_summary_list_item expense'>
+              <dt>EXPENSE TOTAL:</dt>
+              <dd>-{allTimeSummary.expenseTotal}</dd>
+            </div>
+            <div className='alltime_summary_list_item'>
+              <dt>BALANCE:</dt>
+              <dd>{allTimeSummary.balance}</dd>
+            </div>
+            <div className='alltime_summary_list_item'>
+              <dt>NOTES DONE:</dt>
+              <dd>{allTimeSummary.noteCount}</dd>
+            </div>
+          </>
+        )}
       </dl>
     </div>
   );

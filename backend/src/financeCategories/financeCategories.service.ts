@@ -1,6 +1,6 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { FinanceCategory } from './financeCategory.entity';
 import { CreateFinanceCategoryDto } from './createFinanceCategory.dto';
 import { UpdateFinanceCategoryDto } from './updateFinanceCategory.dto';
@@ -50,8 +50,8 @@ export class FinanceCategoriesService {
     }
 
     const [baseCategories, userCategories] = await Promise.all([
-      this.getAllFinanceCategories(),
-      this.financeCategoriesRepository.find({ where: { userId } }),
+      this.financeCategoriesRepository.find({ where: { user: IsNull() } }),
+      this.financeCategoriesRepository.find({ where: { user: { id: userId } } }),
     ]);
 
     const combined = baseCategories.concat(userCategories);
@@ -64,7 +64,6 @@ export class FinanceCategoriesService {
   async getOnlyUserCategories(userId: number): Promise<FinanceCategory[]> {
     const cacheKey: string = getOnlyUserFinanceCategoriesCacheKey(userId);
     const cachedFinanceCategories: string = await this.redisService.getValue(cacheKey);
-
     if (cachedFinanceCategories) {
       return JSON.parse(cachedFinanceCategories);
     }

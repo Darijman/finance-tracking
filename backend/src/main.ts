@@ -24,9 +24,9 @@ async function bootstrap() {
 
   app.use(express.static('public'));
   app.use(express.json());
-  app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+  app.use(cors({ origin: ['http://localhost:3000', 'http://192.168.1.69:3000'], credentials: true }));
   app.use(cookieParser());
-  await app.listen(9000);
+  await app.listen(9000, '0.0.0.0');
   await seed();
 }
 bootstrap();

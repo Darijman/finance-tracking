@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { emitter } from '@/events';
 
 const api = axios.create({
   baseURL: 'http://localhost:9000',
@@ -10,24 +11,16 @@ api.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
+  async (error) => {
+    if (error.response?.status === 401 && !error.config.url?.includes('/logout')) {
+      emitter.emit('logout');
+    }
+
     if (error.code === 'ECONNABORTED') {
       return Promise.reject({ error: 'Request timed out!' });
     }
     return Promise.reject(error);
   },
 );
-
-// api.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     if (error.response?.status === 401 || error.response?.status === 403) {
-//       if (typeof window !== 'undefined') {
-//         window.location.href = '/auth/login';
-//       }
-//     }
-//     return Promise.reject(error.response?.data || 'Something went wrong...');
-//   },
-// );
 
 export default api;

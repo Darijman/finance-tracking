@@ -36,7 +36,7 @@ export class AuthService {
     }
 
     const createdUser = await this.usersService.registerNewUser(registerUserDto);
-    const payload = { id: createdUser.id, name: createdUser.name, roleId: createdUser.roleId, roleName: userRole.name };
+    const payload = { id: createdUser.id };
     const expiresIn = rememberMe ? '30d' : '7d';
 
     return {
@@ -53,7 +53,7 @@ export class AuthService {
       throw new UnauthorizedException({ error: 'Incorrect password!' });
     }
 
-    const payload = { id: user.id, name: user.name, roleId: user.roleId, roleName: user.role.name };
+    const payload = { id: user.id };
     const expiresIn = rememberMe ? '30d' : '7d';
 
     return {

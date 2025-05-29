@@ -34,8 +34,8 @@ export const SubMenu = ({ closeSubMenu, buttonRef, switchAppearanceStyle, subMen
   useClickOutside(subMenuRef, closeSubMenu, buttonRef);
 
   const logOutUser = async () => {
-    await api.post(`/auth/logOut`);
-    setUser({ id: 0, name: '', roleId: 0 });
+    await api.post(`/auth/logout`);
+    setUser({ id: 0 });
     router.push(`/auth/login`);
   };
 

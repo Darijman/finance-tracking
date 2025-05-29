@@ -1,10 +1,7 @@
-import { FinanceNote } from '../financeNote.entity';
-
 export interface GetFinanceNotesSummaryByUserId {
   incomeTotal: number;
   expenseTotal: number;
   balance: number;
-  recentNotes: FinanceNote[];
   noteCount: number;
 }
 

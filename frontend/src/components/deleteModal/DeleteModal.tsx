@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useClickOutside } from '@/hooks/useClickOutside/UseClickOutside';
 import { Loader } from '@/ui/loader/Loader';
 import './deleteModal.css';
+import './responsive.css';
 
 interface Props {
   isOpen: boolean;

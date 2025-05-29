@@ -6,14 +6,14 @@ export class RegisterUserDto {
   @IsNotEmpty()
   @MinLength(2, { message: 'Name must contain at least 2 letters!' })
   @MaxLength(40, { message: 'Name must contain no more than 40 letters!' })
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   name: string;
 
   @IsString()
   @IsEmail({}, { message: 'Invalid email format' })
   @MaxLength(254, { message: 'Email must contain no more than 254 characters!' })
   @IsNotEmpty()
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   email: string;
 
   @IsNumber()
@@ -28,7 +28,7 @@ export class RegisterUserDto {
   @IsNotEmpty()
   @MinLength(6, { message: 'Password must contain at least 6 letters!' })
   @MaxLength(20, { message: 'Password must contain no more than 20 letters!' })
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   password: string;
 
   @IsOptional()

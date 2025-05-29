@@ -1,0 +1,19 @@
+@media screen and (max-width: 930px) {
+  .user_finance_categories_list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .user_finance_categories_list_top {
+    flex-direction: column;
+  }
+
+  .user_finance_categories_remaining_text {
+    position: static !important;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .user_finance_categories_list {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

@@ -3,7 +3,6 @@
 import React, { ReactNode } from 'react';
 import { Select as AntdSelect, ConfigProvider } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
-import { DownOutlined } from '@ant-design/icons';
 import { Empty } from 'antd';
 
 interface Props {
@@ -21,6 +20,7 @@ interface Props {
   allowClear?: boolean | { clearIcon?: ReactNode };
   maxCount?: number;
   onChange?: (value: string | string[], option?: DefaultOptionType | DefaultOptionType[]) => void;
+  loading?: boolean;
 }
 
 export const Select = ({
@@ -29,7 +29,6 @@ export const Select = ({
   defaultValue,
   value,
   prefix,
-  suffixIcon,
   style,
   className,
   disabled,
@@ -38,6 +37,7 @@ export const Select = ({
   allowClear,
   maxCount,
   onChange,
+  loading,
 }: Props) => {
   return (
     <ConfigProvider
@@ -63,7 +63,6 @@ export const Select = ({
         defaultValue={defaultValue}
         value={value}
         prefix={prefix}
-        suffixIcon={suffixIcon ?? <DownOutlined style={{ color: 'var(--secondary-text-color)' }} />}
         style={style}
         className={className}
         disabled={disabled}
@@ -72,6 +71,7 @@ export const Select = ({
         allowClear={allowClear}
         maxCount={maxCount}
         onChange={onChange}
+        loading={loading}
         notFoundContent={
           <div style={{ textAlign: 'center' }}>
             <Empty description={<span style={{ color: 'var(--red-color)' }}>No Data</span>} image={Empty.PRESENTED_IMAGE_SIMPLE} />

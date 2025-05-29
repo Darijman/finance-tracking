@@ -15,41 +15,15 @@
   border-radius: 10px;
   width: 300px;
   height: 100%;
-  /* width: 100%; */
   margin-bottom: 10px;
 }
 
-.user_finance_categories {
-  background-color: var(--foreground-color);
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.user_finance_categories_list {
-  padding: 0px;
-  margin: 0px;
-  list-style-type: none;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.user_finance_categories_list_item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: var(--background-color);
-  padding: 10px;
-  border-radius: 10px;
-  color: var(--primary-text-color);
-}
-
-.delete_icon {
-  width: 30px;
-  height: 30px;
-  fill: var(--red-color);
-  cursor: pointer;
-  &:hover {
-    opacity: 0.8;
+.add_category_submit_button {
+  width: 100%;
+  text-transform: uppercase;
+  &:disabled {
+    background-color: #4d4d4d !important;
+    border-color: #4d4d4d !important;
+    color: #808080 !important;
   }
 }

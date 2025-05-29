@@ -2,7 +2,7 @@
 
 import { FinanceNoteCard } from '@/components/financeNoteCard/FinanceNoteCard';
 import { useAuth } from '@/contexts/authContext/AuthContext';
-import { message, Typography } from 'antd';
+import { Button, message, notification, Typography } from 'antd';
 import { useLoader } from '@/contexts/loaderContext/LoaderContext';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FinanceNote } from '@/interfaces/financeNote';
@@ -10,6 +10,8 @@ import { FinanceCategory } from '@/interfaces/financeCategory';
 import { Loader } from '@/ui/loader/Loader';
 import { getFinanceCategories, getUserNotes } from './requests';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Select } from '@/components/select/Select';
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import './history.css';
 import './responsive.css';
 
@@ -18,26 +20,34 @@ const { Title } = Typography;
 const History = () => {
   const { user } = useAuth();
 
-  const [messageApi, contextHolder] = message.useMessage({ maxCount: 2 });
+  const [messageApi, messageContextHolder] = message.useMessage({ maxCount: 2 });
   const { isLoading, showLoader, hideLoader } = useLoader();
   const [userFinanceNotes, setUserFinanceNotes] = useState<FinanceNote[]>([]);
   const [financeCategories, setFinanceCategories] = useState<FinanceCategory[]>([]);
 
-  const [selectedFinanceCategory, setSelectedFinanceCategory] = useState<string>('');
+  const [selectedFinanceCategory, setSelectedFinanceCategory] = useState<string | null>(null);
   const [sortByDate, setSortByDate] = useState<'asc' | 'desc'>('desc');
   const [sortByPrice, setSortByPrice] = useState<'asc' | 'desc' | null>(null);
   const [sortByType, setSortByType] = useState<'INCOME' | 'EXPENSE' | null>(null);
 
+  const [hasError, setHasError] = useState<boolean>(false);
+  const [notificationApi, notificationContextHolder] = notification.useNotification({
+    maxCount: 2,
+    placement: 'top',
+    duration: 5,
+  });
+
   const getData = useCallback(async () => {
     if (user.id) {
       try {
+        setHasError(false);
         showLoader();
-        const [notes, categories] = await Promise.all([getUserNotes(user.id), getFinanceCategories()]);
+        const [notes, categories] = await Promise.all([getUserNotes(user.id), getFinanceCategories(user.id)]);
 
         setUserFinanceNotes(notes);
         setFinanceCategories(categories);
-      } catch (err) {
-        console.error('Error fetching data:', err);
+      } catch {
+        setHasError(true);
       } finally {
         hideLoader();
       }
@@ -47,6 +57,15 @@ const History = () => {
   useEffect(() => {
     getData();
   }, [getData]);
+
+  useEffect(() => {
+    if (hasError) {
+      notificationApi.error({
+        message: 'Something went wrong..',
+        description: 'We couldn’t load your history. Please try again later.',
+      });
+    }
+  }, [hasError, notificationApi]);
 
   const deleteFinanceNoteHandler = (noteId: number) => {
     setUserFinanceNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
@@ -66,9 +85,9 @@ const History = () => {
     });
   };
 
-  const categoryOnChangeHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCategory = event.target.value;
-    setSelectedFinanceCategory(selectedCategory);
+  const categoryOnChangeHandler = (value: string | string[]) => {
+    if (Array.isArray(value)) return;
+    setSelectedFinanceCategory(value);
   };
 
   const sortByDateHandler = () => {
@@ -80,6 +99,16 @@ const History = () => {
     const newSort = sortByPrice === 'asc' ? 'desc' : sortByPrice === 'desc' ? null : 'asc';
     setSortByPrice(newSort);
   };
+
+  const selectFinanceCategories = useMemo(() => {
+    return [
+      { label: 'Category', value: '' },
+      ...financeCategories.map((category) => ({
+        label: category.name,
+        value: category.name,
+      })),
+    ];
+  }, [financeCategories]);
 
   const filteredAndSortedFinanceNotes = useMemo(() => {
     let filteredNotes = [...userFinanceNotes];
@@ -115,85 +144,100 @@ const History = () => {
 
   return (
     <div className='history_container'>
-      {contextHolder}
+      {messageContextHolder}
+      {notificationContextHolder}
+
       <Title level={1} style={{ textAlign: 'center', margin: '0px 0px 20px 0px' }}>
         History
       </Title>
       <div className='history_top_buttons'>
         <div className='sortby_type_buttons'>
-          <button
+          <Button
             className={`sortby_expense_button ${sortByType === 'EXPENSE' ? 'active' : ''}`}
             onClick={() => setSortByType((prev) => (prev === 'EXPENSE' ? null : 'EXPENSE'))}
+            disabled={hasError}
           >
             EXPENSE
-          </button>
-          <button
+          </Button>
+          <Button
             className={`sortby_income_button ${sortByType === 'INCOME' ? 'active' : ''}`}
             onClick={() => setSortByType((prev) => (prev === 'INCOME' ? null : 'INCOME'))}
+            disabled={hasError}
           >
             INCOME
-          </button>
+          </Button>
         </div>
-        <select className='financecategory_select' value={selectedFinanceCategory} onChange={categoryOnChangeHandler}>
-          <option value=''>Category</option>
-          {financeCategories.map((financeCategory) => {
-            return (
-              <option key={financeCategory.id} value={financeCategory.name}>
-                {financeCategory.name}
-              </option>
-            );
-          })}
-        </select>
+        <Select
+          placeholder='Category'
+          value={selectedFinanceCategory}
+          onChange={categoryOnChangeHandler}
+          className='history_select_category'
+          options={selectFinanceCategories}
+          disabled={hasError}
+        />
         <div className='sortby_date_and_price_buttons'>
-          <button className='sortby_date_button' onClick={sortByDateHandler}>
+          <Button
+            className='sortby_date_button'
+            onClick={sortByDateHandler}
+            iconPosition='end'
+            icon={sortByDate === 'asc' ? <ArrowUpOutlined /> : sortByDate === 'desc' ? <ArrowDownOutlined /> : null}
+            disabled={hasError}
+          >
             Date
-            {sortByDate === 'asc' && <span className='sort_arrow up'></span>}
-            {sortByDate === 'desc' && <span className='sort_arrow down'></span>}
-          </button>
-          <button className='sortby_price_button' onClick={sortByPriceHandler}>
+          </Button>
+          <Button
+            className='sortby_price_button'
+            onClick={sortByPriceHandler}
+            iconPosition='end'
+            icon={sortByPrice === 'asc' ? <ArrowUpOutlined /> : sortByPrice === 'desc' ? <ArrowDownOutlined /> : null}
+            disabled={hasError}
+          >
             Price
-            {sortByPrice === 'asc' && <span className='sort_arrow up'></span>}
-            {sortByPrice === 'desc' && <span className='sort_arrow down'></span>}
-            {sortByPrice === null && <span className='sort_arrow none'></span>}
-          </button>
+          </Button>
         </div>
       </div>
       <hr className='history_divider' />
 
-      <div>
-        {(sortByType || selectedFinanceCategory) && (
-          <Title level={3} style={{ margin: '0px 0px 10px 0px', textAlign: 'center' }}>
-            {sortByType && <span className={`financenotes_type_word ${sortByType === 'EXPENSE' ? 'expense' : 'income'}`}>{sortByType}</span>}
-            {selectedFinanceCategory && (
-              <>
-                {sortByType ? ' ' : ''}({selectedFinanceCategory})
-              </>
-            )}
-          </Title>
-        )}
-        <div className='financenotes_grid'>
-          <AnimatePresence>
-            {filteredAndSortedFinanceNotes.map((financeNote, index) => (
-              <motion.div
-                key={financeNote.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -100 }}
-                transition={{
-                  delay: index < 6 ? index * 0.03 : 0.15,
-                  duration: 0.2,
-                }}
-              >
-                <FinanceNoteCard
-                  financeNote={financeNote}
-                  onDelete={() => deleteFinanceNoteHandler(financeNote.id)}
-                  onEdit={editFinanceNoteHandler}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </div>
+      {hasError ? (
+        <div style={{ textAlign: 'center', color: 'var(--secondary-text-color)' }}>Failed to load history data.</div>
+      ) : (
+        <>
+          {(sortByType || selectedFinanceCategory) && (
+            <Title level={3} style={{ margin: '0px 0px 10px 0px', textAlign: 'center' }}>
+              {sortByType && (
+                <span className={`financenotes_type_word ${sortByType === 'EXPENSE' ? 'expense' : 'income'}`}>{sortByType}</span>
+              )}
+              {selectedFinanceCategory && (
+                <>
+                  {sortByType ? ' ' : ''}({selectedFinanceCategory})
+                </>
+              )}
+            </Title>
+          )}
+          <div className='financenotes_grid'>
+            <AnimatePresence>
+              {filteredAndSortedFinanceNotes.map((financeNote, index) => (
+                <motion.div
+                  key={financeNote.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -100 }}
+                  transition={{
+                    delay: index < 6 ? index * 0.03 : 0.15,
+                    duration: 0.2,
+                  }}
+                >
+                  <FinanceNoteCard
+                    financeNote={financeNote}
+                    onDelete={() => deleteFinanceNoteHandler(financeNote.id)}
+                    onEdit={editFinanceNoteHandler}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -3,21 +3,36 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import { Button, Form, message } from 'antd';
 import { TextField } from '@/components/textField/TextField';
+import { FinanceCategory } from '@/interfaces/financeCategory';
 import api from '../../../../../axiosInstance';
 import './addCategoryForm.css';
-import { FinanceCategory } from '@/interfaces/financeCategory';
+import './responsive.css';
 
 interface Props {
   setUserFinanceCategories: Dispatch<SetStateAction<FinanceCategory[]>>;
+  userFinanceCategories: FinanceCategory[];
 }
 
-export const AddCategoryForm = ({ setUserFinanceCategories }: Props) => {
+export const AddCategoryForm = ({ setUserFinanceCategories, userFinanceCategories }: Props) => {
   const [form] = Form.useForm<{ name: string }>();
+
+  const categoryName: string = Form.useWatch<string>('name', form);
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 2 });
   const [isCreating, setIsCreating] = useState<boolean>(false);
 
   const onFinishHandler = async (values: { name: string }) => {
     setIsCreating(true);
+    values.name = values.name.trim();
+
+    const categoryNameExists = userFinanceCategories.some((financeCategory) => financeCategory.name.trim() === categoryName.trim());
+    if (categoryNameExists) {
+      setIsCreating(false);
+      return messageApi.open({
+        type: 'error',
+        content: 'Category with this name already exists!',
+      });
+    }
+
     try {
       const category = await api.post<FinanceCategory>(`/finance_categories/user`, values);
 
@@ -53,9 +68,10 @@ export const AddCategoryForm = ({ setUserFinanceCategories }: Props) => {
             <Button
               htmlType='submit'
               type='primary'
-              style={{ width: '100%', textTransform: 'uppercase' }}
               iconPosition='start'
               loading={isCreating}
+              disabled={userFinanceCategories.length >= 10 || !categoryName?.trim()}
+              className='add_category_submit_button'
             >
               Add Category
             </Button>

@@ -24,5 +24,6 @@ export class UpdateFinanceNoteDto {
   @IsOptional()
   @IsString()
   @MaxLength(255, { message: 'Comment must contain no more than 255 letters!' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   comment?: string;
 }

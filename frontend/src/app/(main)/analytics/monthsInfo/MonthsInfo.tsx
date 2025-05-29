@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/authContext/AuthContext';
-import { Card } from 'antd';
+import { Card, Typography } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Month } from './interfaces';
@@ -9,14 +9,23 @@ import { CustomTooltip } from './customTooltip';
 import api from '../../../../../axiosInstance';
 import './monthsInfo.css';
 
+const { Title } = Typography;
+
 export const MonthsInfo = () => {
   const { user } = useAuth();
   const [months, setMonths] = useState<Month[]>([]);
+  const [hasError, setHasError] = useState<boolean>(false);
 
   const getMonthsInfo = useCallback(async () => {
     if (user.id) {
-      const response = await api.get<Month[]>(`/finance_notes_summary/monthly/${user.id}`);
-      setMonths(response.data);
+      try {
+        setHasError(false);
+
+        const response = await api.get<Month[]>(`/finance_notes_summary/monthly/${user.id}`);
+        setMonths(response.data);
+      } catch {
+        setHasError(true);
+      }
     }
   }, [user.id]);
 
@@ -31,17 +40,33 @@ export const MonthsInfo = () => {
       variant='borderless'
     >
       <ResponsiveContainer width='100%' height={400} style={{ backgroundColor: 'var(--background-color)' }}>
-        <div className='scroll_container'>
-          <LineChart width={months.length * 400} height={400} data={months}>
-            <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='monthLabel' />
-            <YAxis tick={{ fontSize: 10 }} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
-            <Legend />
-            <Line type='monotone' dataKey='income' stroke='var(--green-color)' name='Income' />
-            <Line type='monotone' dataKey='expense' stroke='var(--red-color)' name='Expense' />
-          </LineChart>
-        </div>
+        {hasError ? (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Title level={5} style={{ color: 'var(--red-color)', margin: 0, textAlign: 'center' }}>
+              Sorry, data is unavailable
+            </Title>
+          </div>
+        ) : (
+          <div className='scroll_container'>
+            <LineChart width={months.length * 400} height={400} data={months}>
+              <CartesianGrid strokeDasharray='3 3' />
+              <XAxis dataKey='monthLabel' />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
+              <Legend />
+              <Line type='monotone' dataKey='income' stroke='var(--green-color)' name='Income' />
+              <Line type='monotone' dataKey='expense' stroke='var(--red-color)' name='Expense' />
+            </LineChart>
+          </div>
+        )}
       </ResponsiveContainer>
     </Card>
   );

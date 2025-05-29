@@ -6,6 +6,7 @@ export class UpdateFinanceCategoryDto {
   @IsString()
   @MaxLength(100, { message: 'Name must contain no more than 100 letters!' })
   @MinLength(1, { message: 'Name must contain at least 1 letter!' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   name?: string;
 
   @IsOptional()

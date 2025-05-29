@@ -2,18 +2,13 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FinanceNote } from '../financeNote.entity';
-import { RedisService } from 'src/common/redis/redis.service';
-import { Between } from 'typeorm';
 import { GetFinanceNotesSummaryByUserId, GetMonthlySummaryByUserId } from './interfaces';
-
-// const getUserFinanceNotesCacheKey = (userId: number) => `userFinanceNotes_${userId}`;
 
 @Injectable()
 export class FinanceNotesSummaryService {
   constructor(
     @InjectRepository(FinanceNote)
     private notesRepository: Repository<FinanceNote>,
-    private readonly redisService: RedisService,
   ) {}
 
   // MONTHS AND YEARS WITH NOTES
@@ -47,9 +42,7 @@ export class FinanceNotesSummaryService {
     const targetMonth = month ?? now.getMonth() + 1;
 
     const start = new Date(targetYear, targetMonth - 1, 1);
-    const end = new Date(targetYear, targetMonth, 0);
-
-    const dateCondition = { noteDate: Between(start, end) };
+    const end = new Date(targetYear, targetMonth, 1);
 
     const [incomeTotalResult, expenseTotalResult, noteCountResult] = await Promise.all([
       this.notesRepository
@@ -57,7 +50,7 @@ export class FinanceNotesSummaryService {
         .select('SUM(note.amount)', 'total')
         .where('note.userId = :userId', { userId })
         .andWhere('note.type = :type', { type: 'INCOME' })
-        .andWhere('note.noteDate BETWEEN :start AND :end', { start, end })
+        .andWhere('note.noteDate >= :start AND note.noteDate < :end', { start, end })
         .getRawOne(),
 
       this.notesRepository
@@ -65,14 +58,14 @@ export class FinanceNotesSummaryService {
         .select('SUM(note.amount)', 'total')
         .where('note.userId = :userId', { userId })
         .andWhere('note.type = :type', { type: 'EXPENSE' })
-        .andWhere('note.noteDate BETWEEN :start AND :end', { start, end })
+        .andWhere('note.noteDate >= :start AND note.noteDate < :end', { start, end })
         .getRawOne(),
 
       this.notesRepository
         .createQueryBuilder('note')
         .select('COUNT(*)', 'count')
         .where('note.userId = :userId', { userId })
-        .andWhere('note.noteDate BETWEEN :start AND :end', { start, end })
+        .andWhere('note.noteDate >= :start AND note.noteDate < :end', { start, end })
         .getRawOne(),
     ]);
 
@@ -80,21 +73,10 @@ export class FinanceNotesSummaryService {
     const expenseTotal = Number(expenseTotalResult?.total) || 0;
     const noteCount = Number(noteCountResult?.count) || 0;
 
-    const recentNotes = await this.notesRepository.find({
-      where: {
-        userId,
-        ...dateCondition,
-      },
-      relations: ['category'],
-      order: { noteDate: 'DESC' },
-      take: 5,
-    });
-
     return {
       incomeTotal,
       expenseTotal,
       balance: incomeTotal - expenseTotal,
-      recentNotes,
       noteCount,
     };
   }
@@ -127,18 +109,10 @@ export class FinanceNotesSummaryService {
     const expenseTotal = Number(expenseTotalResult?.total) || 0;
     const noteCount = Number(noteCountResult?.count) || 0;
 
-    const recentNotes = await this.notesRepository.find({
-      where: { userId },
-      relations: ['category'],
-      order: { noteDate: 'DESC' },
-      take: 5,
-    });
-
     return {
       incomeTotal,
       expenseTotal,
       balance: incomeTotal - expenseTotal,
-      recentNotes,
       noteCount,
     };
   }

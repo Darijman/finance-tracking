@@ -63,12 +63,6 @@
   height: 40px;
 }
 
-.notecard_header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .notecard_info,
 .notecard_mid {
   width: 310px;
@@ -89,6 +83,7 @@
 
 .notecard_info {
   height: 60px;
+  overflow-x: auto;
 }
 
 .notecard_comment {
@@ -103,16 +98,30 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
+  overflow-y: hidden;
 }
 
 .notecard_mid {
   margin-bottom: 10px;
-  word-break: break-word;
 }
 
 .amount_text,
 .category_text {
   color: var(--green-color);
+}
+
+.amount_text {
+  white-space: nowrap;
+  margin-right: 30px;
+}
+
+.category_text {
+  white-space: nowrap;
+}
+
+.category_text span {
+  display: block;
+  word-break: break-word;
 }
 
 .expense_text {

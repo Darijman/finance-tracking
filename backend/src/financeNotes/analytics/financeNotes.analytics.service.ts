@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FinanceNote } from '../financeNote.entity';
 import { UsersService } from 'src/users/users.service';
-import { RedisService } from 'src/common/redis/redis.service';
 import { GetCategoriesExpensesByUserId } from './interfaces';
-
-// const getUserFinanceNotesCacheKey = (userId: number) => `userFinanceNotes_${userId}`;
 
 @Injectable()
 export class FinanceNotesAnalyticsService {
@@ -14,7 +11,6 @@ export class FinanceNotesAnalyticsService {
     @InjectRepository(FinanceNote)
     private notesRepository: Repository<FinanceNote>,
     private readonly usersService: UsersService,
-    private readonly redisService: RedisService,
   ) {}
 
   // CATEGORIES EXPENSES FOR SELECTED DATE OR ALL TIME - TOTAL
@@ -36,13 +32,12 @@ export class FinanceNotesAnalyticsService {
     let start: Date | undefined;
     let end: Date | undefined;
 
-    // Если передан и год, и месяц — строим период месяца
     if (year !== undefined && month !== undefined) {
       if (month < 1 || month > 12) {
         throw new BadRequestException({ error: 'Invalid month! Must be from 1 to 12.' });
       }
       start = new Date(year, month - 1, 1);
-      end = new Date(year, month, 0); // последний день месяца
+      end = new Date(year, month, 0);
     }
 
     const query = this.notesRepository

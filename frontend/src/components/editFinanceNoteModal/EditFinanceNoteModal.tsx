@@ -45,7 +45,7 @@ export const EditFinanceNoteModal = ({ isOpen, financeNote, onClose, onEdit }: P
   const getCategories = useCallback(async () => {
     if (user.id) {
       try {
-        const financeCategories = await getFinanceCategories();
+        const financeCategories = await getFinanceCategories(user.id);
 
         setFinanceCategories(financeCategories);
       } catch (error: any) {

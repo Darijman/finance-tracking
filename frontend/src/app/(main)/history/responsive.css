@@ -8,7 +8,7 @@
   }
 }
 
-@media screen and (max-width: 850px) {
+@media screen and (max-width: 900px) {
   .financenotes_grid {
     grid-template-columns: repeat(1, 1fr);
   }
@@ -29,19 +29,15 @@
     flex-direction: column;
   }
 
-  .financecategory_select {
-    margin: 0px;
-  }
-
   .sortby_expense_button {
-    margin: 0px 0px 20px 0px;
-  }
-
-  .financecategory_select {
-    margin-bottom: 20px;
+    margin: 0px 0px 20px 0px !important;
   }
 
   .sortby_date_button {
-    margin: 0px 0px 20px 0px;
+    margin: 0px 0px 20px 0px !important;
+  }
+
+  .history_select_category {
+    margin-bottom: 20px !important;
   }
 }

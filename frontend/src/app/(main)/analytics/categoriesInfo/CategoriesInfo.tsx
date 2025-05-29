@@ -29,11 +29,25 @@ export const CategoriesInfo = ({ availableDates }: Props) => {
   const [categoriesInfo, setCategoriesInfo] = useState<CategoryInfo[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(currentDate);
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasError, setHasError] = useState<boolean>(false);
+
   const getCategoriesInfo = useCallback(
     async (year: number, month: number) => {
       if (user.id) {
-        const response = await api.get<CategoryInfo[]>(`/finance_notes_analytics/expenses_category/${user.id}`, { params: { year, month } });
-        setCategoriesInfo(response.data);
+        try {
+          setIsLoading(true);
+          setHasError(false);
+
+          const response = await api.get<CategoryInfo[]>(`/finance_notes_analytics/expenses_category/${user.id}`, {
+            params: { year, month },
+          });
+          setCategoriesInfo(response.data);
+        } catch {
+          setHasError(true);
+        } finally {
+          setIsLoading(false);
+        }
       }
     },
     [user.id],
@@ -86,6 +100,7 @@ export const CategoriesInfo = ({ availableDates }: Props) => {
               onChange={monthOnChangeHandler}
               style={{ width: 200, marginBottom: '10px' }}
               options={dates}
+              loading={isLoading}
             />
           </div>
         </div>
@@ -97,23 +112,39 @@ export const CategoriesInfo = ({ availableDates }: Props) => {
       }}
       variant='borderless'
     >
-      <ResponsiveContainer width='100%' height={400} style={{ backgroundColor: 'var(--background-color)' }}>
-        {chartData.length ? (
-          <BarChart data={chartData}>
-            <XAxis
-              dataKey='name'
-              interval={0}
-              height={80}
-              tick={(tickProps) => <CreateCustomTick {...tickProps} categoriesInfo={categoriesInfo} />}
-            />
-            <YAxis tick={{ fontSize: 10 }} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
-            <Bar dataKey='totalExpense' fill='#8884d8' barSize={40} name='Total Expenses' />
-          </BarChart>
-        ) : (
-          <div></div>
-        )}
-      </ResponsiveContainer>
+      <div style={{ width: '100%', overflowX: 'auto' }}>
+        <div style={{ width: `${chartData.length * 100}px`, minWidth: '600px', height: '400px' }}>
+          <ResponsiveContainer width='100%' height='100%' style={{ backgroundColor: 'var(--background-color)', overflowY: 'hidden' }}>
+            {hasError ? (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Title level={5} style={{ color: 'var(--red-color)', margin: 0, textAlign: 'center' }}>
+                  Sorry, data is unavailable
+                </Title>
+              </div>
+            ) : (
+              <BarChart data={chartData}>
+                <XAxis
+                  dataKey='name'
+                  interval={0}
+                  height={80}
+                  tick={(tickProps) => <CreateCustomTick {...tickProps} categoriesInfo={categoriesInfo} />}
+                />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
+                <Bar dataKey='totalExpense' fill='#8884d8' barSize={40} name='Total Expenses' />
+              </BarChart>
+            )}
+          </ResponsiveContainer>
+        </div>
+      </div>
     </Card>
   );
 };

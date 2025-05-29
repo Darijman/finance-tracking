@@ -77,8 +77,8 @@ export const LoginForm = () => {
         router.push('/');
       })
       .catch((error) => {
-        const errorMessage = error.response.data?.error;
-        const errorType = error.response.data?.type;
+        const errorMessage = error?.response.data?.error;
+        const errorType = error?.response.data?.type;
         setServerError({ error: errorMessage || 'Something went wrong...', type: errorType || '' });
       });
   };

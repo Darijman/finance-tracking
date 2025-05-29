@@ -27,22 +27,27 @@ export const MonthSummary = ({ availableDates }: Props) => {
     incomeTotal: 0,
     expenseTotal: 0,
     balance: 0,
-    recentNotes: [],
     noteCount: 0,
   });
 
   const [selectedDate, setSelectedDate] = useState<string>(currentStateDate);
-  const [serverError, setServerError] = useState<{ error: string }>({ error: '' });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasError, setHasError] = useState<boolean>(false);
 
   const getMonthSummary = useCallback(
     async (year: number, month: number) => {
-      try {
-        if (user.id) {
+      if (user.id) {
+        try {
+          setIsLoading(true);
+          setHasError(false);
+
           const response = await api.get<IMonthSummary>(`/finance_notes_summary/${user.id}`, { params: { year, month } });
           setMonthSummary(response.data);
+        } catch {
+          setHasError(true);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error: any) {
-        setServerError(error);
       }
     },
     [user.id],
@@ -52,7 +57,7 @@ export const MonthSummary = ({ availableDates }: Props) => {
     getMonthSummary(currentYear, currentMonth);
   }, [getMonthSummary]);
 
-  const monthOnChangeHandler = (value: string | string[]) => {
+  const dateOnChangeHandler = (value: string | string[]) => {
     if (Array.isArray(value)) return;
     setSelectedDate(value);
 
@@ -79,44 +84,53 @@ export const MonthSummary = ({ availableDates }: Props) => {
     ];
   }, [availableDates]);
 
-  return (
-    <div className='month_summary'>
-      <div className='month_summary_top'>
-        {serverError.error ? (
-          <Title level={3} style={{ margin: '0px', color: '#d32f2f' }} className='month_summary_top_title'>
-            {serverError.error}
-          </Title>
-        ) : (
-          <Title level={3} style={{ margin: '0px' }} className='month_summary_top_title'>
-            {displayedDate}
-          </Title>
-        )}
-        <Select
-          placeholder='Select a date'
-          value={displayedDate}
-          onChange={monthOnChangeHandler}
-          style={{ width: 200, textAlign: 'center' }}
-          options={dates}
-        />
-      </div>
-      <dl className='month_summary_list'>
-        <div className='month_summary_list_item income'>
+  const renderContent = () => {
+    if (hasError) {
+      return (
+        <Title level={5} style={{ color: 'var(--red-color)', textAlign: 'center', margin: 0 }}>
+          Sorry, data is unavailable
+        </Title>
+      );
+    }
+
+    return (
+      <>
+        <div className='alltime_summary_list_item income'>
           <dt>INCOME TOTAL:</dt>
           <dd>+{monthSummary.incomeTotal}</dd>
         </div>
-        <div className='month_summary_list_item expense'>
+        <div className='alltime_summary_list_item expense'>
           <dt>EXPENSE TOTAL:</dt>
           <dd>-{monthSummary.expenseTotal}</dd>
         </div>
-        <div className='month_summary_list_item'>
+        <div className='alltime_summary_list_item'>
           <dt>BALANCE:</dt>
           <dd>{monthSummary.balance}</dd>
         </div>
-        <div className='month_summary_list_item'>
+        <div className='alltime_summary_list_item'>
           <dt>NOTES DONE:</dt>
           <dd>{monthSummary.noteCount}</dd>
         </div>
-      </dl>
+      </>
+    );
+  };
+
+  return (
+    <div className='month_summary'>
+      <div className='month_summary_top'>
+        <Title level={3} style={{ margin: '0px' }} className='month_summary_top_title'>
+          {displayedDate}
+        </Title>
+        <Select
+          placeholder='Select a date'
+          value={displayedDate}
+          onChange={dateOnChangeHandler}
+          style={{ width: 200, textAlign: 'center' }}
+          options={dates}
+          loading={isLoading}
+        />
+      </div>
+      <dl className='month_summary_list'>{renderContent()}</dl>
     </div>
   );
 };

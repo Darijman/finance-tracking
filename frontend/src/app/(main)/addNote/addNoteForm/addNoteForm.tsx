@@ -24,7 +24,6 @@ export interface NewFinanceNote {
   amount: string;
   noteDate: Date;
   category: FinanceCategory | null;
-  userId: number;
   comment?: string;
 }
 
@@ -41,7 +40,6 @@ export const AddNoteForm = ({ financeCategories, setLastThreeUserNotes }: Props)
     amount: '',
     noteDate: dayjs().startOf('minute').toDate(),
     category: null,
-    userId: 0,
     comment: '',
   });
 
@@ -117,18 +115,19 @@ export const AddNoteForm = ({ financeCategories, setLastThreeUserNotes }: Props)
   };
 
   const onFinishHandler = async () => {
+    if (!user.id) return;
+    setIsCreating(true);
+
     if (!newFinanceNote.amount.trim().length) {
+      setIsCreating(false);
       return setHasAmountError(true);
     }
-
-    setIsCreating(true);
 
     const financeNote = {
       type: newFinanceNote.type,
       amount: Number(newFinanceNote.amount),
       noteDate: newFinanceNote.noteDate,
       categoryId: newFinanceNote.category?.id,
-      userId: user.id,
       comment: newFinanceNote.comment,
     };
 
@@ -145,7 +144,6 @@ export const AddNoteForm = ({ financeCategories, setLastThreeUserNotes }: Props)
         amount: '',
         noteDate: dayjs().startOf('minute').toDate(),
         category: null,
-        userId: user.id,
         comment: '',
       });
 
@@ -199,7 +197,9 @@ export const AddNoteForm = ({ financeCategories, setLastThreeUserNotes }: Props)
                       title={financeCategory.name}
                     >
                       <Image className='addNote_category_image' src={imagePath} alt={financeCategory.name} width={40} height={40} />
-                      <div style={{ textTransform: 'uppercase' }}>{financeCategory.name}</div>
+                      <div style={{ textTransform: 'uppercase', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+                        {financeCategory.name}
+                      </div>
                     </li>
                   );
                 })}

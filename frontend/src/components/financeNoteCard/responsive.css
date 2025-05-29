@@ -10,6 +10,12 @@
   .notecard_mid {
     width: 250px;
   }
+
+  .notecard_container {
+    &:hover {
+      background-color: var(--foreground-color);
+    }
+  }
 }
 
 

@@ -19,9 +19,10 @@ export class AuthController {
     const isRemembered = registerUserDto.rememberMe === true;
 
     res.cookie('access_token', access_token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: false,
       sameSite: 'lax',
+      path: '/',
       maxAge: isRemembered
         ? 30 * 24 * 60 * 60 * 1000 // 30days
         : 7 * 24 * 60 * 60 * 1000, // 7days
@@ -38,9 +39,10 @@ export class AuthController {
     const isRemembered = logInUserDto.rememberMe === true;
 
     res.cookie('access_token', access_token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: false,
       sameSite: 'lax',
+      path: '/',
       maxAge: isRemembered
         ? 30 * 24 * 60 * 60 * 1000 // 30days
         : 7 * 24 * 60 * 60 * 1000, // 7days
@@ -52,18 +54,19 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Req() req: Request) {
-    const { id, name, roleName } = req.user;
-    return { id, name, roleName }; // return without roleId
+    const { id } = req.user;
+    return { id };
   }
 
-  @UseGuards(AuthGuard)
+  @Public()
   @HttpCode(200)
-  @Post('logOut')
+  @Post('logout')
   logOutUser(@Res() res: Response) {
     res.clearCookie('access_token', {
-      httpOnly: false,
-      sameSite: 'lax',
+      httpOnly: true,
       secure: false,
+      sameSite: 'lax',
+      path: '/',
     });
     return res.send({ success: true });
   }
