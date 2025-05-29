@@ -44,7 +44,7 @@ export class FinanceNotesService {
     const cacheKey: string = getUserFinanceNotesCacheKey(userId);
 
     const hasFilters = !!categoryId || !!type || sortByPrice !== null || sortByDate !== 'DESC';
-    if (!hasFilters && offset < CACHE_LIMIT) {
+    if (!hasFilters && offset === 0) {
       const cachedData = await this.redisService.getValue(cacheKey);
       if (cachedData) {
         const parsedNotes: FinanceNote[] = JSON.parse(cachedData);
@@ -97,8 +97,8 @@ export class FinanceNotesService {
 
   async deleteFinanceNote(note: FinanceNote): Promise<FinanceNote> {
     const userCacheKey: string = getUserFinanceNotesCacheKey(note.userId);
-    await this.notesRepository.delete(note.id);
     await this.redisService.deleteValue(userCacheKey);
+    await this.notesRepository.delete(note.id);
     return note;
   }
 

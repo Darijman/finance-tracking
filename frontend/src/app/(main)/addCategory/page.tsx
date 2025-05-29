@@ -58,7 +58,7 @@ const AddCategory = () => {
     if (hasError) {
       notificationApi.error({
         message: 'Something went wrong..',
-        description: 'We couldn’t your categories. Please try again later.',
+        description: 'We couldn’t load your categories. Please try again later.',
       });
     }
   }, [hasError, notificationApi]);
@@ -106,7 +106,7 @@ const AddCategory = () => {
       </Title>
 
       {hasError ? (
-        <div style={{ textAlign: 'center', color: 'var(--secondary-text-color)' }}>Failed to load your categories</div>
+        <div style={{ textAlign: 'center', color: 'var(--secondary-text-color)' }}>Failed to load your categories.</div>
       ) : (
         <>
           <AddCategoryForm setUserFinanceCategories={setUserFinanceCategories} userFinanceCategories={userFinanceCategories} />

@@ -1,17 +1,17 @@
 'use client';
 
 import { SubMenuButton } from './subMenuButton/SubMenuButton';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SwitchAppearance } from './switchAppearance/SwitchAppearance';
 import { useTheme } from 'next-themes';
 import { useClickOutside } from '@/hooks/useClickOutside/UseClickOutside';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { useRouter } from 'next/navigation';
+import { notification } from 'antd';
 import { DeleteModal } from '@/components/deleteModal/DeleteModal';
 import api from '../../../../axiosInstance';
 import './subMenu.css';
 
-import SettingsIcon from '@/assets/svg/settings-icon.svg';
 import SunIcon from '@/assets/svg/sun-icon.svg';
 import MoonIcon from '@/assets/svg/moon-icon.svg';
 
@@ -27,6 +27,12 @@ export const SubMenu = ({ closeSubMenu, buttonRef, switchAppearanceStyle, subMen
   const { setUser } = useAuth();
   const router = useRouter();
 
+  const [hasLogoutError, setHasLogoutError] = useState<boolean>(false);
+  const [notificationApi, notificationContextHolder] = notification.useNotification({
+    maxCount: 2,
+    placement: 'top',
+    duration: 5,
+  });
   const [showSwitchAppearance, setShowSwitchAppearance] = useState<boolean>(false);
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const subMenuRef = useRef<HTMLDivElement>(null);
@@ -34,21 +40,36 @@ export const SubMenu = ({ closeSubMenu, buttonRef, switchAppearanceStyle, subMen
   useClickOutside(subMenuRef, closeSubMenu, buttonRef);
 
   const logOutUser = async () => {
-    await api.post(`/auth/logout`);
-    setUser({ id: 0 });
-    router.push(`/auth/login`);
+    try {
+      setHasLogoutError(false);
+
+      await api.post(`/auth/logout`);
+      setUser({ id: 0 });
+      router.push(`/auth/login`);
+    } catch {
+      setHasLogoutError(true);
+    } finally {
+      setShowLogoutModal(false);
+    }
   };
+
+  useEffect(() => {
+    if (hasLogoutError) {
+      notificationApi.error({
+        message: 'Something went wrong..',
+        description: 'Logout failed. Please try again.',
+      });
+    }
+  }, [hasLogoutError, notificationApi]);
 
   return (
     <div ref={subMenuRef}>
+      {notificationContextHolder}
       {showSwitchAppearance ? (
         <SwitchAppearance style={switchAppearanceStyle} closeSwitchApperance={() => setShowSwitchAppearance(false)} />
       ) : (
         <div className='submenu' style={subMenuStyle}>
           <ul className='submenu_list'>
-            <li className='submenu_item'>
-              <SubMenuButton iconSrc={SettingsIcon} label='Settings' href='/settings' navigation={true} />
-            </li>
             <li className='submenu_item'>
               <SubMenuButton
                 iconSrc={theme === 'light' ? SunIcon : MoonIcon}
@@ -62,7 +83,6 @@ export const SubMenu = ({ closeSubMenu, buttonRef, switchAppearanceStyle, subMen
               <button
                 className='submenu_button'
                 onClick={() => {
-                  // closeSubMenu();
                   setShowLogoutModal(true);
                 }}
               >
