@@ -140,7 +140,6 @@ export const EditFinanceNoteModal = ({ isOpen, financeNote, onClose, onEdit }: P
       amount: Number(editedNote.amount),
       type: editedNote.type,
       categoryId: editedNote.category?.id,
-      userId: user.id,
       comment: editedNote.comment,
     };
 
