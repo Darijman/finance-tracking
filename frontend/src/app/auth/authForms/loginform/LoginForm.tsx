@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { LoginUser } from '@/interfaces/loginUser';
 import { areObjectsEqual } from '@/helpers/areObjectsEqual';
 import { InputField } from '@/components/inputField/InputField';
-import { Checkbox, CheckboxChangeEvent, Form, Typography } from 'antd';
-import { Button } from '@/components/button/Button';
+import { Checkbox, CheckboxChangeEvent, Form, Typography, Button } from 'antd';
 import useAuthValidation from '@/hooks/useAuthValidation/UseAuthValidation';
 import api from '../../../../../axiosInstance';
 import Link from 'next/link';
@@ -138,7 +137,9 @@ export const LoginForm = () => {
               </Checkbox>
             </Form.Item>
             <Form.Item style={{ maxWidth: '300px', width: '100%', textAlign: 'center' }}>
-              <Button className='login_submit_button' htmlType='submit' disabled={isSubmitButtonDisabled} label='Sign in' />
+              <Button className='login_submit_button' htmlType='submit' disabled={isSubmitButtonDisabled}>
+                Sign In
+              </Button>
             </Form.Item>
           </div>
         </Form>

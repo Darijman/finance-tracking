@@ -140,17 +140,17 @@
 }
 
 .addNote_submit_button {
-  color: #FFFFFF;
-  max-width: 250px;
-  width: 100%;
+  color: #FFFFFF !important;
+  max-width: 250px !important;
+  width: 100% !important;
   height: 35px !important;
-  border-radius: 10px;
-  border: 1px solid var(--submit-button-color);
-  background-color: var(--submit-button-color);
-  text-transform: uppercase;
-  cursor: pointer;
+  border-radius: 10px !important;
+  border: 1px solid var(--submit-button-color) !important;
+  background-color: var(--submit-button-color) !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
   &:hover {
-    opacity: 0.8;
+    opacity: 0.8 !important;
   }
 }
 

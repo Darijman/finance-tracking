@@ -18,7 +18,7 @@ import './responsive.css';
 
 const { Title } = Typography;
 
-const initialQuery: GetUserNotesQuery = {
+export const initialQuery: GetUserNotesQuery = {
   offset: 0,
   limit: 20,
   sortByDate: 'DESC',
@@ -280,6 +280,7 @@ const History = () => {
               )}
             </Title>
           )}
+
           <InfiniteScroll
             dataLength={userFinanceNotes.length}
             next={loadMoreUserFinanceNotes}

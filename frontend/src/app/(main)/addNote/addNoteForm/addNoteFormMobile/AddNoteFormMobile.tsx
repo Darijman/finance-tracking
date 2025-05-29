@@ -8,10 +8,9 @@ import { FinanceNote } from '@/interfaces/financeNote';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { DatePicker } from '@/components/datePicker/DatePicker';
 import { InputField } from '@/components/inputField/InputField';
-import { Form, message } from 'antd';
+import { Form, message, Button } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { TextField } from '@/components/textField/TextField';
-import { Button } from '@/components/button/Button';
 import Image from 'next/image';
 import dayjs from 'dayjs';
 import api from '../../../../../../axiosInstance';
@@ -191,16 +190,18 @@ export const AddNoteFormMobile = ({ financeCategories, setLastThreeUserNotes }: 
                       className={`addNote_expense_button ${newFinanceNote.type === 'EXPENSE' ? 'active' : ''}`}
                       onClick={() => typeOnChangeHandler(NoteType.EXPENSE)}
                       disabled={newFinanceNote.type === 'EXPENSE'}
-                      label='EXPENSE'
-                    />
+                    >
+                      EXPENSE
+                    </Button>
                     <Button
                       htmlType='button'
                       type='primary'
                       className={`addNote_income_button ${newFinanceNote.type === 'INCOME' ? 'active' : ''}`}
                       onClick={() => typeOnChangeHandler(NoteType.INCOME)}
                       disabled={newFinanceNote.type === 'INCOME'}
-                      label='INCOME'
-                    />
+                    >
+                      INCOME
+                    </Button>
                   </div>
                 </div>
               </Form.Item>
@@ -271,14 +272,9 @@ export const AddNoteFormMobile = ({ financeCategories, setLastThreeUserNotes }: 
                 />
               </Form.Item>
               <Form.Item>
-                <Button
-                  htmlType='submit'
-                  type='primary'
-                  className='addNote_submit_button'
-                  label='Create'
-                  iconPosition='start'
-                  loading={isCreating}
-                />
+                <Button htmlType='submit' type='primary' className='addNote_submit_button' iconPosition='start' loading={isCreating}>
+                  CREATE
+                </Button>
               </Form.Item>
             </div>
           </div>

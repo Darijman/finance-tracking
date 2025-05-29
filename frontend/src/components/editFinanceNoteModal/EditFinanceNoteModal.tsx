@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { useClickOutside } from '@/hooks/useClickOutside/UseClickOutside';
 import { FinanceNote, NoteType } from '@/interfaces/financeNote';
 import { FinanceNoteCard } from '../financeNoteCard/FinanceNoteCard';
@@ -163,7 +164,7 @@ export const EditFinanceNoteModal = ({ isOpen, financeNote, onClose, onEdit }: P
 
   if (!isOpen) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className='edit_note_modal_overlay'>
       <div className='edit_note_modal_content' ref={modalRef}>
         <button className='close_edit_modal_button' onClick={onClose}>
@@ -313,6 +314,7 @@ export const EditFinanceNoteModal = ({ isOpen, financeNote, onClose, onEdit }: P
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };

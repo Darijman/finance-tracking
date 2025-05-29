@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { RegisterUser } from '@/interfaces/registerUser';
 import { areObjectsEqual } from '@/helpers/areObjectsEqual';
-import { Checkbox, CheckboxChangeEvent, Form, Typography } from 'antd';
+import { Checkbox, CheckboxChangeEvent, Form, Typography, Button } from 'antd';
 import { InputField } from '@/components/inputField/InputField';
-import { Button } from '@/components/button/Button';
 import useAuthValidation from '@/hooks/useAuthValidation/UseAuthValidation';
 import api from '../../../../../axiosInstance';
 import Link from 'next/link';
@@ -155,7 +154,9 @@ export const RegisterForm = () => {
             </Form.Item>
 
             <Form.Item style={{ maxWidth: '300px', width: '100%', textAlign: 'center' }}>
-              <Button className='register_submit_button' htmlType='submit' disabled={!!isSubmitButtonDisabled} label='Sign up' />
+              <Button className='register_submit_button' htmlType='submit' disabled={!!isSubmitButtonDisabled}>
+                Sign up
+              </Button>
             </Form.Item>
           </div>
         </Form>

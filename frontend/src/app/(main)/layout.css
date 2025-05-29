@@ -12,16 +12,10 @@
   padding: 20px 50px 40px 50px;
   margin-top: 20px;
   height: 100vh;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 
 .burger_wrapper {
   display: flex;
   justify-content: end;
-}
-
-@media screen and (max-width: 850px) {
-  .main_layout {
-    padding: 20pxж;
-  }
 }

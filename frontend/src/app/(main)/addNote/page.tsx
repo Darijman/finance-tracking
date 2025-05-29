@@ -13,6 +13,7 @@ import { FinanceCategory } from '@/interfaces/financeCategory';
 import { Loader } from '@/ui/loader/Loader';
 import { motion } from 'framer-motion';
 import { FinanceNoteCard } from '@/components/financeNoteCard/FinanceNoteCard';
+import { initialQuery } from '../history/page';
 import './addNote.css';
 
 const { Title } = Typography;
@@ -38,7 +39,10 @@ const AddNote = () => {
         setHasError(false);
         showLoader();
 
-        const [financeCategories, lastThreeUserNotes] = await Promise.all([getFinanceCategories(user.id), getUserNotes(user.id, 3)]);
+        const [financeCategories, lastThreeUserNotes] = await Promise.all([
+          getFinanceCategories(user.id),
+          getUserNotes(user.id, { ...initialQuery, limit: 3 }),
+        ]);
         setFinanceCategories(financeCategories);
         setLastThreeUserNotes(lastThreeUserNotes);
       } catch {

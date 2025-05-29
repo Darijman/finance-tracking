@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useClickOutside } from '@/hooks/useClickOutside/UseClickOutside';
 import { Loader } from '@/ui/loader/Loader';
 import './deleteModal.css';
@@ -43,7 +44,7 @@ export const DeleteModal = ({ isOpen, onClose, onDelete, text, deleteButtonText,
 
   if (!isOpen) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className='delete_modal_overlay'>
       <div className='delete_modal_content' ref={modalRef} style={style}>
         <button className='close_delete_modal_button' onClick={onClose}>
@@ -78,6 +79,7 @@ export const DeleteModal = ({ isOpen, onClose, onDelete, text, deleteButtonText,
           </div>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
