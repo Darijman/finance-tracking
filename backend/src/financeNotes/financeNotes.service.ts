@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FinanceNote } from './financeNote.entity';
@@ -9,6 +9,15 @@ import { plainToInstance } from 'class-transformer';
 import { RedisService } from 'src/common/redis/redis.service';
 
 export const getUserFinanceNotesCacheKey = (userId: number) => `user:${userId}:notes:preview`;
+
+export interface UserFinanceNotesQuery {
+  offset?: number;
+  limit?: number;
+  categoryId?: number | null;
+  type?: 'INCOME' | 'EXPENSE' | null;
+  sortByDate?: 'ASC' | 'DESC';
+  sortByPrice?: 'ASC' | 'DESC' | null;
+}
 
 @Injectable()
 export class FinanceNotesService {
@@ -27,18 +36,16 @@ export class FinanceNotesService {
     return await this.notesRepository.findOneBy({ id: financeNoteId });
   }
 
-  async getFinanceNotesByUserId(userId: number, offset: number = 0, limit: number = 20): Promise<FinanceNote[]> {
-    const user = await this.usersService.getUserById(userId);
-    if (!user) {
-      throw new NotFoundException({ error: 'User not found!' });
-    }
+  async getFinanceNotesByUserId(userId: number, query: UserFinanceNotesQuery): Promise<FinanceNote[]> {
+    const { offset = 0, limit = 20, categoryId = null, type = null, sortByDate = 'DESC', sortByPrice = null } = query;
+    await this.usersService.getUserById(userId);
 
     const CACHE_LIMIT: number = 100;
     const cacheKey: string = getUserFinanceNotesCacheKey(userId);
 
-    if (offset < CACHE_LIMIT) {
-      const cachedData: string = await this.redisService.getValue(cacheKey);
-
+    const hasFilters = !!categoryId || !!type || sortByPrice !== null || sortByDate !== 'DESC';
+    if (!hasFilters && offset < CACHE_LIMIT) {
+      const cachedData = await this.redisService.getValue(cacheKey);
       if (cachedData) {
         const parsedNotes: FinanceNote[] = JSON.parse(cachedData);
         return parsedNotes.slice(offset, offset + limit);
@@ -47,31 +54,37 @@ export class FinanceNotesService {
       const notesToCache = await this.notesRepository.find({
         where: { userId },
         relations: ['category', 'user', 'user.currency'],
-        order: {
-          noteDate: 'DESC',
-        },
+        order: { noteDate: 'DESC' },
         take: CACHE_LIMIT,
       });
 
       const transformedNotes = plainToInstance(FinanceNote, notesToCache);
       if (transformedNotes.length) {
-        await this.redisService.setValue(cacheKey, JSON.stringify(transformedNotes), 300); // 5min
+        await this.redisService.setValue(cacheKey, JSON.stringify(transformedNotes), 300); //5min
       }
-
       return transformedNotes.slice(offset, offset + limit);
     }
 
-    const userNotes = await this.notesRepository.find({
-      where: { userId },
-      relations: ['category', 'user', 'user.currency'],
-      order: {
-        noteDate: 'DESC',
-      },
-      skip: offset,
-      take: limit,
-    });
+    const qb = this.notesRepository
+      .createQueryBuilder('note')
+      .leftJoinAndSelect('note.category', 'category')
+      .leftJoinAndSelect('note.user', 'user')
+      .leftJoinAndSelect('user.currency', 'currency')
+      .where('note.userId = :userId', { userId });
 
-    return plainToInstance(FinanceNote, userNotes);
+    if (categoryId) qb.andWhere('category.id = :categoryId', { categoryId });
+    if (type) qb.andWhere('note.type = :type', { type });
+    if (sortByPrice) {
+      qb.addSelect('note.amount * 1.0', 'amount_numeric');
+      qb.orderBy('amount_numeric', sortByPrice as 'ASC' | 'DESC');
+      qb.addOrderBy('note.noteDate', sortByDate || 'DESC');
+    } else {
+      qb.orderBy('note.noteDate', sortByDate || 'DESC');
+    }
+
+    qb.skip(offset).take(limit);
+    const notes = await qb.getMany();
+    return plainToInstance(FinanceNote, notes);
   }
 
   async createNewFinanceNote(createFinanceNoteDto: CreateFinanceNoteDto, currentUserId: number): Promise<FinanceNote> {

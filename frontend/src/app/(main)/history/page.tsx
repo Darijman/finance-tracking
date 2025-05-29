@@ -8,15 +8,24 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FinanceNote } from '@/interfaces/financeNote';
 import { FinanceCategory } from '@/interfaces/financeCategory';
 import { Loader } from '@/ui/loader/Loader';
-import { getFinanceCategories, getUserNotes } from './requests';
+import { getFinanceCategories, getUserNotes, GetUserNotesQuery } from './requests';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Select } from '@/components/select/Select';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import './history.css';
 import './responsive.css';
-import InfiniteScroll from 'react-infinite-scroll-component';
 
 const { Title } = Typography;
+
+const initialQuery: GetUserNotesQuery = {
+  offset: 0,
+  limit: 20,
+  sortByDate: 'DESC',
+  sortByPrice: null,
+  type: null,
+  categoryId: null,
+};
 
 const History = () => {
   const { user } = useAuth();
@@ -26,10 +35,16 @@ const History = () => {
   const [userFinanceNotes, setUserFinanceNotes] = useState<FinanceNote[]>([]);
   const [financeCategories, setFinanceCategories] = useState<FinanceCategory[]>([]);
 
-  const [selectedFinanceCategory, setSelectedFinanceCategory] = useState<string | null>(null);
-  const [sortByDate, setSortByDate] = useState<'asc' | 'desc'>('desc');
-  const [sortByPrice, setSortByPrice] = useState<'asc' | 'desc' | null>(null);
-  const [sortByType, setSortByType] = useState<'INCOME' | 'EXPENSE' | null>(null);
+  const [queryLoader, setQueryLoader] = useState<boolean>(false);
+  const [query, setQuery] = useState<GetUserNotesQuery>({
+    limit: 20,
+    sortByDate: 'DESC',
+    sortByPrice: null,
+    type: null,
+    categoryId: null,
+  });
+
+  const [offset, setOffset] = useState<number>(0);
 
   const [hasError, setHasError] = useState<boolean>(false);
   const [notificationApi, notificationContextHolder] = notification.useNotification({
@@ -38,20 +53,18 @@ const History = () => {
     duration: 5,
   });
 
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
-  const getData = useCallback(async () => {
+  const getInitialData = useCallback(async () => {
     if (user.id) {
       try {
         setHasError(false);
         showLoader();
-        const [notes, categories] = await Promise.all([getUserNotes(user.id, 0, 20), getFinanceCategories(user.id)]);
+        const [notes, categories] = await Promise.all([getUserNotes(user.id, initialQuery), getFinanceCategories(user.id)]);
 
         setUserFinanceNotes(notes);
         setFinanceCategories(categories);
-        setOffset(notes.length);
         setHasMore(notes.length === 20);
       } catch {
         setHasError(true);
@@ -61,14 +74,33 @@ const History = () => {
     }
   }, [user, hideLoader, showLoader]);
 
+  const getDataOnQueryChange = useCallback(async () => {
+    if (user.id) {
+      try {
+        setQueryLoader(true);
+        setHasError(false);
+        setOffset(0);
+
+        const notes = await getUserNotes(user.id, { ...query, offset: 0 });
+        setUserFinanceNotes(notes);
+        setHasMore(notes.length === 20);
+      } catch {
+        setHasError(true);
+      } finally {
+        setQueryLoader(false);
+      }
+    }
+  }, [user.id, query]);
+
   const loadMoreUserFinanceNotes = useCallback(async () => {
     if (!hasMore || loadingMore || hasError || !user.id) return;
 
     setLoadingMore(true);
     try {
-      const newNotes = await getUserNotes(user.id, offset, 20);
+      const nextOffset = offset + 20;
+      const newNotes = await getUserNotes(user.id, { ...query, offset: nextOffset });
       setUserFinanceNotes((prev) => [...prev, ...newNotes]);
-      setOffset((prev) => prev + newNotes.length);
+      setOffset(nextOffset);
 
       if (newNotes.length < 20) {
         setHasMore(false);
@@ -77,12 +109,17 @@ const History = () => {
       setHasError(true);
     } finally {
       setLoadingMore(false);
+      setQueryLoader(false);
     }
-  }, [offset, user.id, hasMore, loadingMore, hasError]);
+  }, [user.id, hasMore, loadingMore, hasError, query, offset]);
 
   useEffect(() => {
-    getData();
-  }, [getData]);
+    getInitialData();
+  }, [getInitialData]);
+
+  useEffect(() => {
+    getDataOnQueryChange();
+  }, [getDataOnQueryChange]);
 
   useEffect(() => {
     if (hasError) {
@@ -113,56 +150,47 @@ const History = () => {
 
   const categoryOnChangeHandler = (value: string | string[]) => {
     if (Array.isArray(value)) return;
-    setSelectedFinanceCategory(value);
+    setQuery((prev) => ({
+      ...prev,
+      categoryId: Number(value),
+      offset: 0,
+    }));
   };
 
   const sortByDateHandler = () => {
-    const newSort = sortByDate === 'asc' ? 'desc' : 'asc';
-    setSortByDate(newSort);
+    setQuery((prev) => ({
+      ...prev,
+      sortByDate: prev.sortByDate === 'ASC' ? 'DESC' : 'ASC',
+      offset: 0,
+    }));
   };
 
   const sortByPriceHandler = () => {
-    const newSort = sortByPrice === 'asc' ? 'desc' : sortByPrice === 'desc' ? null : 'asc';
-    setSortByPrice(newSort);
+    setQuery((prev) => {
+      let newSort: 'ASC' | 'DESC' | null;
+      if (prev.sortByPrice === 'ASC') newSort = 'DESC';
+      else if (prev.sortByPrice === 'DESC') newSort = null;
+      else newSort = 'ASC';
+
+      return {
+        ...prev,
+        sortByPrice: newSort,
+        offset: 0,
+      };
+    });
   };
 
-  const selectFinanceCategories = useMemo(() => {
+  const selectFinanceCategoriesOptions = useMemo(() => {
     return [
       { label: 'Category', value: '' },
       ...financeCategories.map((category) => ({
         label: category.name,
-        value: category.name,
+        value: category.id,
       })),
     ];
   }, [financeCategories]);
 
-  const filteredAndSortedFinanceNotes = useMemo(() => {
-    let filteredNotes = [...userFinanceNotes];
-
-    if (selectedFinanceCategory) {
-      filteredNotes = filteredNotes.filter((note) => note.category.name === selectedFinanceCategory);
-    }
-
-    if (sortByType) {
-      filteredNotes = filteredNotes.filter((note) => note.type === sortByType);
-    }
-
-    if (sortByDate) {
-      filteredNotes = filteredNotes.sort((a, b) => {
-        const dateA = new Date(a.noteDate).getTime();
-        const dateB = new Date(b.noteDate).getTime();
-        return sortByDate === 'asc' ? dateA - dateB : dateB - dateA;
-      });
-    }
-
-    if (sortByPrice) {
-      filteredNotes = filteredNotes.sort((a, b) => {
-        return sortByPrice === 'asc' ? a.amount - b.amount : b.amount - a.amount;
-      });
-    }
-
-    return filteredNotes;
-  }, [userFinanceNotes, selectedFinanceCategory, sortByType, sortByDate, sortByPrice]);
+  const selectedCategoryName = financeCategories.find((cat) => cat.id === query.categoryId)?.name || null;
 
   if (isLoading) {
     return <Loader />;
@@ -179,15 +207,25 @@ const History = () => {
       <div className='history_top_buttons'>
         <div className='sortby_type_buttons'>
           <Button
-            className={`sortby_expense_button ${sortByType === 'EXPENSE' ? 'active' : ''}`}
-            onClick={() => setSortByType((prev) => (prev === 'EXPENSE' ? null : 'EXPENSE'))}
+            className={`sortby_expense_button ${query.type === 'EXPENSE' ? 'active' : ''}`}
+            onClick={() =>
+              setQuery((prev) => ({
+                ...prev,
+                type: prev.type === 'EXPENSE' ? null : 'EXPENSE',
+              }))
+            }
             disabled={hasError}
           >
             EXPENSE
           </Button>
           <Button
-            className={`sortby_income_button ${sortByType === 'INCOME' ? 'active' : ''}`}
-            onClick={() => setSortByType((prev) => (prev === 'INCOME' ? null : 'INCOME'))}
+            className={`sortby_income_button ${query.type === 'INCOME' ? 'active' : ''}`}
+            onClick={() =>
+              setQuery((prev) => ({
+                ...prev,
+                type: prev.type === 'INCOME' ? null : 'INCOME',
+              }))
+            }
             disabled={hasError}
           >
             INCOME
@@ -195,10 +233,10 @@ const History = () => {
         </div>
         <Select
           placeholder='Category'
-          value={selectedFinanceCategory}
+          value={selectedCategoryName}
           onChange={categoryOnChangeHandler}
           className='history_select_category'
-          options={selectFinanceCategories}
+          options={selectFinanceCategoriesOptions}
           disabled={hasError}
         />
         <div className='sortby_date_and_price_buttons'>
@@ -206,7 +244,7 @@ const History = () => {
             className='sortby_date_button'
             onClick={sortByDateHandler}
             iconPosition='end'
-            icon={sortByDate === 'asc' ? <ArrowUpOutlined /> : sortByDate === 'desc' ? <ArrowDownOutlined /> : null}
+            icon={query.sortByDate === 'ASC' ? <ArrowUpOutlined /> : query.sortByDate === 'DESC' ? <ArrowDownOutlined /> : null}
             disabled={hasError}
           >
             Date
@@ -215,7 +253,7 @@ const History = () => {
             className='sortby_price_button'
             onClick={sortByPriceHandler}
             iconPosition='end'
-            icon={sortByPrice === 'asc' ? <ArrowUpOutlined /> : sortByPrice === 'desc' ? <ArrowDownOutlined /> : null}
+            icon={query.sortByPrice === 'ASC' ? <ArrowUpOutlined /> : query.sortByPrice === 'DESC' ? <ArrowDownOutlined /> : null}
             disabled={hasError}
           >
             Price
@@ -224,18 +262,20 @@ const History = () => {
       </div>
       <hr className='history_divider' />
 
-      {hasError ? (
+      {queryLoader ? (
+        <Loader style={{ width: '40px', height: '40px' }} />
+      ) : hasError ? (
         <div style={{ textAlign: 'center', color: 'var(--secondary-text-color)' }}>Failed to load history data.</div>
       ) : (
         <>
-          {(sortByType || selectedFinanceCategory) && (
+          {(query.type || selectedCategoryName) && (
             <Title level={3} style={{ margin: '0px 0px 10px 0px', textAlign: 'center' }}>
-              {sortByType && (
-                <span className={`financenotes_type_word ${sortByType === 'EXPENSE' ? 'expense' : 'income'}`}>{sortByType}</span>
+              {query.type && (
+                <span className={`financenotes_type_word ${query.type === 'EXPENSE' ? 'expense' : 'income'}`}>{query.type}</span>
               )}
-              {selectedFinanceCategory && (
+              {selectedCategoryName && (
                 <>
-                  {sortByType ? ' ' : ''}({selectedFinanceCategory})
+                  {query.type ? ' ' : ''}({selectedCategoryName})
                 </>
               )}
             </Title>
@@ -255,7 +295,7 @@ const History = () => {
           >
             <div className='financenotes_grid'>
               <AnimatePresence>
-                {filteredAndSortedFinanceNotes.map((financeNote, index) => (
+                {userFinanceNotes.map((financeNote, index) => (
                   <motion.div
                     key={financeNote.id}
                     layout

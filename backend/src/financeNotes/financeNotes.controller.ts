@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Delete, Put, Body, Param, UseInterceptors, UseGuards, Query, Req } from '@nestjs/common';
-import { FinanceNotesService } from './financeNotes.service';
+import { FinanceNotesService, UserFinanceNotesQuery } from './financeNotes.service';
 import { CreateFinanceNoteDto } from './createFinanceNote.dto';
 import { UpdateFinanceNoteDto } from './updateFinanceNote.dto';
 import { ParseInterceptor } from './parseInterceptor';
@@ -23,14 +23,8 @@ export class FinanceNotesController {
 
   @UseGuards(AuthGuard, OwnerOrAdminGuard)
   @Get('user/:userId')
-  async getFinanceNotesByUserId(
-    @Param('userId') userId: number,
-    @Query('offset') offset?: string,
-    @Query('limit') limit?: string,
-  ): Promise<FinanceNote[]> {
-    const offsetNum = offset ? parseInt(offset, 10) : undefined;
-    const limitNum = limit ? parseInt(limit, 10) : undefined;
-    return await this.financeNotesService.getFinanceNotesByUserId(userId, offsetNum, limitNum);
+  async getFinanceNotesByUserId(@Param('userId') userId: number, @Query() query: UserFinanceNotesQuery): Promise<FinanceNote[]> {
+    return await this.financeNotesService.getFinanceNotesByUserId(userId, query);
   }
 
   @UseGuards(AuthGuard)
