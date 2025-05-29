@@ -14,6 +14,7 @@ import { Select } from '@/components/select/Select';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import './history.css';
 import './responsive.css';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const { Title } = Typography;
 
@@ -37,15 +38,21 @@ const History = () => {
     duration: 5,
   });
 
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const getData = useCallback(async () => {
     if (user.id) {
       try {
         setHasError(false);
         showLoader();
-        const [notes, categories] = await Promise.all([getUserNotes(user.id), getFinanceCategories(user.id)]);
+        const [notes, categories] = await Promise.all([getUserNotes(user.id, 0, 20), getFinanceCategories(user.id)]);
 
         setUserFinanceNotes(notes);
         setFinanceCategories(categories);
+        setOffset(notes.length);
+        setHasMore(notes.length === 20);
       } catch {
         setHasError(true);
       } finally {
@@ -53,6 +60,25 @@ const History = () => {
       }
     }
   }, [user, hideLoader, showLoader]);
+
+  const loadMoreUserFinanceNotes = useCallback(async () => {
+    if (!hasMore || loadingMore || hasError || !user.id) return;
+
+    setLoadingMore(true);
+    try {
+      const newNotes = await getUserNotes(user.id, offset, 20);
+      setUserFinanceNotes((prev) => [...prev, ...newNotes]);
+      setOffset((prev) => prev + newNotes.length);
+
+      if (newNotes.length < 20) {
+        setHasMore(false);
+      }
+    } catch {
+      setHasError(true);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [offset, user.id, hasMore, loadingMore, hasError]);
 
   useEffect(() => {
     getData();
@@ -214,28 +240,43 @@ const History = () => {
               )}
             </Title>
           )}
-          <div className='financenotes_grid'>
-            <AnimatePresence>
-              {filteredAndSortedFinanceNotes.map((financeNote, index) => (
-                <motion.div
-                  key={financeNote.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -100 }}
-                  transition={{
-                    delay: index < 6 ? index * 0.03 : 0.15,
-                    duration: 0.2,
-                  }}
-                >
-                  <FinanceNoteCard
-                    financeNote={financeNote}
-                    onDelete={() => deleteFinanceNoteHandler(financeNote.id)}
-                    onEdit={editFinanceNoteHandler}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+          <InfiniteScroll
+            dataLength={userFinanceNotes.length}
+            next={loadMoreUserFinanceNotes}
+            hasMore={hasMore}
+            loader={<Loader style={{ marginTop: 10, width: '40px', height: '40px' }} />}
+            endMessage={
+              <Title level={5} style={{ textAlign: 'center', margin: '10px 0px 0px 0px', color: 'var(--red-color)' }}>
+                Looks like you have reached the end!
+              </Title>
+            }
+            scrollableTarget='scrollableMainLayout'
+            style={{ overflowY: 'hidden' }}
+          >
+            <div className='financenotes_grid'>
+              <AnimatePresence>
+                {filteredAndSortedFinanceNotes.map((financeNote, index) => (
+                  <motion.div
+                    key={financeNote.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{
+                      delay: index < 6 ? index * 0.03 : 0.15,
+                      duration: 0.2,
+                    }}
+                  >
+                    <FinanceNoteCard
+                      financeNote={financeNote}
+                      onDelete={() => deleteFinanceNoteHandler(financeNote.id)}
+                      onEdit={editFinanceNoteHandler}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </InfiniteScroll>
         </>
       )}
     </div>

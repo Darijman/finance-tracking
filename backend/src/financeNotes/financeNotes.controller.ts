@@ -23,8 +23,14 @@ export class FinanceNotesController {
 
   @UseGuards(AuthGuard, OwnerOrAdminGuard)
   @Get('user/:userId')
-  async getFinanceNotesByUserId(@Param('userId') userId: number, @Query('limit') limit?: number): Promise<FinanceNote[]> {
-    return await this.financeNotesService.getFinanceNotesByUserId(userId, limit);
+  async getFinanceNotesByUserId(
+    @Param('userId') userId: number,
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ): Promise<FinanceNote[]> {
+    const offsetNum = offset ? parseInt(offset, 10) : undefined;
+    const limitNum = limit ? parseInt(limit, 10) : undefined;
+    return await this.financeNotesService.getFinanceNotesByUserId(userId, offsetNum, limitNum);
   }
 
   @UseGuards(AuthGuard)

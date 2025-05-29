@@ -8,7 +8,7 @@ import { UsersService } from 'src/users/users.service';
 import { plainToInstance } from 'class-transformer';
 import { RedisService } from 'src/common/redis/redis.service';
 
-export const getUserFinanceNotesCacheKey = (userId: number) => `userFinanceNotes_${userId}`;
+export const getUserFinanceNotesCacheKey = (userId: number) => `user:${userId}:notes:preview`;
 
 @Injectable()
 export class FinanceNotesService {
@@ -27,18 +27,38 @@ export class FinanceNotesService {
     return await this.notesRepository.findOneBy({ id: financeNoteId });
   }
 
-  async getFinanceNotesByUserId(userId: number, limit?: number): Promise<FinanceNote[]> {
+  async getFinanceNotesByUserId(userId: number, offset: number = 0, limit: number = 20): Promise<FinanceNote[]> {
     const user = await this.usersService.getUserById(userId);
     if (!user) {
       throw new NotFoundException({ error: 'User not found!' });
     }
 
-    const userCacheKey: string = getUserFinanceNotesCacheKey(userId);
-    const cachedUserNotes: string = await this.redisService.getValue(userCacheKey);
+    const CACHE_LIMIT: number = 100;
+    const cacheKey: string = getUserFinanceNotesCacheKey(userId);
 
-    if (cachedUserNotes) {
-      const parsedNotes = JSON.parse(cachedUserNotes);
-      return limit ? parsedNotes.slice(0, limit) : parsedNotes;
+    if (offset < CACHE_LIMIT) {
+      const cachedData: string = await this.redisService.getValue(cacheKey);
+
+      if (cachedData) {
+        const parsedNotes: FinanceNote[] = JSON.parse(cachedData);
+        return parsedNotes.slice(offset, offset + limit);
+      }
+
+      const notesToCache = await this.notesRepository.find({
+        where: { userId },
+        relations: ['category', 'user', 'user.currency'],
+        order: {
+          noteDate: 'DESC',
+        },
+        take: CACHE_LIMIT,
+      });
+
+      const transformedNotes = plainToInstance(FinanceNote, notesToCache);
+      if (transformedNotes.length) {
+        await this.redisService.setValue(cacheKey, JSON.stringify(transformedNotes), 300); // 5min
+      }
+
+      return transformedNotes.slice(offset, offset + limit);
     }
 
     const userNotes = await this.notesRepository.find({
@@ -47,26 +67,23 @@ export class FinanceNotesService {
       order: {
         noteDate: 'DESC',
       },
-      take: limit ? limit : undefined,
+      skip: offset,
+      take: limit,
     });
 
-    const transformedNotes = plainToInstance(FinanceNote, userNotes);
-    if (transformedNotes.length) {
-      await this.redisService.setValue(userCacheKey, JSON.stringify(transformedNotes), 300); // 5min
-    }
-    return transformedNotes;
+    return plainToInstance(FinanceNote, userNotes);
   }
 
   async createNewFinanceNote(createFinanceNoteDto: CreateFinanceNoteDto, currentUserId: number): Promise<FinanceNote> {
     const createdNote = await this.notesRepository.save({ ...createFinanceNoteDto, userId: currentUserId });
 
-    const userCacheKey = getUserFinanceNotesCacheKey(currentUserId);
+    const userCacheKey: string = getUserFinanceNotesCacheKey(currentUserId);
     await this.redisService.deleteValue(userCacheKey);
     return createdNote;
   }
 
   async deleteFinanceNote(note: FinanceNote): Promise<FinanceNote> {
-    const userCacheKey = getUserFinanceNotesCacheKey(note.userId);
+    const userCacheKey: string = getUserFinanceNotesCacheKey(note.userId);
     await this.notesRepository.delete(note.id);
     await this.redisService.deleteValue(userCacheKey);
     return note;
@@ -81,7 +98,7 @@ export class FinanceNotesService {
     Object.assign(financeNote, updateFinanceNoteDto);
     const updatedNote = await this.notesRepository.save(financeNote);
 
-    const userCacheKey = getUserFinanceNotesCacheKey(financeNote.userId);
+    const userCacheKey: string = getUserFinanceNotesCacheKey(financeNote.userId);
     await this.redisService.deleteValue(userCacheKey);
     return updatedNote;
   }

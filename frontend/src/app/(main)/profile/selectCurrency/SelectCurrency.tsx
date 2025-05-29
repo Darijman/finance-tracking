@@ -23,15 +23,16 @@ export const SelectCurrency = ({ fullUser, setFullUser }: Props) => {
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1 });
   const [selectedCurrencyId, setSelectedCurrencyId] = useState<number>(0);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [serverError, setServerError] = useState<{ error: string }>({ error: '' });
+
+  const [hasError, setHasError] = useState<boolean>(false);
 
   const getAllCurrencies = useCallback(async () => {
     if (user.id) {
       try {
         const response = await api.get<Currency[]>(`/currencies`);
         setAllCurrencies(response.data);
-      } catch (error: any) {
-        setServerError(error.response?.data || 'Something went wrong...');
+      } catch {
+        setHasError(true);
       }
     }
   }, [user.id]);
@@ -77,9 +78,9 @@ export const SelectCurrency = ({ fullUser, setFullUser }: Props) => {
         Select Currency:
       </Title>
       <div className='currency_container'>
-        {serverError.error ? (
-          <Title level={3} style={{ color: 'var(--red-color)', textAlign: 'center' }}>
-            {serverError.error}
+        {hasError ? (
+          <Title level={5} style={{ color: 'var(--red-color)', margin: 0, textAlign: 'center' }}>
+            Failed to load currencies data.
           </Title>
         ) : (
           <ul className='currency_list'>

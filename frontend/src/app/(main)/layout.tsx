@@ -30,7 +30,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       {isMobile && <BurgerMenu />}
       <div className='layout_container'>
         {!isMobile && <SideBar />}
-        <div className='main_layout'>
+        <div className='main_layout' id='scrollableMainLayout'>
           <main>{children}</main>
           <Footer />
         </div>

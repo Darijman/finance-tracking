@@ -2,8 +2,13 @@ import api from '../../../../axiosInstance';
 import { FinanceNote } from '@/interfaces/financeNote';
 import { FinanceCategory } from '@/interfaces/financeCategory';
 
-export const getUserNotes = async (userId: number, limit?: number) => {
-  const response = await api.get<FinanceNote[]>(`/finance_notes/user/${userId}`, { params: { limit } });
+export const getUserNotes = async (userId: number, offset?: number, limit?: number) => {
+  const response = await api.get<FinanceNote[]>(`/finance_notes/user/${userId}`, {
+    params: {
+      offset,
+      limit,
+    },
+  });
   return response.data;
 };
 
