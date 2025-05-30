@@ -21,6 +21,7 @@ Finance-Tracking is a simple application that allows you to organize your money.
 - Edit **Finance-Note**, you can change everything.
 - Receive analytics from all time or specific date.
 - Explore graphs to see where you spend the most and which months are the most expensive.
+- Pick the currency you want to use.
 
 ---
 
