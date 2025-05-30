@@ -37,7 +37,7 @@ export class FinanceNotesAnalyticsService {
         throw new BadRequestException({ error: 'Invalid month! Must be from 1 to 12.' });
       }
       start = new Date(year, month - 1, 1);
-      end = new Date(year, month, 0);
+      end = new Date(year, month, 0, 23, 59, 59, 999);
     }
 
     const query = this.notesRepository

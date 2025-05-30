@@ -26,31 +26,31 @@ Finance-Tracking is a simple application that allows you to organize your money.
 
 ## 📒 Process
 
-### Finance Notes
+### Finance Notes:
 Core feature allowing users to add, update, delete, and fetch income or expense records.
 
-### Finance Categories
+### Finance Categories:
 Users can create up to 10 custom categories to better organize their financial data.
 
-### Currencies
+### Currencies:
 Users can set and update their preferred currency. All data is formatted accordingly. (Default: USD $).
 
-### Fixtures
+### Fixtures:
 Used to populate the database with initial or test data for faster development and testing.
 
-### Multer
+### Multer:
 Integrated for handling file uploads. Only for basic categories so far.
 
-### Redis
-Used for session caching, performance optimization, and potentially rate-limiting.
+### Redis:
+Used for performance optimization.
 
-### Guards
+### Guards:
 Implemented custom **AuthGuard** and **OwnerOrAdminGuard** to secure routes and enforce role-based access. Also added Guards for specific entities to avoid code duplication.
 
-### Roles
+### Roles:
 Admin/user roles are supported with specific permissions.
 
-### Users
+### Users:
 Authenticated user management, including profile and currency preferences.
 
 ---
