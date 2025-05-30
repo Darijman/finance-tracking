@@ -7,6 +7,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { User } from './user.entity';
 import { Request as ExpressRequest } from 'express';
 import { OwnerOrAdminGuard } from 'src/guards/ownerOrAdmin.guard';
+import { Currency } from 'src/currencies/currency.entity';
 
 @Controller('users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -15,8 +16,8 @@ export class UsersController {
 
   @UseGuards(AuthGuard, OwnerOrAdminGuard)
   @Get(':userId/details')
-  async getUserByIdWithRole(@Param('id') id: number): Promise<User> {
-    return await this.usersService.getUserByIdWithRole(id);
+  async getUserByIdWithRole(@Param('userId') userId: number): Promise<User> {
+    return await this.usersService.getUserByIdWithRole(userId);
   }
 
   @Admin()
@@ -47,5 +48,11 @@ export class UsersController {
   @Patch('/currency/:currencyId')
   async changeUserCurrencyId(@Param('currencyId') currencyId: number, @Req() req: ExpressRequest): Promise<{ success: boolean }> {
     return await this.usersService.changeUserCurrencyId(req.user.id, currencyId);
+  }
+
+  @UseGuards(AuthGuard, OwnerOrAdminGuard)
+  @Get('/currency/:userId')
+  async getUserCurrency(@Param('userId') userId: number): Promise<Promise<Currency>> {
+    return await this.usersService.getUserCurrency(userId);
   }
 }

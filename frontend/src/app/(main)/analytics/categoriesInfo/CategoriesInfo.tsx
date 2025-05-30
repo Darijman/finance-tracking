@@ -9,6 +9,7 @@ import { Select } from '@/components/select/Select';
 import { CustomTooltip } from './customTooltip';
 import { CategoryInfo } from './interfaces';
 import { CreateCustomTick } from './createCustomTick';
+import { Currency } from '@/interfaces/currency';
 import api from '../../../../../axiosInstance';
 import './categoriesInfo.css';
 
@@ -21,9 +22,10 @@ const currentDate = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`
 
 interface Props {
   availableDates: AvailableDate[];
+  userCurrency: Currency;
 }
 
-export const CategoriesInfo = ({ availableDates }: Props) => {
+export const CategoriesInfo = ({ availableDates, userCurrency }: Props) => {
   const { user } = useAuth();
 
   const [categoriesInfo, setCategoriesInfo] = useState<CategoryInfo[]>([]);
@@ -138,7 +140,7 @@ export const CategoriesInfo = ({ availableDates }: Props) => {
                   tick={(tickProps) => <CreateCustomTick {...tickProps} categoriesInfo={categoriesInfo} />}
                 />
                 <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
+                <Tooltip content={<CustomTooltip userCurrency={userCurrency} />} cursor={{ fill: 'var(--foreground-color)' }} />
                 <Bar dataKey='totalExpense' fill='#8884d8' barSize={40} name='Total Expenses' />
               </BarChart>
             )}

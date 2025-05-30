@@ -13,7 +13,11 @@ import './responsive.css';
 import EditIcon from '@/assets/svg/edit-icon.svg';
 import DeleteIcon from '@/assets/svg/delete-icon.svg';
 
-function formatCurrency(amount: number, currencyCode: string) {
+export function formatCurrency(amount: number, currencyCode: string) {
+  if (typeof amount !== 'number' || isNaN(amount) || !currencyCode) {
+    return '';
+  }
+
   return amount.toLocaleString('en-US', {
     style: 'currency',
     currency: currencyCode,
@@ -35,11 +39,11 @@ export const FinanceNoteCard = ({ financeNote, onDelete, onEdit, preview }: Prop
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
-  const userCurrencyCode = user?.currency?.code || 'USD';
-  const formattedAmountText = formatCurrency(amount, userCurrencyCode);
+  const userCurrencyCode: string = user?.currency?.code || 'USD';
+  const formattedAmountText: string = formatCurrency(amount, userCurrencyCode);
 
-  const amountText = type === `INCOME` ? `+${formattedAmountText}` : `-${formattedAmountText}`;
-  const typeClass = type === 'EXPENSE' ? 'expense_text' : '';
+  const amountText: string = type === `INCOME` ? `+${formattedAmountText}` : `-${formattedAmountText}`;
+  const typeClass: string = type === 'EXPENSE' ? 'expense_text' : '';
 
   const imagePath = category.image
     ? `http://localhost:9000/uploads/${category.image}`

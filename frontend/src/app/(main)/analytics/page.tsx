@@ -10,6 +10,7 @@ import { AvailableDate } from './monthSummary/interfaces';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { useLoader } from '@/contexts/loaderContext/LoaderContext';
 import { Loader } from '@/ui/loader/Loader';
+import { Currency } from '@/interfaces/currency';
 import api from '../../../../axiosInstance';
 import './analytics.css';
 import './responsive.css';
@@ -19,7 +20,17 @@ const { Title } = Typography;
 const Analytics = () => {
   const { user } = useAuth();
   const { isLoading, hideLoader, showLoader } = useLoader();
+
   const [availableDates, setAvailableDates] = useState<AvailableDate[]>([]);
+  const [userCurrency, setUserCurrency] = useState<Currency>({
+    id: 0,
+    name: '',
+    symbol: '',
+    code: '',
+    flag: '',
+    createdAt: '',
+    updatedAt: '',
+  });
 
   const [hasError, setHasError] = useState<boolean>(false);
   const [notificationApi, contextHolder] = notification.useNotification({
@@ -28,13 +39,18 @@ const Analytics = () => {
     duration: 5,
   });
 
-  const getAvailableDates = useCallback(async () => {
+  const getData = useCallback(async () => {
     if (user.id) {
       try {
         showLoader();
 
-        const response = await api.get<AvailableDate[]>(`/finance_notes_summary/months/${user.id}`);
-        setAvailableDates(response.data);
+        const [dates, userCurrency] = await Promise.all([
+          api.get<AvailableDate[]>(`/finance_notes_summary/months/${user.id}`),
+          api.get<Currency>(`/users/currency/${user.id}`),
+        ]);
+
+        setAvailableDates(dates.data);
+        setUserCurrency(userCurrency.data);
       } catch {
         setHasError(true);
       } finally {
@@ -43,9 +59,11 @@ const Analytics = () => {
     }
   }, [user.id, hideLoader, showLoader]);
 
+  console.log(`userCurrency`, userCurrency);
+
   useEffect(() => {
-    getAvailableDates();
-  }, [getAvailableDates]);
+    getData();
+  }, [getData]);
 
   useEffect(() => {
     if (hasError) {
@@ -69,12 +87,12 @@ const Analytics = () => {
       </Title>
       <div>
         <div className='analytics_summary'>
-          <MonthSummary availableDates={availableDates} />
-          <AllTimeSummary />
+          <MonthSummary availableDates={availableDates} userCurrency={userCurrency} />
+          <AllTimeSummary userCurrency={userCurrency} />
         </div>
         <div>
-          <MonthsInfo />
-          <CategoriesInfo availableDates={availableDates} />
+          <MonthsInfo userCurrency={userCurrency} />
+          <CategoriesInfo availableDates={availableDates} userCurrency={userCurrency} />
         </div>
       </div>
     </div>

@@ -6,12 +6,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Month } from './interfaces';
 import { CustomTooltip } from './customTooltip';
+import { Currency } from '@/interfaces/currency';
 import api from '../../../../../axiosInstance';
 import './monthsInfo.css';
 
 const { Title } = Typography;
 
-export const MonthsInfo = () => {
+interface Props {
+  userCurrency: Currency;
+}
+
+export const MonthsInfo = ({ userCurrency }: Props) => {
   const { user } = useAuth();
   const [months, setMonths] = useState<Month[]>([]);
   const [hasError, setHasError] = useState<boolean>(false);
@@ -60,7 +65,7 @@ export const MonthsInfo = () => {
               <CartesianGrid strokeDasharray='3 3' />
               <XAxis dataKey='monthLabel' />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--foreground-color)' }} />
+              <Tooltip content={<CustomTooltip userCurrency={userCurrency} />} cursor={{ fill: 'var(--foreground-color)' }} />
               <Legend />
               <Line type='monotone' dataKey='income' stroke='var(--green-color)' name='Income' />
               <Line type='monotone' dataKey='expense' stroke='var(--red-color)' name='Expense' />

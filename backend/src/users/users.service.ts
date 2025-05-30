@@ -10,9 +10,11 @@ import { getUserFinanceNotesCacheKey } from 'src/financeNotes/financeNotes.servi
 import { plainToInstance } from 'class-transformer';
 import { FinanceCategory } from 'src/financeCategories/financeCategory.entity';
 import { FinanceNote } from 'src/financeNotes/financeNote.entity';
+import { Currency } from 'src/currencies/currency.entity';
 
 const getUserWithRoleCacheKey = (userId: number) => `userWithRole_${userId}`;
 const getUserByIdCacheKey = (userId: number) => `userById_${userId}`;
+const getUserCurrencyCacheKey = (userId: number) => `userCurrency_${userId}`;
 
 @Injectable()
 export class UsersService {
@@ -105,6 +107,7 @@ export class UsersService {
 
     await this.redisService.deleteValue(getUserWithRoleCacheKey(userId));
     await this.redisService.deleteValue(getUserByIdCacheKey(userId));
+    await this.redisService.deleteValue(getUserCurrencyCacheKey(userId));
 
     await this.financeNotesRepository.delete({ userId });
     await this.financeCategoriesRepository.delete({ userId });
@@ -144,10 +147,28 @@ export class UsersService {
 
     await this.redisService.deleteValue(getUserFinanceNotesCacheKey(userId)); // delete cached FinanceNotes since currency changed
     await this.redisService.deleteValue(getUserWithRoleCacheKey(userId)); // delete cached UserWithRole since currency changed
+    await this.redisService.deleteValue(getUserCurrencyCacheKey(userId)); // delete cached UserCurrency since currency changed
 
     user.currencyId = currencyId;
     await this.usersRepository.save(user);
     return { success: true };
+  }
+
+  async getUserCurrency(userId: number): Promise<Currency> {
+    const cacheKey: string = getUserCurrencyCacheKey(userId);
+    const cachedUserCurrency: string = await this.redisService.getValue(cacheKey);
+    if (cachedUserCurrency) {
+      return JSON.parse(cachedUserCurrency);
+    }
+
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['currency'],
+      select: ['currency'],
+    });
+
+    await this.redisService.setValue(cacheKey, JSON.stringify(user.currency), 3600); //1hour
+    return user.currency;
   }
 
   async verifyChanges(user: User, updateUserDto: UpdateUserDto): Promise<boolean> {

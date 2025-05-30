@@ -1,4 +1,8 @@
-export const CustomTooltip = ({ active, payload, label }: any) => {
+'use client';
+
+import { formatCurrency } from '@/components/financeNoteCard/FinanceNoteCard';
+
+export const CustomTooltip = ({ active, payload, label, userCurrency }: any) => {
   if (active && payload && payload.length) {
     return (
       <div
@@ -11,7 +15,7 @@ export const CustomTooltip = ({ active, payload, label }: any) => {
         }}
       >
         <p style={{ margin: 0 }}>{label}</p>
-        <p style={{ margin: 0, color: '#8884d8' }}>{`Total Spent: ${payload[0].value}`}</p>
+        <p style={{ margin: 0, color: '#8884d8' }}>{`Total Spent: ${formatCurrency(payload[0].value, userCurrency.code)}`}</p>
       </div>
     );
   }

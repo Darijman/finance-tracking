@@ -5,6 +5,8 @@ import { Typography } from 'antd';
 import { Select } from '@/components/select/Select';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { AvailableDate, IMonthSummary } from './interfaces';
+import { formatCurrency } from '@/components/financeNoteCard/FinanceNoteCard';
+import { Currency } from '@/interfaces/currency';
 import api from '../../../../../axiosInstance';
 import './monthSummary.css';
 import './responsive.css';
@@ -19,9 +21,10 @@ const currentStateDate = `${currentYear}-${currentMonth.toString().padStart(2, '
 
 interface Props {
   availableDates: AvailableDate[];
+  userCurrency: Currency;
 }
 
-export const MonthSummary = ({ availableDates }: Props) => {
+export const MonthSummary = ({ availableDates, userCurrency }: Props) => {
   const { user } = useAuth();
   const [monthSummary, setMonthSummary] = useState<IMonthSummary>({
     incomeTotal: 0,
@@ -97,15 +100,15 @@ export const MonthSummary = ({ availableDates }: Props) => {
       <>
         <div className='alltime_summary_list_item income'>
           <dt>INCOME TOTAL:</dt>
-          <dd>+{monthSummary.incomeTotal}</dd>
+          <dd>+{formatCurrency(monthSummary.incomeTotal, userCurrency?.code)}</dd>
         </div>
         <div className='alltime_summary_list_item expense'>
           <dt>EXPENSE TOTAL:</dt>
-          <dd>-{monthSummary.expenseTotal}</dd>
+          <dd>-{formatCurrency(monthSummary.expenseTotal, userCurrency?.code)}</dd>
         </div>
         <div className='alltime_summary_list_item'>
           <dt>BALANCE:</dt>
-          <dd>{monthSummary.balance}</dd>
+          <dd>{formatCurrency(monthSummary.balance, userCurrency?.code)}</dd>
         </div>
         <div className='alltime_summary_list_item'>
           <dt>NOTES DONE:</dt>

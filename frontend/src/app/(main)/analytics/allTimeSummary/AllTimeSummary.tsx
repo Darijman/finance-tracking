@@ -4,13 +4,19 @@ import { Typography } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/authContext/AuthContext';
 import { IAllTimeSummary } from './interfaces';
+import { Currency } from '@/interfaces/currency';
+import { formatCurrency } from '@/components/financeNoteCard/FinanceNoteCard';
 import api from '../../../../../axiosInstance';
 import './allTimeSummary.css';
 import './responsive.css';
 
 const { Title } = Typography;
 
-export const AllTimeSummary = () => {
+interface Props {
+  userCurrency: Currency;
+}
+
+export const AllTimeSummary = ({ userCurrency }: Props) => {
   const { user } = useAuth();
   const [allTimeSummary, setAllTimeSummary] = useState<IAllTimeSummary>({
     incomeTotal: 0,
@@ -53,15 +59,15 @@ export const AllTimeSummary = () => {
           <>
             <div className='alltime_summary_list_item income'>
               <dt>INCOME TOTAL:</dt>
-              <dd>+{allTimeSummary.incomeTotal}</dd>
+              <dd>+{formatCurrency(allTimeSummary.incomeTotal, userCurrency.code)}</dd>
             </div>
             <div className='alltime_summary_list_item expense'>
               <dt>EXPENSE TOTAL:</dt>
-              <dd>-{allTimeSummary.expenseTotal}</dd>
+              <dd>-{formatCurrency(allTimeSummary.expenseTotal, userCurrency.code)}</dd>
             </div>
             <div className='alltime_summary_list_item'>
               <dt>BALANCE:</dt>
-              <dd>{allTimeSummary.balance}</dd>
+              <dd>{formatCurrency(allTimeSummary.balance, userCurrency.code)}</dd>
             </div>
             <div className='alltime_summary_list_item'>
               <dt>NOTES DONE:</dt>

@@ -1,4 +1,8 @@
-export const CustomTooltip = ({ active, payload }: any) => {
+'use client';
+
+import { formatCurrency } from '@/components/financeNoteCard/FinanceNoteCard';
+
+export const CustomTooltip = ({ active, payload, userCurrency }: any) => {
   if (active && payload && payload.length) {
     const income = payload.find((item: any) => item.dataKey === 'income')?.value || 0;
     const expense = payload.find((item: any) => item.dataKey === 'expense')?.value || 0;
@@ -14,8 +18,8 @@ export const CustomTooltip = ({ active, payload }: any) => {
           textAlign: 'left',
         }}
       >
-        <p style={{ margin: 0, color: 'var(--green-color)', fontSize: '16px' }}>{`Income: ${income}`}</p>
-        <p style={{ margin: 0, color: 'var(--red-color)', fontSize: '16px' }}>{`Expense: ${expense}`}</p>
+        <p style={{ margin: 0, color: 'var(--green-color)', fontSize: '16px' }}>{`Income: ${formatCurrency(income, userCurrency.code)}`}</p>
+        <p style={{ margin: 0, color: 'var(--red-color)', fontSize: '16px' }}>{`Expense: ${formatCurrency(expense, userCurrency.code)}`}</p>
       </div>
     );
   }
