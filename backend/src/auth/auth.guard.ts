@@ -40,7 +40,7 @@ export class AuthGuard implements CanActivate {
       throw new ForbiddenException({ error: 'You do not have permission!' });
     }
 
-    request.user = { id: user.id, name: user.name, roleId: user.roleId, roleName: user.role.name };
+    request.user = { id: user.id, name: user.name, roleId: user.roleId, roleName: user.role.name, currencyId: user.currencyId };
     return true;
   }
 

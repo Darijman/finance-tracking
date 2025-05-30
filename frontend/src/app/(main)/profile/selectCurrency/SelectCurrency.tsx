@@ -43,29 +43,30 @@ export const SelectCurrency = ({ fullUser, setFullUser }: Props) => {
 
   useEffect(() => {
     if (fullUser?.currencyId) {
-      setSelectedCurrencyId(fullUser.currencyId);
+      setSelectedCurrencyId(fullUser?.currencyId);
     }
   }, [fullUser.currencyId]);
 
   const currencyOnSaveHandler = async () => {
-    try {
-      setIsSaving(true);
-      await api.patch(`/users/currency/${selectedCurrencyId}`);
-      setFullUser((prevState) => ({ ...prevState, currencyId: selectedCurrencyId }));
+    if (user.id) {
+      try {
+        setIsSaving(true);
 
-      messageApi.open({
-        type: 'success',
-        content: 'Your currency has been changed!',
-      });
-    } catch (error: any) {
-      const errorText: string = error.response?.data.error;
+        await api.patch(`/users/${user.id}/currency`, { currencyId: selectedCurrencyId });
+        setFullUser((prevState) => ({ ...prevState, currencyId: selectedCurrencyId }));
 
-      messageApi.open({
-        type: 'error',
-        content: errorText,
-      });
-    } finally {
-      setIsSaving(false);
+        messageApi.open({
+          type: 'success',
+          content: 'Your currency has been changed!',
+        });
+      } catch {
+        messageApi.open({
+          type: 'error',
+          content: 'Failed to change currency. Please try again later.',
+        });
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 

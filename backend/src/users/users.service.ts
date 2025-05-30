@@ -129,25 +129,20 @@ export class UsersService {
     return await this.usersRepository.save(user);
   }
 
-  async changeUserCurrencyId(userId: number, currencyId: number): Promise<{ success: boolean }> {
-    if (isNaN(currencyId)) {
-      throw new BadRequestException({ error: 'Invalid Currency ID!' });
-    }
+  async changeUserCurrencyId(userId: number, currencyDto: { currencyId: number }): Promise<{ success: boolean }> {
+    const { currencyId } = currencyDto;
 
-    const user = await this.usersRepository.findOneBy({ id: userId });
-    if (!user) {
-      throw new NotFoundException({ error: 'User not found!' });
-    }
-
+    const user = await this.getUserById(userId);
     if (user.currencyId === currencyId) {
       throw new BadRequestException({ error: 'Invalid currency ID!' });
     }
 
     await this.currenciesService.getCurrencyById(currencyId);
 
-    await this.redisService.deleteValue(getUserFinanceNotesCacheKey(userId)); // delete cached FinanceNotes since currency changed
-    await this.redisService.deleteValue(getUserWithRoleCacheKey(userId)); // delete cached UserWithRole since currency changed
-    await this.redisService.deleteValue(getUserCurrencyCacheKey(userId)); // delete cached UserCurrency since currency changed
+    await this.redisService.deleteValue(getUserFinanceNotesCacheKey(user.id)); // delete cached FinanceNotes since currency changed
+    await this.redisService.deleteValue(getUserWithRoleCacheKey(user.id)); // delete cached UserWithRole since currency changed
+    await this.redisService.deleteValue(getUserCurrencyCacheKey(user.id)); // delete cached UserCurrency since currency changed
+    await this.redisService.deleteValue(getUserByIdCacheKey(user.id)); // delete cached UserCurrency since currency changed
 
     user.currencyId = currencyId;
     await this.usersRepository.save(user);

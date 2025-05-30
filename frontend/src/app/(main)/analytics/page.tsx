@@ -46,7 +46,7 @@ const Analytics = () => {
 
         const [dates, userCurrency] = await Promise.all([
           api.get<AvailableDate[]>(`/finance_notes_summary/months/${user.id}`),
-          api.get<Currency>(`/users/currency/${user.id}`),
+          api.get<Currency>(`/users/${user.id}/currency`),
         ]);
 
         setAvailableDates(dates.data);

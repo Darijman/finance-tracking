@@ -9,6 +9,7 @@ declare module 'express' {
       name: string;
       roleId: number;
       roleName: string;
+      currencyId: number;
     };
     financeNote?: FinanceNote;
     financeCategory?: FinanceCategory;

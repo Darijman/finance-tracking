@@ -1,11 +1,10 @@
-import { Controller, Get, Delete, Body, Param, UseInterceptors, Put, UseGuards, Patch, Req } from '@nestjs/common';
+import { Controller, Get, Delete, Body, Param, UseInterceptors, Put, UseGuards, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './updateUser.dto';
 import { ClassSerializerInterceptor } from '@nestjs/common';
 import { Admin } from 'src/auth/auth.decorators';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { User } from './user.entity';
-import { Request as ExpressRequest } from 'express';
 import { OwnerOrAdminGuard } from 'src/guards/ownerOrAdmin.guard';
 import { Currency } from 'src/currencies/currency.entity';
 
@@ -44,14 +43,14 @@ export class UsersController {
     return await this.usersService.updateUserById(userId, updateUserDto);
   }
 
-  @UseGuards(AuthGuard)
-  @Patch('/currency/:currencyId')
-  async changeUserCurrencyId(@Param('currencyId') currencyId: number, @Req() req: ExpressRequest): Promise<{ success: boolean }> {
-    return await this.usersService.changeUserCurrencyId(req.user.id, currencyId);
+  @UseGuards(AuthGuard, OwnerOrAdminGuard)
+  @Patch(':userId/currency')
+  async changeUserCurrencyId(@Param('userId') userId: number, @Body() currencyDto: { currencyId: number }): Promise<{ success: boolean }> {
+    return await this.usersService.changeUserCurrencyId(userId, currencyDto);
   }
 
   @UseGuards(AuthGuard, OwnerOrAdminGuard)
-  @Get('/currency/:userId')
+  @Get(':userId/currency')
   async getUserCurrency(@Param('userId') userId: number): Promise<Promise<Currency>> {
     return await this.usersService.getUserCurrency(userId);
   }
