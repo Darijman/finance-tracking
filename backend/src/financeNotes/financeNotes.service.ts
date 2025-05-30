@@ -40,31 +40,6 @@ export class FinanceNotesService {
     const { offset = 0, limit = 20, categoryId = null, type = null, sortByDate = 'DESC', sortByPrice = null } = query;
     await this.usersService.getUserById(userId);
 
-    const CACHE_LIMIT: number = 100;
-    const cacheKey: string = getUserFinanceNotesCacheKey(userId);
-
-    const hasFilters = !!categoryId || !!type || sortByPrice !== null || sortByDate !== 'DESC';
-    if (!hasFilters && offset === 0) {
-      const cachedData = await this.redisService.getValue(cacheKey);
-      if (cachedData) {
-        const parsedNotes: FinanceNote[] = JSON.parse(cachedData);
-        return parsedNotes.slice(offset, offset + limit);
-      }
-
-      const notesToCache = await this.notesRepository.find({
-        where: { userId },
-        relations: ['category', 'user', 'user.currency'],
-        order: { noteDate: 'DESC' },
-        take: CACHE_LIMIT,
-      });
-
-      const transformedNotes = plainToInstance(FinanceNote, notesToCache);
-      if (transformedNotes.length) {
-        await this.redisService.setValue(cacheKey, JSON.stringify(transformedNotes), 300); //5min
-      }
-      return transformedNotes.slice(offset, offset + limit);
-    }
-
     const qb = this.notesRepository
       .createQueryBuilder('note')
       .leftJoinAndSelect('note.category', 'category')

@@ -88,5 +88,5 @@ npm run start:dev # starts the backend dev server
 
 ## 📹 Video
 
-
+https://github.com/user-attachments/assets/e83e0b07-0893-414a-b08f-b19bef1bc70a
 
