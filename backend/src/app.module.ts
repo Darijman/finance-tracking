@@ -23,7 +23,7 @@ import { Currency } from './currencies/currency.entity';
       password: '123456789',
       database: 'finance-tracking',
       entities: [FinanceNote, FinanceCategory, User, Role, Currency],
-      synchronize: true,
+      synchronize: false,
       timezone: 'Z',
     }),
     FinanceNotesModule,

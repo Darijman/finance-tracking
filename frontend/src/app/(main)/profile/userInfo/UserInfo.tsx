@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/authContext/AuthContext';
 import { useCallback, useEffect, useState } from 'react';
 import { FullUser } from '@/interfaces/fullUser';
 import { formatDate } from '@/helpers/formatDate';
-import { FinanceNote } from '@/interfaces/financeNote';
 import { Typography } from 'antd';
 import api from '../../../../../axiosInstance';
 import './userInfo.css';
@@ -19,23 +18,31 @@ interface Props {
 export const UserInfo = ({ fullUser }: Props) => {
   const { user } = useAuth();
 
-  const [userFinanceNotes, setUserFinanceNotes] = useState<FinanceNote[]>([]);
+  const [userFinanceNotesCount, setUserFinanceNotesCount] = useState<{ count: number }>({
+    count: 0,
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [serverError, setServerError] = useState<{ error: string }>({ error: '' });
 
-  const getNotesByUserId = useCallback(async () => {
+  const getUserNotesCount = useCallback(async () => {
     if (user.id) {
       try {
-        const response = await api.get<FinanceNote[]>(`/finance_notes/user/${user.id}`);
-        setUserFinanceNotes(response.data);
+        setIsLoading(true);
+
+        const response = await api.get<{ count: number }>(`/finance_notes/user/${user.id}/count`);
+        setUserFinanceNotesCount(response.data);
       } catch (error: any) {
         setServerError(error.response?.data || 'Something went wrong...');
+      } finally {
+        setIsLoading(false);
       }
     }
   }, [user.id]);
 
   useEffect(() => {
-    getNotesByUserId();
-  }, [getNotesByUserId]);
+    getUserNotesCount();
+  }, [getUserNotesCount]);
 
   return (
     <div className='user_info'>
@@ -63,7 +70,13 @@ export const UserInfo = ({ fullUser }: Props) => {
             </div>
             <div className='userinfo_list_item'>
               <dt>Finance-Notes:</dt>
-              <dd>{userFinanceNotes.length}</dd>
+              <dd>
+                {isLoading ? (
+                  <div style={{ color: 'var(--secondary-text-color)' }}>Loading..</div>
+                ) : (
+                  userFinanceNotesCount.count.toLocaleString('ru-RU')
+                )}
+              </dd>
             </div>
           </>
         )}

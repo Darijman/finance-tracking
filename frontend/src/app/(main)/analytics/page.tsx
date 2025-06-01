@@ -59,8 +59,6 @@ const Analytics = () => {
     }
   }, [user.id, hideLoader, showLoader]);
 
-  console.log(`userCurrency`, userCurrency);
-
   useEffect(() => {
     getData();
   }, [getData]);

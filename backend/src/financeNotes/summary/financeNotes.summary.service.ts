@@ -19,8 +19,10 @@ export class FinanceNotesSummaryService {
 
     const results = await this.notesRepository
       .createQueryBuilder('note')
-      .select(['DISTINCT EXTRACT(MONTH FROM note.noteDate) AS month', 'EXTRACT(YEAR FROM note.noteDate) AS year'])
+      .select(['EXTRACT(YEAR FROM note.noteDate) AS year', 'EXTRACT(MONTH FROM note.noteDate) AS month'])
       .where('note.userId = :userId', { userId })
+      .groupBy('year')
+      .addGroupBy('month')
       .orderBy('year', 'DESC')
       .addOrderBy('month', 'DESC')
       .getRawMany();
@@ -44,34 +46,34 @@ export class FinanceNotesSummaryService {
     const start = new Date(targetYear, targetMonth - 1, 1);
     const end = new Date(targetYear, targetMonth, 1);
 
-    const [incomeTotalResult, expenseTotalResult, noteCountResult] = await Promise.all([
-      this.notesRepository
-        .createQueryBuilder('note')
-        .select('SUM(note.amount)', 'total')
-        .where('note.userId = :userId', { userId })
-        .andWhere('note.type = :type', { type: 'INCOME' })
-        .andWhere('note.noteDate >= :start AND note.noteDate < :end', { start, end })
-        .getRawOne(),
+    const results = await this.notesRepository
+      .createQueryBuilder('note')
+      .select('note.type', 'type')
+      .addSelect('SUM(note.amount)', 'total')
+      .addSelect('COUNT(*)', 'count')
+      .where('note.userId = :userId', { userId })
+      .andWhere('note.noteDate >= :start AND note.noteDate < :end', { start, end })
+      .groupBy('note.type')
+      .getRawMany();
 
-      this.notesRepository
-        .createQueryBuilder('note')
-        .select('SUM(note.amount)', 'total')
-        .where('note.userId = :userId', { userId })
-        .andWhere('note.type = :type', { type: 'EXPENSE' })
-        .andWhere('note.noteDate >= :start AND note.noteDate < :end', { start, end })
-        .getRawOne(),
+    // Инициализируем переменные с нулями
+    let incomeTotal = 0;
+    let expenseTotal = 0;
+    let noteCount = 0;
 
-      this.notesRepository
-        .createQueryBuilder('note')
-        .select('COUNT(*)', 'count')
-        .where('note.userId = :userId', { userId })
-        .andWhere('note.noteDate >= :start AND note.noteDate < :end', { start, end })
-        .getRawOne(),
-    ]);
+    // Обрабатываем результаты, заполняя суммы и счетчики
+    for (const row of results) {
+      const total = Number(row.total) || 0;
+      const count = Number(row.count) || 0;
 
-    const incomeTotal = Number(incomeTotalResult?.total) || 0;
-    const expenseTotal = Number(expenseTotalResult?.total) || 0;
-    const noteCount = Number(noteCountResult?.count) || 0;
+      if (row.type === 'INCOME') {
+        incomeTotal = total;
+        noteCount += count;
+      } else if (row.type === 'EXPENSE') {
+        expenseTotal = total;
+        noteCount += count;
+      }
+    }
 
     return {
       incomeTotal,
@@ -127,18 +129,17 @@ export class FinanceNotesSummaryService {
       .createQueryBuilder('note')
       .select([
         "DATE_FORMAT(note.noteDate, '%Y-%m') AS monthRaw",
-        "DATE_FORMAT(note.noteDate, '%Y-%M') AS monthLabel",
         "SUM(CASE WHEN note.type = 'INCOME' THEN note.amount ELSE 0 END) AS income",
         "SUM(CASE WHEN note.type = 'EXPENSE' THEN note.amount ELSE 0 END) AS expense",
       ])
       .where('note.userId = :userId', { userId })
-      .groupBy("DATE_FORMAT(note.noteDate, '%Y-%m'), DATE_FORMAT(note.noteDate, '%Y-%M')")
+      .groupBy('monthRaw')
       .orderBy('monthRaw', 'ASC')
       .getRawMany();
 
     return result.map((row) => ({
       monthRaw: row.monthRaw,
-      monthLabel: row.monthLabel,
+      monthLabel: new Date(row.monthRaw + '-01').toLocaleString('default', { year: 'numeric', month: 'long' }),
       income: parseFloat(row.income),
       expense: parseFloat(row.expense),
     }));

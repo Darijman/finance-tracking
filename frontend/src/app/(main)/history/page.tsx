@@ -36,13 +36,7 @@ const History = () => {
   const [financeCategories, setFinanceCategories] = useState<FinanceCategory[]>([]);
 
   const [queryLoader, setQueryLoader] = useState<boolean>(false);
-  const [query, setQuery] = useState<GetUserNotesQuery>({
-    limit: 20,
-    sortByDate: 'DESC',
-    sortByPrice: null,
-    type: null,
-    categoryId: null,
-  });
+  const [query, setQuery] = useState<GetUserNotesQuery>(initialQuery);
 
   const [offset, setOffset] = useState<number>(0);
 
@@ -56,16 +50,14 @@ const History = () => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
-  const getInitialData = useCallback(async () => {
+  const getCategories = useCallback(async () => {
     if (user.id) {
       try {
         setHasError(false);
         showLoader();
-        const [notes, categories] = await Promise.all([getUserNotes(user.id, initialQuery), getFinanceCategories(user.id)]);
+        const categories = await getFinanceCategories(user.id);
 
-        setUserFinanceNotes(notes);
         setFinanceCategories(categories);
-        setHasMore(notes.length === 20);
       } catch {
         setHasError(true);
       } finally {
@@ -74,23 +66,26 @@ const History = () => {
     }
   }, [user, hideLoader, showLoader]);
 
-  const getDataOnQueryChange = useCallback(async () => {
-    if (user.id) {
-      try {
-        setQueryLoader(true);
-        setHasError(false);
-        setOffset(0);
+  const getDataOnQueryChange = useCallback(
+    async (query: GetUserNotesQuery) => {
+      if (user.id) {
+        try {
+          setQueryLoader(true);
+          setHasError(false);
+          setOffset(0);
 
-        const notes = await getUserNotes(user.id, { ...query, offset: 0 });
-        setUserFinanceNotes(notes);
-        setHasMore(notes.length === 20);
-      } catch {
-        setHasError(true);
-      } finally {
-        setQueryLoader(false);
+          const notes = await getUserNotes(user.id, { ...query, offset: 0 });
+          setUserFinanceNotes(notes);
+          setHasMore(notes.length === 20);
+        } catch {
+          setHasError(true);
+        } finally {
+          setQueryLoader(false);
+        }
       }
-    }
-  }, [user.id, query]);
+    },
+    [user.id],
+  );
 
   const loadMoreUserFinanceNotes = useCallback(async () => {
     if (!hasMore || loadingMore || hasError || !user.id) return;
@@ -114,12 +109,12 @@ const History = () => {
   }, [user.id, hasMore, loadingMore, hasError, query, offset]);
 
   useEffect(() => {
-    getInitialData();
-  }, [getInitialData]);
+    getDataOnQueryChange(query);
+  }, [query, getDataOnQueryChange]);
 
   useEffect(() => {
-    getDataOnQueryChange();
-  }, [getDataOnQueryChange]);
+    getCategories();
+  }, [getCategories]);
 
   useEffect(() => {
     if (hasError) {

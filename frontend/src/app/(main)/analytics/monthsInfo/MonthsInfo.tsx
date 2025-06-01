@@ -19,17 +19,22 @@ interface Props {
 export const MonthsInfo = ({ userCurrency }: Props) => {
   const { user } = useAuth();
   const [months, setMonths] = useState<Month[]>([]);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
 
   const getMonthsInfo = useCallback(async () => {
     if (user.id) {
       try {
+        setIsLoading(true);
         setHasError(false);
 
         const response = await api.get<Month[]>(`/finance_notes_summary/monthly/${user.id}`);
         setMonths(response.data);
       } catch {
         setHasError(true);
+      } finally {
+        setIsLoading(false);
       }
     }
   }, [user.id]);
@@ -45,7 +50,9 @@ export const MonthsInfo = ({ userCurrency }: Props) => {
       variant='borderless'
     >
       <ResponsiveContainer width='100%' height={400} style={{ backgroundColor: 'var(--background-color)' }}>
-        {hasError ? (
+        {isLoading ? (
+          <div style={{ color: 'var(--secondary-text-color)', paddingTop: '15%' }}>Loading...</div>
+        ) : hasError ? (
           <div
             style={{
               width: '100%',

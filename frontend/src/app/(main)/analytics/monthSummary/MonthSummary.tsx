@@ -77,14 +77,21 @@ export const MonthSummary = ({ availableDates, userCurrency }: Props) => {
   }, [selectedDate]);
 
   const dates = useMemo(() => {
-    return [
-      ...availableDates.map(({ month, year }) => {
-        const date = new Date(year, month - 1);
-        const label = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-        const value = `${year}-${month.toString().padStart(2, '0')}`;
-        return { value, label };
-      }),
-    ];
+    const currentLabel = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+    const mappedDates = availableDates.map(({ month, year }) => {
+      const date = new Date(year, month - 1);
+      const label = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+      const value = `${year}-${month.toString().padStart(2, '0')}`;
+      return { value, label };
+    });
+
+    const hasCurrentDate = mappedDates.some((date) => date.value === currentStateDate);
+    if (!hasCurrentDate) {
+      return [{ value: currentStateDate, label: currentLabel }, ...mappedDates];
+    }
+
+    return mappedDates;
   }, [availableDates]);
 
   const renderContent = () => {
@@ -112,7 +119,7 @@ export const MonthSummary = ({ availableDates, userCurrency }: Props) => {
         </div>
         <div className='alltime_summary_list_item'>
           <dt>NOTES DONE:</dt>
-          <dd>{monthSummary.noteCount}</dd>
+          <dd>{monthSummary.noteCount.toLocaleString('ru-RU')}</dd>
         </div>
       </>
     );
@@ -126,11 +133,12 @@ export const MonthSummary = ({ availableDates, userCurrency }: Props) => {
         </Title>
         <Select
           placeholder='Select a date'
-          value={displayedDate}
+          value={selectedDate}
           onChange={dateOnChangeHandler}
           style={{ width: 200, textAlign: 'center' }}
           options={dates}
           loading={isLoading}
+          disabled={isLoading}
         />
       </div>
       <dl className='month_summary_list'>{renderContent()}</dl>

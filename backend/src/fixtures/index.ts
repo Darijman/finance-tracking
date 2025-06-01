@@ -6,19 +6,21 @@ import { seedUsers } from './users.fixture';
 
 export async function seed() {
   if (!AppDataSource.isInitialized) {
-    await AppDataSource.initialize();
+    return await AppDataSource.initialize();
   }
   console.log('🔗 Database connected');
 
-  await seedRoles(AppDataSource);
-  await seedCurrencies(AppDataSource);
-  await seedUsers(AppDataSource);
-  await seedFinanceCategories(AppDataSource);
-
-  await AppDataSource.destroy();
-  console.log('🌱 Seeding complete');
+  try {
+    await seedRoles(AppDataSource);
+    await seedCurrencies(AppDataSource);
+    await seedUsers(AppDataSource);
+    await seedFinanceCategories(AppDataSource);
+  } catch (err) {
+    console.error('❌ Seeding failed', err);
+  } finally {
+    await AppDataSource.destroy();
+    console.log('🌱 Seeding complete');
+  }
 }
 
-seed().catch((err) => {
-  console.error('❌ Seeding failed', err);
-});
+seed();

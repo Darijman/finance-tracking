@@ -37,36 +37,62 @@ export class FinanceNotesService {
   }
 
   async getFinanceNotesByUserId(userId: number, query: UserFinanceNotesQuery): Promise<FinanceNote[]> {
-    const { offset = 0, limit = 20, categoryId = null, type = null, sortByDate = 'DESC', sortByPrice = null } = query;
-    await this.usersService.getUserById(userId);
+    const MAX_LIMIT: number = 100;
+    const { offset = 0, limit = 20, categoryId, type, sortByDate = 'DESC', sortByPrice } = query;
 
-    const qb = this.notesRepository
+    if (limit > MAX_LIMIT) {
+      throw new BadRequestException({ error: 'Limit exceeded!' });
+    }
+
+    await this.usersService.getUserById(userId);
+    const baseQb = this.notesRepository
+      .createQueryBuilder('note')
+      .select(['note.id'])
+      .where('note.userId = :userId', { userId })
+      .skip(offset)
+      .take(limit);
+
+    if (categoryId) baseQb.andWhere('note.categoryId = :categoryId', { categoryId });
+    if (type) baseQb.andWhere('note.type = :type', { type });
+    if (sortByPrice) {
+      baseQb.orderBy('note.amount', sortByPrice);
+    }
+    baseQb.orderBy('note.noteDate', sortByDate).addOrderBy('note.id', 'ASC');
+
+    const idsWithOrder = await baseQb.getRawMany<{ note_id: number }>();
+    const ids = idsWithOrder.map((row) => row.note_id);
+    if (!ids.length) return [];
+
+    const finalQb = this.notesRepository
       .createQueryBuilder('note')
       .leftJoinAndSelect('note.category', 'category')
       .leftJoinAndSelect('note.user', 'user')
       .leftJoinAndSelect('user.currency', 'currency')
-      .where('note.userId = :userId', { userId });
+      .whereInIds(ids);
 
-    if (categoryId) qb.andWhere('category.id = :categoryId', { categoryId });
-    if (type) qb.andWhere('note.type = :type', { type });
-    if (sortByPrice) {
-      qb.addSelect('note.amount * 1.0', 'amount_numeric');
-      qb.orderBy('amount_numeric', sortByPrice as 'ASC' | 'DESC');
-      qb.addOrderBy('note.noteDate', sortByDate || 'DESC');
-    } else {
-      qb.orderBy('note.noteDate', sortByDate || 'DESC');
-    }
-
-    qb.skip(offset).take(limit);
-    const notes = await qb.getMany();
+    finalQb.orderBy(`FIELD(note.id, ${ids.join(',')})`);
+    const notes = await finalQb.getMany();
     return plainToInstance(FinanceNote, notes);
   }
 
-  async createNewFinanceNote(createFinanceNoteDto: CreateFinanceNoteDto, currentUserId: number): Promise<FinanceNote> {
-    const createdNote = await this.notesRepository.save({ ...createFinanceNoteDto, userId: currentUserId });
+  async getFinanceNotesCountByUserId(userId: number): Promise<{ count: number }> {
+    const count = await this.notesRepository.count({ where: { userId } });
+    return { count };
+  }
 
+  async createNewFinanceNote(createFinanceNoteDto: CreateFinanceNoteDto, currentUserId: number): Promise<FinanceNote> {
+    console.time('⏱ CreateNote total');
+
+    console.time('⏱ Save note');
+    const createdNote = await this.notesRepository.save({ ...createFinanceNoteDto, userId: currentUserId });
+    console.timeEnd('⏱ Save note');
+
+    console.time('⏱ Delete user cache');
     const userCacheKey: string = getUserFinanceNotesCacheKey(currentUserId);
     await this.redisService.deleteValue(userCacheKey);
+    console.timeEnd('⏱ Delete user cache');
+
+    console.timeEnd('⏱ CreateNote total');
     return createdNote;
   }
 

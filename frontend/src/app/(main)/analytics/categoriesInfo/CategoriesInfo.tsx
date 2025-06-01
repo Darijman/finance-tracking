@@ -88,14 +88,17 @@ export const CategoriesInfo = ({ availableDates, userCurrency }: Props) => {
   }));
 
   const dates = useMemo(() => {
-    return [
-      ...availableDates.map(({ month, year }) => {
-        const date = new Date(year, month - 1);
-        const label = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-        const value = `${year}-${month.toString().padStart(2, '0')}`;
-        return { value, label };
-      }),
-    ];
+    const currentLabel = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+    const mappedDates = availableDates.map(({ month, year }) => {
+      const date = new Date(year, month - 1);
+      const label = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+      const value = `${year}-${month.toString().padStart(2, '0')}`;
+      return { value, label };
+    });
+
+    const hasCurrentDate = mappedDates.some((date) => date.value === currentDate);
+    return hasCurrentDate ? mappedDates : [{ value: currentDate, label: currentLabel }, ...mappedDates];
   }, [availableDates]);
 
   const formattedDate = new Date(selectedDate).toLocaleString('en-US', {
@@ -115,11 +118,12 @@ export const CategoriesInfo = ({ availableDates, userCurrency }: Props) => {
             <div className='card_select_wrapper'>
               <Select
                 placeholder='Select a date'
-                value={formattedDate}
+                value={selectedDate}
                 onChange={monthOnChangeHandler}
                 style={{ width: 200, marginBottom: '10px' }}
                 options={dates}
                 loading={isLoading}
+                disabled={isLoading}
               />
             </div>
           </div>

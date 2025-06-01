@@ -4,7 +4,6 @@ import { IsNull, Repository } from 'typeorm';
 import { FinanceCategory } from './financeCategory.entity';
 import { CreateFinanceCategoryDto } from './createFinanceCategory.dto';
 import { UpdateFinanceCategoryDto } from './updateFinanceCategory.dto';
-import { UsersService } from 'src/users/users.service';
 import { RedisService } from 'src/common/redis/redis.service';
 import { CreateUserFinanceCategoryDto } from './createUserFinanceCategory.dto';
 import { FinanceNote } from 'src/financeNotes/financeNote.entity';
@@ -22,7 +21,6 @@ export class FinanceCategoriesService {
     @InjectRepository(FinanceNote)
     private financeNotesRepository: Repository<FinanceNote>,
 
-    private readonly usersService: UsersService,
     private readonly redisService: RedisService,
   ) {}
 

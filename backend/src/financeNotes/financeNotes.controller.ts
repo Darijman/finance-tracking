@@ -27,6 +27,12 @@ export class FinanceNotesController {
     return await this.financeNotesService.getFinanceNotesByUserId(userId, query);
   }
 
+  @UseGuards(AuthGuard, OwnerOrAdminGuard)
+  @Get('user/:userId/count')
+  async getFinanceNotesCountByUserId(@Param('userId') userId: number): Promise<{ count: number }> {
+    return await this.financeNotesService.getFinanceNotesCountByUserId(userId);
+  }
+
   @UseGuards(AuthGuard)
   @Post()
   async createNewFinanceNote(@Body() createNoteDto: CreateFinanceNoteDto, @Req() req: Request): Promise<FinanceNote> {

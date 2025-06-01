@@ -71,7 +71,7 @@ export const AllTimeSummary = ({ userCurrency }: Props) => {
             </div>
             <div className='alltime_summary_list_item'>
               <dt>NOTES DONE:</dt>
-              <dd>{allTimeSummary.noteCount}</dd>
+              <dd>{allTimeSummary.noteCount.toLocaleString('ru-RU')}</dd>
             </div>
           </>
         )}
